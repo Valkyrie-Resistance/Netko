@@ -1,24 +1,22 @@
 {
-  "name": "chad-chat",
+  "name": "@chad-chat",
   "private": true,
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "fmt-lint": "biome check .",
+    "fmt-lint:fix": "biome check . --write",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
     "turbo": "^2.5.4",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "@biomejs/biome": "1.9.4"
   },
   "engines": {
     "node": ">=18"
   },
   "packageManager": "bun@1.2.14",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "workspaces": ["apps/*", "packages/shared/*"]
 }

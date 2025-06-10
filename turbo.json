@@ -16,6 +16,10 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "//#fmt-lint": {},
+    "//#fmt-lint:fix": {
+      "cache": false
     }
   }
 }
