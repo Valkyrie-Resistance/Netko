@@ -13,6 +13,9 @@
       "suspicious": {
         "noArrayIndexKey": "off"
       },
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
       "style": {
         "useNamingConvention": {
           "level": "error",
@@ -77,6 +80,7 @@
       "dist/**/**",
       ".turbo/**",
       ".next/**",
+      "generated/prisma/**/**",
       // Ignore UI package since is shadcn/ui generated
       "packages/shared/ui/**/**"
     ]

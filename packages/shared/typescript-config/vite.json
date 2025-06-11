@@ -1,0 +1,4 @@
+{
+  "files": [],
+  "references": [{ "path": "./vite.app.json" }, { "path": "./vite.node.json" }]
+}
