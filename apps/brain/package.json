@@ -4,10 +4,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --watch src/index.ts",
+    "dev": "bun run db:migrate && bun --watch src/index.ts",
     "build": "bun build src/index.ts --target bun --outdir ./dist",
     "start": "NODE_ENV=production bun dist/index.js",
-    "test": "bun test"
+    "test": "bun test",
+    "db:migrate": "bun run --env-file=.env --filter @chad-chat/brain-repository db:migrate"
   },
   "devDependencies": {
     "@types/bun": "latest",
