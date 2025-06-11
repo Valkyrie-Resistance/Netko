@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "better-auth": "^1.2.9",
-    "@chad-chat/brain-domain": "workspace:*",
-    "@chad-chat/brain-entities": "workspace:*"
+    "@chad-chat/brain-domain": "workspace:*"
   }
 }
