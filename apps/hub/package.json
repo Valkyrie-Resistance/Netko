@@ -17,10 +17,12 @@
     "next": "15.3.2"
   },
   "devDependencies": {
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react-swc": "^3.9.0",
+    "globals": "^16.0.0",
     "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "vite": "^6.3.5",
     "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4",
     "@chad-chat/typescript-config": "workspace:*"

@@ -12,7 +12,8 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@chad-chat/typescript-config": "workspace:*"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",
