@@ -6,8 +6,17 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "db:generate": "prisma generate --schema ./src/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --skip-generate --schema ./src/prisma/schema.prisma",
+    "db:deploy": "prisma migrate deploy --schema ./src/prisma/schema.prisma"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "prisma": "^6.9.0"
   }
 }
