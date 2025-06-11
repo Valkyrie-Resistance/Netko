@@ -69,7 +69,7 @@ model Verification {
 }
 
 model Chat {
-  id        String     @id
+  id        String     @id @default(cuid())
   title     String
   userId    String
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -81,7 +81,7 @@ model Chat {
 }
 
 model Message {
-  id        String   @id
+  id        String   @id @default(cuid())
   chatId    String
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   content   String

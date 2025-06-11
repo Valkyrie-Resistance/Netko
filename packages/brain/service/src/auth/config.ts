@@ -1,39 +1,34 @@
 import { prisma } from '@chad-chat/brain-repository'
+import { env } from '@chad-chat/brain-service/env'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 
-type EnvironmentMode = 'warn' | 'throw' | 'silent'
+const hasGithubCredentials = env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
+const hasGoogleCredentials = env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
 
-const getEnv = (key: string, mode: EnvironmentMode = 'warn'): string | undefined => {
-  const value = process.env[key]
-  if (!value) {
-    const message = `Environment variable ${key} missing or empty.`
-    if (mode === 'warn') {
-      console.warn(`Environment variable ${key} is not set.`)
-    } else if (mode === 'throw') {
-      throw new Error(`Environment variable ${key} is required but not set.`)
-    }
-    return undefined
-  }
-  return value
-}
-
-const githubClientId = process.env.GITHUB_CLIENT_ID
-const githubClientSecret = process.env.GITHUB_CLIENT_SECRET
-const googleClientId = process.env.GOOGLE_CLIENT_ID
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
-
-const hasGithubCredentials = githubClientId && githubClientSecret
-const hasGoogleCredentials = googleClientId && googleClientSecret
-
-if (!hasGithubCredentials || !hasGoogleCredentials) {
+if (!hasGithubCredentials && !hasGoogleCredentials) {
   console.error(
     'No social provider credentials found. Please set environment variables for GitHub or Google.',
   )
   process.exit(1)
 }
 
-export const auth = betterAuth({
+const socialProviders: Record<string, { clientId: string; clientSecret: string }> = {}
+
+if (hasGithubCredentials) {
+  socialProviders.github = {
+    clientId: env.GITHUB_CLIENT_ID as string,
+    clientSecret: env.GITHUB_CLIENT_SECRET as string,
+  }
+}
+if (hasGoogleCredentials) {
+  socialProviders.google = {
+    clientId: env.GOOGLE_CLIENT_ID as string,
+    clientSecret: env.GOOGLE_CLIENT_SECRET as string,
+  }
+}
+
+const config = {
   basePath: '/api',
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
@@ -41,14 +36,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: false,
   },
-  socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    },
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
-  },
-})
+  socialProviders,
+}
+
+export const auth = betterAuth(config)

@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./env": "./src/config/env-checker.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -12,6 +13,7 @@
   },
   "dependencies": {
     "better-auth": "^1.2.9",
-    "@chad-chat/brain-repository": "workspace:*"
+    "@chad-chat/brain-domain": "workspace:*",
+    "@chad-chat/brain-entities": "workspace:*"
   }
 }
