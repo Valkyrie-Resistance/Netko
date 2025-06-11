@@ -4,13 +4,14 @@
   "type": "module",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./env-schema": "./src/entities/config.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5"
   },
   "dependencies": {
-    "zod": "^3.25.57"
+    "zod": "^3.25.58"
   }
 }
