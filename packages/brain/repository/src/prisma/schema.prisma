@@ -8,8 +8,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
 model User {
-  id            String    @id
+  id            String       @id
   name          String
   email         String
   emailVerified Boolean
@@ -19,6 +25,9 @@ model User {
   sessions      Session[]
   accounts      Account[]
   threads       Thread[]
+  Assistant     Assistant[]
+  Message       Message[]
+  SharedChat    SharedChat[]
 
   @@unique([email])
   @@map("user")
@@ -69,26 +78,117 @@ model Verification {
   @@map("verification")
 }
 
+model LLMModel {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  provider    String
+  displayName String
+  isActive    Boolean @default(true)
+
+  assistants Assistant[]
+  messages   Message[]
+
+  @@map("llm_model")
+}
+
+model Assistant {
+  id           String  @id @default(cuid())
+  name         String
+  description  String?
+  systemPrompt String
+  temperature  Float   @default(0.7)
+  maxTokens    Int?
+  isPublic     Boolean @default(false)
+
+  defaultModelId String?
+  defaultModel   LLMModel? @relation(fields: [defaultModelId], references: [id])
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  threads  Thread[]
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("assistant")
+}
+
 model Thread {
-  id        String    @id @default(cuid())
-  title     String
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages  Message[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id    String  @id @default(cuid())
+  title String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  assistantId String
+  assistant   Assistant @relation(fields: [assistantId], references: [id])
+
+  parentId String?
+  parent   Thread?  @relation("ThreadBranches", fields: [parentId], references: [id])
+  branches Thread[] @relation("ThreadBranches")
+
+  messages    Message[]
+  sharedChats SharedChat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([createdAt, id])
-  @@map("chat")
+  @@index([userId])
+  @@index([parentId])
+  @@map("thread")
 }
 
 model Message {
-  id        String   @id @default(cuid())
-  threadId  String
-  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  content   String
+  id      String      @id @default(cuid())
+  content String
+  role    MessageRole
+
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  assistantId String?
+  assistant   Assistant? @relation(fields: [assistantId], references: [id])
+
+  modelId String?
+  model   LLMModel? @relation(fields: [modelId], references: [id])
+
+  parentId String?
+  parent   Message?  @relation("MessageBranches", fields: [parentId], references: [id])
+  branches Message[] @relation("MessageBranches")
+
+  tokenCount Int?
+  metadata   Json?
+
   createdAt DateTime @default(now())
 
+  @@index([threadId])
+  @@index([parentId])
   @@index([createdAt, id])
   @@map("message")
+}
+
+model SharedChat {
+  id      String @id @default(cuid())
+  shareId String @unique @default(cuid())
+
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  sharedById String
+  sharedBy   User   @relation(fields: [sharedById], references: [id])
+
+  shareUpToMessageId String?
+  isPublic           Boolean   @default(true)
+  expiresAt          DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([shareId])
+  @@map("shared_chat")
 }
