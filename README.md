@@ -1,84 +1,132 @@
-# Turborepo starter
+# chad-chat
 
-This Turborepo starter is maintained by the Turborepo core team.
+Welcome to **chad-chat** — your digital laboratory for AI banter and multi-LLM mischief! 🧪💬
 
-## Using this example
+Ever wanted to wrangle a squad of language models, sync your wildest conversations, and experiment with the bleeding edge of AI—all in one stylish playground? You're in the right timeline. Built for the T3 Chat Cloneathon, chad-chat is where ideas spark, personalities (AI and human) collide, and inspiration is just one message away.
 
-Run the following command:
+> ⚡️ Side effects may include spontaneous brainstorming, worldline shifts, and the urge to build something cool.
 
-```sh
-npx create-turbo@latest
-```
+---
 
-## What's inside?
+## 🚀 Features
 
-This Turborepo includes the following packages/apps:
+- **Multi-LLM Playground:**  
+  Chat with a whole crew of language models (LLMs) — swap between them like you're flipping channels in the multiverse! 🌌
+- **Conversation Sync:**  
+  Your chat history and threads are always saved — never lose a vital message, even if you accidentally diverge from the main worldline. 🕰️💾
+- **Modern UI:**  
+  Modular, reusable, and as smooth as a well-oiled gadget. Powered by shadcn/ui. 🎛️✨
+- **Experimentation Hub:**  
+  Try out new models, prompts, and features in a safe, sandboxed environment. Go wild — we won't judge. 🧑‍🔬🧪
 
-### Apps and Packages
+---
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 🧪 Tech Stack
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Frontend:**  
+  - [React](https://react.dev/) (with [@tanstack/react-router](https://tanstack.com/router/latest)) ⚛️
+  - Vite ⚡️
+  - shadcn/ui component system 🧩
+  - TypeScript 🦕
 
-### Utilities
+- **Backend:**  
+  - Node.js (Bun for package management) 🍞
+  - [Prisma ORM](https://www.prisma.io/) with **PostgreSQL** 🐘
+  - Modular service, domain, and repository layers 🗂️
+  - Auth via [better-auth](https://github.com/your-org/better-auth) with Prisma adapter 🔐
 
-This Turborepo has some additional tools already setup for you:
+- **Monorepo Tooling:**  
+  - [Turborepo](https://turbo.build/) for monorepo management 🏎️
+  - Biome for formatting and linting 🌳
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+---
 
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
+## 🏗️ Project Structure
 
 ```
-cd my-turborepo
-pnpm dev
+chad-chat/
+  apps/
+    hub/        # Frontend (React, TanStack Router, shadcn/ui)
+    brain/      # Backend entrypoint
+  packages/
+    brain/
+      domain/   # Domain-driven design: entities, factories, values
+      repository/ # Prisma ORM, database access, migrations
+      service/  # Business logic, auth, config
+    shared/
+      ui/       # Reusable UI components, chat UIs, shadcn/ui wrappers
+      typescript-config/
+      clients/
+  turbo/        # Turborepo generators and templates
 ```
 
-### Remote Caching
+- **apps/hub:**  
+  The main web app, built with React and TanStack Router. Your portal to the multiverse of chat. 🖥️🚪
+- **apps/brain:**  
+  Backend entrypoint, orchestrating services and database access. The brains behind the banter. 🧠
+- **packages/brain/domain:**  
+  Domain logic: entities, value objects, and factories. The DNA of your chat world. 🧬
+- **packages/brain/repository:**  
+  Prisma schema, migrations, and database adapters (PostgreSQL). Where your data finds a home. 🏡
+- **packages/brain/service:**  
+  Business logic, authentication, and configuration. The secret sauce. 🥫
+- **packages/shared/ui:**  
+  Design system and chat UI components (shadcn/ui, chat, markdown, audio, etc). The wardrobe and props for your chat stage. 🎭
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 🕹️ Getting Started
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Ready to fire up your own lab? 🧑‍🔬
 
-```
-cd my-turborepo
-npx turbo login
-```
+1. **Install dependencies:**  
+   ```sh
+   bun install
+   ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+2. **Set up your database:**  
+   - Copy `.env.example` to `.env` and configure your PostgreSQL connection. 📝
+   - Run Prisma migrations:
+     ```sh
+     bunx prisma migrate deploy
+     ```
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+3. **Start the dev environment:**  
+   ```sh
+   turbo run dev
+   ```
 
-```
-npx turbo link
-```
+4. **Open [http://localhost:3000](http://localhost:3000) and start chatting!** 🎉
 
-## Useful Links
+---
 
-Learn more about the power of Turborepo:
+## 🏡 Self-Hosting (WIP)
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Dreaming of running chad-chat from your own secret lab? 🏰
+
+Self-hosting support is coming soon! 🛠️  
+Stay tuned for updates on how to deploy chad-chat on your own infrastructure. (No microwave time machine required — just a bit of patience as we stabilize the worldline.)
+
+---
+
+## 🧑‍🔬 Contributing
+
+Pull requests and lab memos welcome! 📝
+Help us build the ultimate chat playground — your contributions may just shift the worldline. ✨
+
+Whether you're a code sorcerer, a documentation wizard, or just have a wild idea, hop in! The more, the merrier. 🧙‍♂️🤝
+
+---
+
+## ⚠️ Disclaimer
+
+This project is for experimentation and fun.  
+May cause time paradoxes, spontaneous inspiration, or the urge to shout mysterious phrases at your computer. 🌀
+
+Proceed at your own risk — and remember, the only constant is change (and maybe a little chaos). Divergence is expected. 🦋
+
+---
+
+## 🧭 License
+
+MIT — because the best worldlines are open source. 📜
