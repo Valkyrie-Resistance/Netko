@@ -1,11 +1,24 @@
 {
   "extends": "@chad-chat/typescript-config/react-library.json",
   "compilerOptions": {
-    "jsx": "react",
+    "jsx": "react-jsx",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM"],
     "baseUrl": ".",
     "paths": {
       "@chad-chat/ui/*": [
         "./src/*"
+      ],
+      "@/hooks": [
+        "./src/hooks/*"
+      ],
+      "@/lib": [
+        "./src/lib/*"
+      ],
+      "@/components": [
+        "./src/components/*"
       ]
     }
   },

@@ -4,27 +4,45 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview"
   },
   "dependencies": {
     "@chad-chat/ui": "workspace:*",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-collapsible": "^1.1.11",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "@tanstack/react-router": "^1.121.2",
+    "@tanstack/react-router-devtools": "^1.121.5",
+    "better-auth": "^1.2.9",
+    "class-variance-authority": "^0.7.1",
+    "framer-motion": "11",
+    "lucide-react": "^0.514.0",
+    "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next-themes": "^0.4.4",
-    "next": "15.3.2"
+    "react-markdown": "10",
+    "remark-gfm": "4",
+    "remeda": "2",
+    "shiki": "1",
+    "sonner": "^2.0.5"
   },
   "devDependencies": {
+    "@chad-chat/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4",
+    "@tanstack/router-plugin": "^1.121.4",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "globals": "^16.0.0",
-    "typescript": "^5",
-    "vite": "^6.3.5",
-    "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4",
-    "@chad-chat/typescript-config": "workspace:*"
+    "typescript": "^5",
+    "vite": "^6.3.5"
   }
 }

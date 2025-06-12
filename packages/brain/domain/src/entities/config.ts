@@ -1,27 +1,46 @@
 import { z } from 'zod'
 
-export const environmentSchema = z
-  .object({
-    GITHUB_CLIENT_ID: z.string().optional(),
-    GITHUB_CLIENT_SECRET: z.string().optional(),
-    GOOGLE_CLIENT_ID: z.string().optional(),
-    GOOGLE_CLIENT_SECRET: z.string().optional(),
-  })
-  .superRefine((env, ctx) => {
-    const hasGithub = env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
-    const hasGoogle = env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+const _protoSocialProviderSchema = z.object({
+  clientId: z.string(),
+  clientSecret: z.string(),
+})
 
-    if (!hasGithub && !hasGoogle) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'At least one authentication provider must be configured (GitHub or Google).',
-        path: [
-          'GITHUB_CLIENT_ID',
-          'GITHUB_CLIENT_SECRET',
-          'GOOGLE_CLIENT_ID',
-          'GOOGLE_CLIENT_SECRET',
-        ],
-        fatal: true,
-      })
-    }
-  })
+const transformSocialProviderSchema = (data: z.infer<typeof _protoSocialProviderSchema>) => {
+  if (!data.clientId || !data.clientSecret) {
+    return undefined
+  }
+  return data
+}
+
+const _protoBrainConfigSchema = z.object({
+  auth: z.object({
+    emailAndPassword: z.object({
+      enabled: z.boolean(),
+    }),
+    socialProviders: z.object({
+      github: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
+      google: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
+    }),
+  }),
+})
+
+const brainSuperRefinement = (
+  config: z.infer<typeof _protoBrainConfigSchema>,
+  ctx: z.RefinementCtx,
+) => {
+  const availableProviders = Object.entries(config.auth.socialProviders).filter(
+    ([_, value]) => value?.clientId && value?.clientSecret,
+  )
+
+  if (availableProviders.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'At least one authentication provider must be configured (GitHub or Google).',
+      path: ['auth', 'socialProviders', 'github', 'google'],
+      fatal: true,
+    })
+  }
+}
+
+export const BrainConfigSchema = _protoBrainConfigSchema.superRefine(brainSuperRefinement)
+export type BrainConfig = z.infer<typeof BrainConfigSchema>

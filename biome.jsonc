@@ -11,10 +11,12 @@
         "noUnusedImports": "error"
       },
       "suspicious": {
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noShadowRestrictedNames": "off"
       },
       "a11y": {
-        "noSvgWithoutTitle": "off"
+        "noSvgWithoutTitle": "off",
+        "useValidAnchor": "off"
       },
       "style": {
         "useNamingConvention": {
@@ -82,7 +84,9 @@
       ".next/**",
       "generated/prisma/**/**",
       // Ignore UI package since is shadcn/ui generated
-      "packages/shared/ui/**/**"
+      "packages/shared/ui/**/**",
+      // Ignore routeTree.gen.ts since is a generated file
+      "routeTree.gen.ts"
     ]
   }
 }
