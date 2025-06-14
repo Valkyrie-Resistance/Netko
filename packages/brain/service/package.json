@@ -4,8 +4,7 @@
   "type": "module",
   "private": true,
   "exports": {
-    ".": "./src/index.ts",
-    "./env": "./src/config/env-checker.ts"
+    ".": "./src/index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
