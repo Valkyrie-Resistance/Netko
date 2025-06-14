@@ -27,8 +27,6 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 
 export const appRouter = router({
   user: router({
-    // TODO: fix the spread of the queries and mutations to append
-    // them directly to user instead of having to go through queries and mutations
     queries: userQueries,
     mutations: userMutations,
   }),

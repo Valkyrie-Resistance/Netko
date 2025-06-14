@@ -16,11 +16,11 @@ const userMutations = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const user = await prisma.user.update({
+      return prisma.user.update({
         where: { id: ctx.session.user.id },
         data: input,
+        select: { id: true, name: true, email: true, image: true },
       })
-      return user
     }),
 })
 

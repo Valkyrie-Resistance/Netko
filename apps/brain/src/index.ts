@@ -10,8 +10,6 @@ const app = new Elysia({
 })
 
 // TODO: fix for better-auth: https://github.com/better-auth/better-auth/issues/2959
-// * Mounts the auth service
-app.mount(auth.handler)
 
 // * Loads logger and cors plugins
 app.use(loggerPlugin)
@@ -20,15 +18,6 @@ app.use(swaggerPlugin)
 
 // * Mounts the auth service
 app.mount(auth.handler)
-
-// ! tmp fix for better-auth: https://github.com/better-auth/better-auth/issues/2959
-app.get('*', () => 'not found')
-app.post('*', () => 'not found')
-app.put('*', () => 'not found')
-app.delete('*', () => 'not found')
-app.patch('*', () => 'not found')
-app.options('*', () => 'not found')
-app.head('*', () => 'not found')
 
 app.all('/trpc/*', async (c) => {
   const response = await fetchRequestHandler({
@@ -39,6 +28,14 @@ app.all('/trpc/*', async (c) => {
   })
   return response
 })
+
+app.get('*', () => 'Not found')
+app.post('*', () => 'Not found')
+app.put('*', () => 'Not found')
+app.delete('*', () => 'Not found')
+app.patch('*', () => 'Not found')
+app.options('*', () => 'Not found')
+app.head('*', () => 'Not found')
 
 // * Starts the server
 app.listen(Number(process.env.PORT ?? 3001))
