@@ -9,6 +9,10 @@ const app = new Elysia({
   name: 'Chad Chat Brain Service',
 })
 
+// TODO: fix for better-auth: https://github.com/better-auth/better-auth/issues/2959
+// * Mounts the auth service
+app.mount(auth.handler)
+
 // * Loads logger and cors plugins
 app.use(loggerPlugin)
 app.use(corsPlugin)
