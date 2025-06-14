@@ -1,16 +1,8 @@
-import { prisma } from '@chad-chat/brain-repository'
+import type { Session } from '@chad-chat/brain-domain'
+import { auth } from '@chad-chat/brain-service'
 
 export interface Context {
-  session: {
-    user: {
-      id: string
-      name: string
-      email: string
-      emailVerified: boolean
-      image?: string | null
-      role?: 'ADMIN' | 'USER'
-    } | null
-  } | null
+  session: Session | null
 }
 
 export const createContext = async (req: Request): Promise<Context> => {
@@ -19,21 +11,16 @@ export const createContext = async (req: Request): Promise<Context> => {
     return { session: null }
   }
 
-  const session = await prisma.session.findUnique({
-    where: { token },
-    include: {
-      user: true,
-    },
+  const session = await auth.api.getSession({
+    headers: req.headers,
   })
 
-  if (!session || session.expiresAt < new Date()) {
-    return { session: null }
-  }
-
   return {
-    session: {
-      user: session.user,
-    },
+    session: session
+      ? {
+          user: session.user,
+        }
+      : null,
   }
 }
 

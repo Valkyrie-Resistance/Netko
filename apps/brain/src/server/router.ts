@@ -1,11 +1,12 @@
-import { prisma } from '@chad-chat/brain-repository'
 import { TRPCError, initTRPC } from '@trpc/server'
-import { z } from 'zod'
-import type { Context } from '../server/context'
+import type { Context } from './context'
+import { userMutations } from './routes/user/mutations'
+import { userQueries } from './routes/user/queries'
 
 const t = initTRPC.context<Context>().create()
 
 export const publicProcedure = t.procedure
+export const router = t.router
 
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (!ctx.session?.user) {
@@ -24,58 +25,13 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   })
 })
 
-export const adminProcedure = t.procedure.use(async ({ ctx, next }) => {
-  if (!ctx.session?.user?.role || ctx.session.user.role !== 'ADMIN') {
-    throw new TRPCError({
-      code: 'FORBIDDEN',
-      message: 'You must have admin rights to access this resource',
-    })
-  }
-  return next({
-    ctx: {
-      ...ctx,
-      session: {
-        user: ctx.session.user,
-      },
-    },
-  })
-})
-
-export const router = t.router
-
-// Define the app router with all procedures
 export const appRouter = router({
-  // Public routes
-  userList: publicProcedure.query(async () => {
-    const users = await prisma.user.findMany()
-    return users
-  }),
-
-  // Protected routes
-  me: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.session.user
-  }),
-
-  updateProfile: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().optional(),
-        email: z.string().email().optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const user = await prisma.user.update({
-        where: { id: ctx.session.user.id },
-        data: input,
-      })
-      return user
-    }),
-
-  // Admin routes
-  deleteUser: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
-    const user = await prisma.user.delete({
-      where: { id: input.id },
-    })
-    return user
+  user: router({
+    // TODO: fix the spread of the queries and mutations to append
+    // them directly to user instead of having to go through queries and mutations
+    queries: userQueries,
+    mutations: userMutations,
   }),
 })
+
+export type AppRouter = typeof appRouter
