@@ -3,10 +3,9 @@ import { redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute({
   beforeLoad: ({ context }: { context: AuthRouterContext }) => {
-    if (context.auth.session) {
-      throw redirect({ to: '/chat' })
+    if (!context.auth.session) {
+      throw redirect({ to: '/auth' })
     }
-    throw redirect({ to: '/auth' })
   },
   component: Index,
 })

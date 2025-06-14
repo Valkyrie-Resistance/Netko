@@ -11,44 +11,69 @@
 import type { CreateFileRoute, FileRoutesByPath } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as protectedProfileIndexRouteImport } from './routes/(protected)/profile/index'
+import { Route as protectedChatIndexRouteImport } from './routes/(protected)/chat/index'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const protectedProfileIndexRoute = protectedProfileIndexRouteImport.update({
+  id: '/(protected)/profile/',
+  path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const protectedChatIndexRoute = protectedChatIndexRouteImport.update({
+  id: '/(protected)/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/auth': typeof AuthIndexRoute
+  '/chat': typeof protectedChatIndexRoute
+  '/profile': typeof protectedProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/auth': typeof AuthIndexRoute
+  '/chat': typeof protectedChatIndexRoute
+  '/profile': typeof protectedProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/auth/': typeof AuthIndexRoute
+  '/(protected)/chat/': typeof protectedChatIndexRoute
+  '/(protected)/profile/': typeof protectedProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/auth' | '/chat' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/auth' | '/chat' | '/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth/'
+    | '/(protected)/chat/'
+    | '/(protected)/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  AuthIndexRoute: typeof AuthIndexRoute
+  protectedChatIndexRoute: typeof protectedChatIndexRoute
+  protectedProfileIndexRoute: typeof protectedProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -60,11 +85,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/auth/': {
+      id: '/auth/'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(protected)/chat/': {
+      id: '/(protected)/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof protectedChatIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(protected)/profile/': {
+      id: '/(protected)/profile/'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof protectedProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -79,19 +118,39 @@ declare module './routes/index' {
     FileRoutesByPath['/']['fullPath']
   >
 }
-declare module './routes/about' {
+declare module './routes/auth/index' {
   const createFileRoute: CreateFileRoute<
-    '/about',
-    FileRoutesByPath['/about']['parentRoute'],
-    FileRoutesByPath['/about']['id'],
-    FileRoutesByPath['/about']['path'],
-    FileRoutesByPath['/about']['fullPath']
+    '/auth/',
+    FileRoutesByPath['/auth/']['parentRoute'],
+    FileRoutesByPath['/auth/']['id'],
+    FileRoutesByPath['/auth/']['path'],
+    FileRoutesByPath['/auth/']['fullPath']
+  >
+}
+declare module './routes/(protected)/chat/index' {
+  const createFileRoute: CreateFileRoute<
+    '/(protected)/chat/',
+    FileRoutesByPath['/(protected)/chat/']['parentRoute'],
+    FileRoutesByPath['/(protected)/chat/']['id'],
+    FileRoutesByPath['/(protected)/chat/']['path'],
+    FileRoutesByPath['/(protected)/chat/']['fullPath']
+  >
+}
+declare module './routes/(protected)/profile/index' {
+  const createFileRoute: CreateFileRoute<
+    '/(protected)/profile/',
+    FileRoutesByPath['/(protected)/profile/']['parentRoute'],
+    FileRoutesByPath['/(protected)/profile/']['id'],
+    FileRoutesByPath['/(protected)/profile/']['path'],
+    FileRoutesByPath['/(protected)/profile/']['fullPath']
   >
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  AuthIndexRoute: AuthIndexRoute,
+  protectedChatIndexRoute: protectedChatIndexRoute,
+  protectedProfileIndexRoute: protectedProfileIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
