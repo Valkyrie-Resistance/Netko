@@ -1,8 +1,10 @@
 import { auth } from '@chad-chat/brain-service'
+import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { Elysia } from 'elysia'
 import { corsPlugin, loggerPlugin, swaggerPlugin } from './plugins'
+import { createContext } from './server/context'
+import { appRouter } from './server/router'
 
-// * Creates the app
 const app = new Elysia({
   name: 'Chad Chat Brain Service',
 })
@@ -24,5 +26,17 @@ app.patch('*', () => 'not found')
 app.options('*', () => 'not found')
 app.head('*', () => 'not found')
 
+app.all('/trpc/*', async (c) => {
+  const response = await fetchRequestHandler({
+    endpoint: '/trpc',
+    req: c.request,
+    router: appRouter,
+    createContext: () => createContext(c.request),
+  })
+  return response
+})
+
 // * Starts the server
 app.listen(Number(process.env.PORT ?? 3001))
+
+export type AppRouter = typeof appRouter

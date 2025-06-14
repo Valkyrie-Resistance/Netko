@@ -4,18 +4,20 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { openAPI } from 'better-auth/plugins'
 import { brainEnvConfig } from '../config/env'
 
+const openApiPlugin = openAPI()
+
 export const auth = betterAuth({
   basePath: '/api',
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
-  plugins: [openAPI()],
+  plugins: [openApiPlugin],
   ...brainEnvConfig.auth,
 })
 
-let _schema: ReturnType<typeof auth.api.generateOpenAPISchema>
+let _schema: ReturnType<typeof openApiPlugin.endpoints.generateOpenAPISchema>
 // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-const getSchema = async () => (_schema ??= auth.api.generateOpenAPISchema())
+const getSchema = async () => (_schema ??= openApiPlugin.endpoints.generateOpenAPISchema())
 
 // biome-ignore lint/style/useNamingConvention: <explanation>
 export const OpenAPI = {
