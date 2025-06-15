@@ -5,7 +5,9 @@ import { useAuth } from './auth-provider'
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  context: { auth: { user: null, session: null, refetch: () => {}, error: null } },
+  context: {
+    auth: { user: null, session: null, refetch: () => {}, error: null, isPending: false },
+  },
 })
 
 // Register the router instance for type safety

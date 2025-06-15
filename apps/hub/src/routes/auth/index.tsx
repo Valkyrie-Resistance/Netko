@@ -1,17 +1,21 @@
-import { trpc } from '@/lib/trpc'
-import { useQuery } from '@tanstack/react-query'
+import { LoginForm } from '@/components/auth/login-form'
+import { useAuth } from '@/providers/auth-provider'
+import { Navigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute({
   component: Index,
 })
 
 function Index() {
-  const threadsQuery = useQuery(trpc.threads.getThreads.queryOptions())
-  console.log(threadsQuery.data)
+  const { session, isPending } = useAuth()
+
+  if (!isPending && session) {
+    return <Navigate to="/chat" />
+  }
 
   return (
     <div className="p-2">
-      <h1>Hello</h1>
+      <LoginForm />
     </div>
   )
 }

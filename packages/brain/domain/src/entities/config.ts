@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 const _protoSocialProviderSchema = z.object({
+  enabled: z.boolean(),
   clientId: z.string(),
   clientSecret: z.string(),
 })
@@ -13,7 +14,16 @@ const transformSocialProviderSchema = (data: z.infer<typeof _protoSocialProvider
 }
 
 const _protoBrainConfigSchema = z.object({
+  app: z.object({
+    port: z.number().default(3001),
+    cors: z.array(z.string()).default(['http://localhost:3001', 'http://localhost:5173']),
+  }),
+  db: z.object({
+    url: z.string(),
+  }),
   auth: z.object({
+    secret: z.string().optional(),
+    url: z.string().url(),
     emailAndPassword: z.object({
       enabled: z.boolean(),
     }),
@@ -28,11 +38,11 @@ const brainSuperRefinement = (
   config: z.infer<typeof _protoBrainConfigSchema>,
   ctx: z.RefinementCtx,
 ) => {
-  const availableProviders = Object.entries(config.auth.socialProviders).filter(
-    ([_, value]) => value?.clientId && value?.clientSecret,
+  const enabledProviders = Object.entries(config.auth.socialProviders).filter(
+    ([_, value]) => value?.enabled,
   )
 
-  if (availableProviders.length === 0) {
+  if (enabledProviders.length === 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'At least one authentication provider must be configured (GitHub or Google).',

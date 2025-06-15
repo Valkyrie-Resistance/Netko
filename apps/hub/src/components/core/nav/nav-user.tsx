@@ -3,6 +3,7 @@
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react'
 
 import type { AuthUser } from '@/components/auth/definitions/types'
+import { signOut } from '@/lib/auth'
 import { Avatar, AvatarFallback, AvatarImage } from '@chad-chat/ui/components/shadcn/avatar'
 import {
   DropdownMenu,
@@ -93,7 +94,11 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                signOut()
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

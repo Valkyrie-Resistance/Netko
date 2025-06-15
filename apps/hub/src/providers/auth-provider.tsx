@@ -5,14 +5,14 @@ import React, { createContext, useContext } from 'react'
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { data, refetch, error } = useSession()
+  const { data, refetch, error, isPending } = useSession()
 
   const user = data?.user ?? null
   const session = data?.session ?? null
 
   const auth = React.useMemo(
-    () => ({ user, session, refetch, error }),
-    [user, session, refetch, error],
+    () => ({ user, session, refetch, error, isPending }),
+    [user, session, refetch, error, isPending],
   )
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>

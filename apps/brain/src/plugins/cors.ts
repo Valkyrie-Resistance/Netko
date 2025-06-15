@@ -1,7 +1,8 @@
+import { brainEnvConfig } from '@chad-chat/brain-service'
 import { cors } from '@elysiajs/cors'
 
 export const corsPlugin = cors({
-  origin: process.env.CORS_ORIGIN ?? ['http://localhost:3001', 'http://localhost:3000'],
+  origin: brainEnvConfig.app.cors,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],

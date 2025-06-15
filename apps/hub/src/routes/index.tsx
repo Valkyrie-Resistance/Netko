@@ -1,11 +1,27 @@
-import type { AuthRouterContext } from '@/components/auth/definitions/types'
-import { redirect } from '@tanstack/react-router'
+import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
+import { useAuth } from '@/providers/auth-provider'
+import { Navigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute({
-  beforeLoad: ({ context }: { context: AuthRouterContext }) => {
-    if (context.auth.session) {
-      throw redirect({ to: '/chat' })
-    }
-    throw redirect({ to: '/auth' })
-  },
+  component: Index,
 })
+
+function Index() {
+  const { session, isPending } = useAuth()
+
+  if (!isPending && session) {
+    return <Navigate to="/chat" />
+  }
+
+  if (!isPending && !session) {
+    return <Navigate to="/auth" />
+  }
+
+  return (
+    <div className="flex h-screen w-screen items-center justify-center">
+      <BarsSpinner />
+    </div>
+  )
+}
+
+export default Index

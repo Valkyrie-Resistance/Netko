@@ -24,13 +24,9 @@ export interface AuthContextValue {
   session: AuthSession | null
   refetch: () => void
   error: unknown
+  isPending: boolean
 }
 
 export interface AuthRouterContext {
-  auth: {
-    user: AuthUser | null
-    session: AuthSession | null
-    refetch: () => void
-    error: unknown
-  }
+  auth: AuthContextValue
 }

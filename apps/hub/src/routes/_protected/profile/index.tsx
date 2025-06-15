@@ -1,7 +1,4 @@
-import { authGuard } from '@/lib/auth'
-
 export const Route = createFileRoute({
-  beforeLoad: authGuard,
   component: Index,
 })
 
