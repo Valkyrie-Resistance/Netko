@@ -7,7 +7,5 @@ dependsOn=["setup"]
 cmds = ['bun install']
 
 [phases.build]
-nixLibs = ['openssl']
-
 cmds = ['turbo db:generate', 
         'turbo build --filter @chad-chat/hub']
