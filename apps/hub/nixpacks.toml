@@ -1,0 +1,10 @@
+[phases.setup]
+nixPkgs = ["unzip", "bun", "nodejs_22", "openssl"]
+nixpkgsArchive = "b49f9222cd683837c28becdf09428b8990a551d1"
+
+[phases.install]
+cmds = ['bun install']
+
+[phases.build]
+cmds = ['turbo db:generate', 
+        'turbo build --filter @chad-chat/hub']
