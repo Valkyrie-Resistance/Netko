@@ -1,0 +1,19 @@
+[phases.setup]
+aptPkgs=["unzip", "openssl"]
+
+[phases.bun]
+cmds=["curl -fsSL https://bun.sh/install | bash"]
+paths = ["~/.bun/bin"]
+dependsOn=["setup"]
+
+[phases.install]
+cmds = ['bun install']
+
+[phases.build]
+nixLibs = ['openssl']
+
+cmds = ['turbo db:generate', 
+        'turbo build --filter @chad-chat/brain']
+
+[start]
+cmd = 'bun --filter "./apps/brain" prod:release'
