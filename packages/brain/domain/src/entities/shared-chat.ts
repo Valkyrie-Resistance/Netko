@@ -12,5 +12,8 @@ export const SharedChatSchema = z
     createdAt: z.coerce.date(),
   })
   .strict()
-
+  .refine((data) => !data.expiresAt || data.expiresAt >= data.createdAt, {
+    message: 'expiresAt must be on or after createdAt',
+    path: ['expiresAt'],
+  })
 export type SharedChat = z.infer<typeof SharedChatSchema>
