@@ -1,4 +1,4 @@
-import { type BrainConfig, BrainConfigSchema } from '@chad-chat/brain-domain/env-schema'
+import { type BrainConfig, BrainConfigSchema } from '@chad-chat/brain-domain'
 
 const brainConfig: BrainConfig = {
   auth: {

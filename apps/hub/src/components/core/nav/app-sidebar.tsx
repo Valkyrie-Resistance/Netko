@@ -26,7 +26,7 @@ import {
   SidebarMenuItem,
 } from '@chad-chat/ui/components/shadcn/sidebar'
 
-import { useAuth } from '@/components/auth/auth-provider'
+import { useAuth } from '@/providers/auth-provider'
 
 const data = {
   navMain: [

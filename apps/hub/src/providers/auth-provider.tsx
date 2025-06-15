@@ -1,6 +1,6 @@
-import { useSession } from '@/lib/auth-client'
+import type { AuthContextValue } from '@/components/auth/definitions/types'
+import { useSession } from '@/lib/auth'
 import React, { createContext, useContext } from 'react'
-import type { AuthContextValue } from './definitions/types'
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 

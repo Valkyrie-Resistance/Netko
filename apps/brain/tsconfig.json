@@ -1,8 +1,7 @@
 {
   "extends": "@chad-chat/typescript-config/bun.json",
   "compilerOptions": {
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   }
 }
