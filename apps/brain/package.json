@@ -14,7 +14,7 @@
     "start": "NODE_ENV=production bun dist/index.js",
     "test": "bun test",
     "dev:setup": "bun run db:generate && bun run db:migrate",
-    "db:generate": "bun run --env-file=.env --filter @chad-chat/brain-repository db:generate",
+    "db:generate": "bun run --filter @chad-chat/brain-repository db:generate",
     "db:migrate": "bun run --env-file=.env --filter @chad-chat/brain-repository db:migrate"
   },
   "devDependencies": {
