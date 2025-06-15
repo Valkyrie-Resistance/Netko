@@ -10,6 +10,6 @@ export const SessionAuthSchema = z.object({
   token: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-})
+}).strict()
 
 export type SessionAuth = z.infer<typeof SessionAuthSchema>

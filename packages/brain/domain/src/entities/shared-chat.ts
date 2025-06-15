@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
 export const SharedChatSchema = z.object({
-  id: z.string(),
-  shareId: z.string(),
-  threadId: z.string(),
-  sharedById: z.string(),
-  shareUpToMessageId: z.string().nullish(),
+  id: z.string().cuid(),
+  shareId: z.string().cuid(),
+  threadId: z.string().cuid(),
+  sharedById: z.string().cuid(),
+  shareUpToMessageId: z.string().cuid().nullish(),
   isPublic: z.boolean().default(true),
-  expiresAt: z.date().nullish(),
-  createdAt: z.date(),
-})
+  expiresAt: z.coerce.date().nullish(),
+  createdAt: z.coerce.date(),
+}).strict()
 
 export type SharedChat = z.infer<typeof SharedChatSchema>

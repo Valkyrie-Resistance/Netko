@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
 export const UserSchema = z.object({
-  id: z.string(),
+  id: z.string().cuid(),
   name: z.string(),
   email: z.string().email(),
   emailVerified: z.boolean(),
   image: z.string().nullish(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-})
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+}).strict()
 
 export type User = z.infer<typeof UserSchema>
