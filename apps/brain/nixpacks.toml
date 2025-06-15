@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkg = ["unzip"]
+nixPkgs = ["unzip", "curl", "wget"]
 
 [phases.bun]
 cmds=["curl -fsSL https://bun.sh/install | bash"]
