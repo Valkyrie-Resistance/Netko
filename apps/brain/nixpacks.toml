@@ -6,6 +6,7 @@ nixpkgsArchive = "b49f9222cd683837c28becdf09428b8990a551d1"
 cmds = ['bun install']
 
 [phases.build]
+nixLibs = ['openssl']
 cmds = ['turbo db:generate', 
         'turbo build --filter @chad-chat/brain']
 
