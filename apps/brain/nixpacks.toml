@@ -1,10 +1,6 @@
 [phases.setup]
-nixPkgs = ["unzip", "curl", "wget"]
-
-[phases.bun]
-cmds=["curl -fsSL https://bun.sh/install | bash"]
-paths = ["~/.bun/bin"]
-dependsOn=["setup"]
+nixPkgs = ["unzip", "bun"]
+nixpkgsArchive = "b49f9222cd683837c28becdf09428b8990a551d1"
 
 [phases.install]
 cmds = ['bun install']
