@@ -79,7 +79,7 @@ model Verification {
 }
 
 model LLMModel {
-  id          String  @id @default(cuid())
+  id          String  @id @default(cuid(2))
   name        String  @unique
   provider    String
   displayName String
@@ -92,7 +92,7 @@ model LLMModel {
 }
 
 model Assistant {
-  id           String  @id @default(cuid())
+  id           String  @id @default(cuid(2))
   name         String
   description  String?
   systemPrompt String
@@ -142,7 +142,7 @@ model Thread {
 }
 
 model Message {
-  id      String      @id @default(cuid())
+  id      String      @id @default(cuid(2))
   content String
   role    MessageRole
 
@@ -174,8 +174,8 @@ model Message {
 }
 
 model SharedChat {
-  id      String @id @default(cuid())
-  shareId String @unique @default(cuid())
+  id      String @id @default(cuid(2))
+  shareId String @unique @default(cuid(2))
 
   threadId String
   thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
