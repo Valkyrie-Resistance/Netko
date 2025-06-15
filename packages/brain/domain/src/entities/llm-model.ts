@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-export const LLMModelSchema = z
-  .object({
-    id: z.string().cuid(),
-    name: z.string(),
-    provider: z.string(),
-    displayName: z.string(),
-    isActive: z.boolean().default(false),
-  })
-  .strict()
+export const LLMModelSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  //TODO: Add enum for model provider to make it a bound set of values
+  // e.g., OpenAI, HuggingFace, etc.
+  provider: z.string(),
+  displayName: z.string(),
+  isActive: z.boolean(),
+})
 
 export type LLMModel = z.infer<typeof LLMModelSchema>
