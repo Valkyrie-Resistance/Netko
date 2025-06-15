@@ -17,6 +17,9 @@
       "cache": false,
       "persistent": true
     },
+    "prod:release": {
+      "cache": false
+    },
     "//#fmt-lint": {},
     "//#fmt-lint:fix": {
       "cache": false
