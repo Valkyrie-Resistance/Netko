@@ -9,10 +9,12 @@
     }
   },
   "scripts": {
-    "dev": "bun run db:migrate && bun --watch src/index.ts",
+    "dev": "bun run dev:setup && bun --watch src/index.ts",
     "build": "bun build src/index.ts --target bun --outdir ./dist",
     "start": "NODE_ENV=production bun dist/index.js",
     "test": "bun test",
+    "dev:setup": "bun run db:generate && bun run db:migrate",
+    "db:generate": "bun run --env-file=.env --filter @chad-chat/brain-repository db:generate",
     "db:migrate": "bun run --env-file=.env --filter @chad-chat/brain-repository db:migrate"
   },
   "devDependencies": {
