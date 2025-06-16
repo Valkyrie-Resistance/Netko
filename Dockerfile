@@ -2,6 +2,10 @@ FROM oven/bun:slim
 
 WORKDIR /app
 
+# openssl
+RUN apt-get update
+RUN apt-get install -y openssl
+
 COPY . .
 
 RUN bun install turbo --global
