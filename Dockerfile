@@ -1,14 +1,11 @@
-FROM oven/bun:alpine
+FROM oven/bun:slim
 
 WORKDIR /app
 
 COPY . .
 
 RUN bun install turbo --global
-
-RUN bun install --production
-
-RUN turbo db:generate
+RUN bun install --frozen-lockfile
 
 RUN turbo build
 

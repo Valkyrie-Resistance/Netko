@@ -1,0 +1,4 @@
+node_modules
+bun_modules
+dist
+public
