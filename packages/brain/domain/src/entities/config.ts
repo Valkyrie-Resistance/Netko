@@ -15,15 +15,17 @@ const transformSocialProviderSchema = (data: z.infer<typeof _protoSocialProvider
 
 const _protoBrainConfigSchema = z.object({
   app: z.object({
+    dev: z.boolean().default(false),
     port: z.number().default(3001),
     cors: z.array(z.string()).default(['http://localhost:3001', 'http://localhost:5173']),
+    baseUrl: z.string().url(),
+    sentryDsn: z.string().optional(),
   }),
   db: z.object({
     url: z.string(),
   }),
   auth: z.object({
     secret: z.string().optional(),
-    url: z.string().url(),
     emailAndPassword: z.object({
       enabled: z.boolean(),
     }),
@@ -31,6 +33,7 @@ const _protoBrainConfigSchema = z.object({
     socialProviders: z.object({
       github: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
       google: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
+      discord: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
     }),
   }),
 })

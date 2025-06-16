@@ -3,7 +3,6 @@ import { redirect } from '@tanstack/react-router'
 import { createAuthClient } from 'better-auth/react'
 
 export const { useSession, signIn, signOut } = createAuthClient({
-  baseURL: import.meta.env.VITE_AUTH_API_URL,
   basePath: '/auth/api',
 })
 

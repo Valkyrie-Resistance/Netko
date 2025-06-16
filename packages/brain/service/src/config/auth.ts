@@ -5,6 +5,7 @@ import { openAPI } from 'better-auth/plugins'
 import { brainEnvConfig } from './env'
 
 export const auth = betterAuth({
+  baseURL: brainEnvConfig.app.baseUrl,
   basePath: '/auth/api',
   database: prismaAdapter(prisma, {
     provider: 'postgresql',

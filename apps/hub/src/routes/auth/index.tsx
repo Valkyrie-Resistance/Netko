@@ -14,7 +14,7 @@ function Index() {
   }
 
   return (
-    <div className="p-2">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <LoginForm />
     </div>
   )
