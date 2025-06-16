@@ -12,4 +12,4 @@ RUN turbo db:generate
 
 RUN turbo build --filter @chad-chat/brain
 
-CMD ["turbo", "run", "--filter=@chad-chat/brain", "prod:release"]
+CMD ["bun", "run", "--filter", "./apps/brain", "prod:release"]
