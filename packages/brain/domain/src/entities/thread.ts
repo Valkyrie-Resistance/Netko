@@ -1,10 +1,12 @@
 import { z } from 'zod'
+import { AssistantSchema } from './assistant'
+import { UserSchema } from './user'
 
 export const ThreadSchema = z.object({
   id: z.string(),
   title: z.string().nullish(),
-  userId: z.string(),
-  assistantId: z.string(),
+  user: UserSchema,
+  assistant: AssistantSchema,
   parentId: z.string().nullish(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

@@ -1,9 +1,9 @@
 import { observable } from '@trpc/server/observable'
 import { z } from 'zod'
-import { publicProcedure, router } from '../../lib/trpc'
+import { protectedProcedure, router } from '../../lib/trpc'
 
 export const threadsSubscriptions = router({
-  onThreadUpdate: publicProcedure
+  onThreadUpdate: protectedProcedure
     .input(z.object({ threadId: z.string() }))
     .query(async ({ input }) => {
       return observable<{ threadId: string; type: 'update' | 'delete' }>((emit) => {

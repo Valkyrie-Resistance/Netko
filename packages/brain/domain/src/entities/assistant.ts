@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { LLMModelSchema } from './llm-model'
+import { UserSchema } from './user'
 
 export const AssistantSchema = z.object({
   id: z.string(),
@@ -10,7 +11,7 @@ export const AssistantSchema = z.object({
   maxTokens: z.number().nullish(),
   isPublic: z.boolean(),
   defaultModel: LLMModelSchema.nullish(),
-  createdById: z.string().cuid().nullish(),
+  createdByUser: UserSchema.nullish(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
