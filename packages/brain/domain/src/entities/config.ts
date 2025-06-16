@@ -33,6 +33,7 @@ const _protoBrainConfigSchema = z.object({
     socialProviders: z.object({
       github: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
       google: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
+      discord: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
     }),
   }),
 })

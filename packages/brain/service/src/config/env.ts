@@ -34,6 +34,11 @@ const brainConfig: BrainConfig = {
         clientId: process.env.GOOGLE_CLIENT_ID ?? '',
         clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
       },
+      discord: {
+        enabled: isEnabled([process.env.DISCORD_CLIENT_ID, process.env.DISCORD_CLIENT_SECRET]),
+        clientId: process.env.DISCORD_CLIENT_ID ?? '',
+        clientSecret: process.env.DISCORD_CLIENT_SECRET ?? '',
+      },
     },
   },
 }
