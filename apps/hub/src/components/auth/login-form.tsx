@@ -11,6 +11,7 @@ import {
 import { Separator } from '@radix-ui/react-separator'
 import { useQuery } from '@tanstack/react-query'
 import { MessageCircle } from 'lucide-react'
+import { useState } from 'react'
 import { socialProviders } from './definitions/values'
 
 // Skeleton loader component for social providers
@@ -31,6 +32,7 @@ function ProvidersLoader() {
 
 export function LoginForm() {
   const { data: providers, isLoading } = useQuery(trpc.auth.getEnabledAuthMethods.queryOptions())
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
 
   const enabledProviders = socialProviders.filter((provider) =>
     providers?.includes(provider.provider),
@@ -44,6 +46,16 @@ export function LoginForm() {
   }
 
   const { grid, showText } = getGridLayout(enabledProviders.length)
+
+  const handleProviderLogin = async (provider: (typeof socialProviders)[0]) => {
+    setLoadingProvider(provider.provider)
+    try {
+      await provider.action()
+    } catch (error) {
+      console.error('Login failed:', error)
+      setLoadingProvider(null)
+    }
+  }
 
   return (
     <div className="w-full max-w-md space-y-8">
@@ -82,6 +94,8 @@ export function LoginForm() {
               <div className={`grid gap-3 ${grid}`}>
                 {enabledProviders.map((provider) => {
                   const Icon = provider.icon
+                  const isCurrentlyLoading = loadingProvider === provider.provider
+                  const isAnyLoading = loadingProvider !== null
 
                   return (
                     <Button
@@ -91,11 +105,16 @@ export function LoginForm() {
                       className={`h-12 transition-all duration-200 hover:bg-accent hover:text-accent-foreground ${
                         showText ? 'justify-start' : 'justify-center'
                       }`}
-                      onClick={provider.action}
+                      onClick={() => handleProviderLogin(provider)}
+                      disabled={isAnyLoading}
                     >
-                      <Icon className={`h-5 w-5 ${showText ? 'mr-3' : ''}`} />
+                      {isCurrentlyLoading ? (
+                        <BarsSpinner size={20} className={showText ? 'mr-3' : ''} />
+                      ) : (
+                        <Icon className={`h-5 w-5 ${showText ? 'mr-3' : ''}`} />
+                      )}
 
-                      {showText && (
+                      {showText && !isCurrentlyLoading && (
                         <div className="flex flex-col items-start">
                           <span className="font-medium">{provider.name}</span>
                           {enabledProviders.length <= 2 && (
@@ -104,6 +123,10 @@ export function LoginForm() {
                             </span>
                           )}
                         </div>
+                      )}
+
+                      {showText && isCurrentlyLoading && (
+                        <span className="font-medium">Signing in...</span>
                       )}
                     </Button>
                   )

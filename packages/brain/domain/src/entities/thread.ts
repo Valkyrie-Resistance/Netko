@@ -5,8 +5,8 @@ import { UserSchema } from './user'
 export const ThreadSchema = z.object({
   id: z.string(),
   title: z.string().nullish(),
-  user: UserSchema,
-  assistant: AssistantSchema,
+  user: UserSchema.optional(),
+  assistant: AssistantSchema.optional(),
   parentId: z.string().nullish(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
