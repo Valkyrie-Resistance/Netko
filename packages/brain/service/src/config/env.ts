@@ -19,6 +19,7 @@ const brainConfig: BrainConfig = {
     emailAndPassword: {
       enabled: false,
     },
+    trustedOrigins: process.env.TRUSTED_ORIGINS?.split(',') ?? [],
     socialProviders: {
       // * undefined values are converted to empty strings to avoid better-auth errors
       github: {

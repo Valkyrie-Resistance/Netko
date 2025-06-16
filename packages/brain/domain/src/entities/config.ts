@@ -27,6 +27,7 @@ const _protoBrainConfigSchema = z.object({
     emailAndPassword: z.object({
       enabled: z.boolean(),
     }),
+    trustedOrigins: z.array(z.string()).default(['http://localhost:3001', 'http://localhost:5173']),
     socialProviders: z.object({
       github: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
       google: _protoSocialProviderSchema.transform(transformSocialProviderSchema).optional(),
