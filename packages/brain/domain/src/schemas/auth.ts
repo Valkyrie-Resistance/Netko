@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const UserAuthSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   name: z.string(),
   email: z.string().email(),
   emailVerified: z.boolean(),
@@ -13,7 +13,7 @@ export const UserAuthSchema = z.object({
 export type UserAuth = z.infer<typeof UserAuthSchema>
 
 export const SessionAuthSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   expiresAt: z.coerce.date(),
   token: z.string(),
   createdAt: z.coerce.date(),
