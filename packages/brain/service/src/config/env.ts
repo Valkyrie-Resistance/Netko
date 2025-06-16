@@ -6,9 +6,11 @@ const isEnabled = (args: (string | undefined)[]): boolean => {
 
 const brainConfig: BrainConfig = {
   app: {
+    dev: process.env.DEV_MODE === 'true',
     baseUrl: process.env.BASE_URL,
     port: Number(process.env.PORT),
     cors: process.env.CORS?.split(',') ?? undefined,
+    sentryDsn: process.env.SENTRY_DSN,
   },
   db: {
     url: process.env.DATABASE_URL,

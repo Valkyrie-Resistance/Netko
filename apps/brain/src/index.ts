@@ -1,4 +1,5 @@
 import { auth, brainEnvConfig } from '@chad-chat/brain-service'
+import { sentry } from '@hono/sentry'
 import { trpcServer } from '@hono/trpc-server'
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/bun'
@@ -31,7 +32,11 @@ app.use(
   }),
 )
 
-if (process.env.NODE_ENV === 'production') {
+if (brainEnvConfig.app.sentryDsn) {
+  app.use('*', sentry({ dsn: brainEnvConfig.app.sentryDsn }))
+}
+
+if (!brainEnvConfig.app.dev) {
   app.use('*', serveStatic({ root: './public' }))
   app.use('*', serveStatic({ root: './public', path: 'index.html' }))
 }
