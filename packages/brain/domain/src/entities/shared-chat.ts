@@ -1,10 +1,11 @@
 import { z } from 'zod'
+import { ThreadSchema } from './thread'
 import { UserSchema } from './user'
 
 export const SharedChatSchema = z.object({
   id: z.string(),
   shareId: z.string(),
-  thread: UserSchema,
+  thread: ThreadSchema,
   sharedBy: UserSchema,
   shareUpToMessageId: z.string().cuid().nullish(),
   isPublic: z.boolean(),
