@@ -16,9 +16,7 @@ export const threadsSubscriptions = router({
         // TODO: Subscribe to the event emitter here (ask)
 
         return () => {
-
           // TODO: Unsubscribe from the event emitter here (ask)
-
         }
       })
     }),
