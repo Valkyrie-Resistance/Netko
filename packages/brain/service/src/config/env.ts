@@ -6,6 +6,7 @@ const isEnabled = (args: (string | undefined)[]): boolean => {
 
 const brainConfig: BrainConfig = {
   app: {
+    baseUrl: process.env.BASE_URL,
     port: Number(process.env.PORT),
     cors: process.env.CORS?.split(',') ?? undefined,
   },
@@ -13,8 +14,7 @@ const brainConfig: BrainConfig = {
     url: process.env.DATABASE_URL,
   },
   auth: {
-    url: process.env.BETTER_AUTH_URL,
-    secret: process.env.BETTER_AUTH_SECRET,
+    secret: process.env.AUTH_SECRET,
     // TODO: enable email and password auth
     emailAndPassword: {
       enabled: false,

@@ -1,10 +1,10 @@
-name: Deploy Brain
+name: Deploy Chad Chat
 
 on:
   push:
     branches: [main]
     paths:
-      - 'apps/brain/**'
+      - 'apps/hub/**'
 
 jobs:
   code-quality:
@@ -32,10 +32,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
+  docker-build:
+    needs: code-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Docker image
+        run: |
+          docker build -t chad-chat .
+
   deploy:
     needs: code-quality
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy Brain
+      - name: Deploy Chad Chat
         run: |
-          bash -c "${{ secrets.DEPLOY_BRAIN_CURL }}" 
+          bash -c "${{ secrets.DEPLOY_HUB_CURL }}" 

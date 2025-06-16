@@ -1,31 +1,42 @@
-import { auth } from '@chad-chat/brain-service'
-import { brainEnvConfig } from '@chad-chat/brain-service'
-import { Elysia } from 'elysia'
-import { router } from './lib/trpc'
-import { corsPlugin, loggerPlugin, swaggerPlugin, trpcPlugin } from './plugins'
-import { authRouter, threadsRouter } from './routes'
+import { auth, brainEnvConfig } from '@chad-chat/brain-service'
+import { trpcServer } from '@hono/trpc-server'
+import { Hono } from 'hono'
+import { serveStatic } from 'hono/bun'
+import { cors } from 'hono/cors'
+import { logger } from 'hono/logger'
+import { appRouter } from './routes'
+const app = new Hono()
 
-const app = new Elysia({
-  name: 'Chad Chat Brain Service',
+// Logger middleware
+app.use(logger())
+
+app.use(
+  '*',
+  cors({
+    origin: brainEnvConfig.app.cors,
+    credentials: true,
+    maxAge: 86400, // Cache preflight for 1 day
+  }),
+)
+
+app.all('/auth/api/*', async (c) => {
+  return await auth.handler(c.req.raw)
 })
 
-// TODO: fix for better-auth: https://github.com/better-auth/better-auth/issues/2959
-app.mount(auth.handler)
+app.use(
+  '/api/trpc/*',
+  trpcServer({
+    router: appRouter,
+    endpoint: '/api/trpc',
+  }),
+)
 
-//* Merge all routes
-const appRouter = router({
-  threads: threadsRouter,
-  auth: authRouter,
-})
+if (process.env.NODE_ENV === 'production') {
+  app.use('*', serveStatic({ root: './public' }))
+  app.use('*', serveStatic({ root: './public', path: 'index.html' }))
+}
 
-// * Loads server plugins
-app.use(loggerPlugin)
-app.use(corsPlugin)
-app.use(swaggerPlugin)
-app.use(trpcPlugin(appRouter))
-
-// * Starts the server
-app.listen(brainEnvConfig.app.port)
-
-//* Export the router
-export type AppRouter = typeof appRouter
+export default {
+  port: brainEnvConfig.app.port,
+  fetch: app.fetch,
+}

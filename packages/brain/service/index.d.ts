@@ -4,7 +4,7 @@ declare namespace NodeJS {
     PORT: string
     CORS: string
     DATABASE_URL: string
-    BETTER_AUTH_URL: string
-    BETTER_AUTH_SECRET: string
+    BASE_URL: string
+    AUTH_SECRET: string
   }
 }
