@@ -1,4 +1,11 @@
-import { type Thread, ThreadSchema } from '@chad-chat/brain-domain'
+import {
+  type Thread,
+  type ThreadCreateInput,
+  ThreadCreateInputSchema,
+  ThreadSchema,
+  type ThreadUpdateInput,
+  ThreadUpdateInputSchema,
+} from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -7,32 +14,24 @@ type ThreadWithRelations = Prisma.ThreadGetPayload<{
 }>
 
 export async function createThread(
-  userId: string,
-  assistantId: string,
-  title?: string,
-  parentId?: string,
+  data: Omit<ThreadCreateInput, 'user' | 'assistant'> & { userId: string; assistantId: string },
 ): Promise<Thread> {
-  const thread = (await prisma.thread.create({
-    data: {
-      title,
-      user: {
-        connect: {
-          id: userId,
-        },
+  const validatedData = ThreadCreateInputSchema.parse({
+    ...data,
+    user: {
+      connect: {
+        id: data.userId,
       },
-      assistant: {
-        connect: {
-          id: assistantId,
-        },
-      },
-      ...(parentId && {
-        parent: {
-          connect: {
-            id: parentId,
-          },
-        },
-      }),
     },
+    assistant: {
+      connect: {
+        id: data.assistantId,
+      },
+    },
+  })
+
+  const thread = (await prisma.thread.create({
+    data: validatedData,
     include: {
       user: true,
       assistant: true,
@@ -44,26 +43,25 @@ export async function createThread(
 
 export async function updateThread(
   threadId: string,
-  data: {
-    title?: string
-    assistantId?: string
-  },
+  data: Omit<ThreadUpdateInput, 'assistant'> & { assistantId?: string },
 ): Promise<Thread | null> {
   const { assistantId, ...updateData } = data
+  const validatedData = ThreadUpdateInputSchema.parse({
+    ...updateData,
+    ...(assistantId && {
+      assistant: {
+        connect: {
+          id: assistantId,
+        },
+      },
+    }),
+  })
+
   const thread = (await prisma.thread.update({
     where: {
       id: threadId,
     },
-    data: {
-      ...updateData,
-      ...(assistantId && {
-        assistant: {
-          connect: {
-            id: assistantId,
-          },
-        },
-      }),
-    },
+    data: validatedData,
     include: {
       user: true,
       assistant: true,

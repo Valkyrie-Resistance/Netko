@@ -1,4 +1,11 @@
-import { type Message, MessageSchema } from '@chad-chat/brain-domain'
+import {
+  type Message,
+  type MessageCreateInput,
+  MessageCreateInputSchema,
+  MessageSchema,
+  type MessageUpdateInput,
+  MessageUpdateInputSchema,
+} from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -7,54 +14,19 @@ type MessageWithRelations = Prisma.MessageGetPayload<{
 }>
 
 export async function createMessage(
-  threadId: string,
-  content: string,
-  role: 'USER' | 'ASSISTANT',
-  userId?: string,
-  assistantId?: string,
-  modelId?: string,
-  parentId?: string,
-  tokenCount?: number,
+  data: Omit<MessageCreateInput, 'thread'> & { threadId: string },
 ): Promise<Message> {
-  const message = (await prisma.message.create({
-    data: {
-      content,
-      role,
-      thread: {
-        connect: {
-          id: threadId,
-        },
+  const validatedData = MessageCreateInputSchema.parse({
+    ...data,
+    thread: {
+      connect: {
+        id: data.threadId,
       },
-      ...(userId && {
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
-      }),
-      ...(assistantId && {
-        assistant: {
-          connect: {
-            id: assistantId,
-          },
-        },
-      }),
-      ...(modelId && {
-        model: {
-          connect: {
-            id: modelId,
-          },
-        },
-      }),
-      ...(parentId && {
-        parent: {
-          connect: {
-            id: parentId,
-          },
-        },
-      }),
-      tokenCount,
     },
+  })
+
+  const message = (await prisma.message.create({
+    data: validatedData,
     include: {
       thread: true,
     },
@@ -66,17 +38,16 @@ export async function createMessage(
 export async function updateMessage(
   messageId: string,
   threadId: string,
-  data: {
-    content?: string
-    tokenCount?: number
-  },
+  data: MessageUpdateInput,
 ): Promise<Message | null> {
+  const validatedData = MessageUpdateInputSchema.parse(data)
+
   const message = (await prisma.message.update({
     where: {
       id: messageId,
       threadId,
     },
-    data,
+    data: validatedData,
     include: {
       thread: true,
     },

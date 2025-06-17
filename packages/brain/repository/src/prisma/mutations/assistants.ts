@@ -1,4 +1,11 @@
-import { type Assistant, AssistantSchema } from '@chad-chat/brain-domain'
+import {
+  type Assistant,
+  type AssistantCreateInput,
+  AssistantCreateInputSchema,
+  AssistantSchema,
+  type AssistantUpdateInput,
+  AssistantUpdateInputSchema,
+} from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -7,36 +14,19 @@ type AssistantWithRelations = Prisma.AssistantGetPayload<{
 }>
 
 export async function createAssistant(
-  userId: string,
-  name: string,
-  description: string,
-  systemPrompt: string,
-  temperature = 0.7,
-  maxTokens?: number,
-  defaultModelId?: string,
+  data: Omit<AssistantCreateInput, 'createdBy'> & { createdById: string },
 ): Promise<Assistant> {
-  const createData = {
-    name,
-    description,
-    systemPrompt,
-    temperature,
-    maxTokens,
+  const validatedData = AssistantCreateInputSchema.parse({
+    ...data,
     createdBy: {
       connect: {
-        id: userId,
+        id: data.createdById,
       },
     },
-    ...(defaultModelId && {
-      defaultModel: {
-        connect: {
-          id: defaultModelId,
-        },
-      },
-    }),
-  }
+  })
 
   const assistant = (await prisma.assistant.create({
-    data: createData,
+    data: validatedData,
     include: {
       createdBy: true,
       defaultModel: true,
@@ -48,30 +38,15 @@ export async function createAssistant(
 
 export async function updateAssistant(
   assistantId: string,
-  data: {
-    name?: string
-    description?: string
-    systemPrompt?: string
-    temperature?: number
-    maxTokens?: number
-    defaultModelId?: string
-  },
+  data: AssistantUpdateInput,
 ): Promise<Assistant> {
-  const { defaultModelId, ...updateData } = data
+  const validatedData = AssistantUpdateInputSchema.parse(data)
+
   const assistant = (await prisma.assistant.update({
     where: {
       id: assistantId,
     },
-    data: {
-      ...updateData,
-      ...(defaultModelId && {
-        defaultModel: {
-          connect: {
-            id: defaultModelId,
-          },
-        },
-      }),
-    },
+    data: validatedData,
     include: {
       createdBy: true,
       defaultModel: true,

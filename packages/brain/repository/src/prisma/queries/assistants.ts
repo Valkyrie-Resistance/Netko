@@ -1,4 +1,11 @@
-import { type Assistant, AssistantSchema } from '@chad-chat/brain-domain'
+import {
+  type Assistant,
+  type AssistantListInput,
+  AssistantListInputSchema,
+  AssistantSchema,
+  type AssistantSearchInput,
+  AssistantSearchInputSchema,
+} from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -6,14 +13,12 @@ type AssistantWithRelations = Prisma.AssistantGetPayload<{
   include: { createdBy: true; defaultModel: true }
 }>
 
-export async function getAllAssistants(
-  userId: string,
-  limit: number,
-  cursor?: string,
-): Promise<{
+export async function getAllAssistants(input: AssistantListInput): Promise<{
   assistants: Assistant[]
   nextCursor: string | null
 }> {
+  const { limit, cursor, userId } = AssistantListInputSchema.parse(input)
+
   const assistants = (await prisma.assistant.findMany({
     where: {
       createdById: userId,
@@ -37,10 +42,16 @@ export async function getAllAssistants(
   }
 }
 
-export async function getAssistantById(assistantId: string): Promise<Assistant | null> {
+export async function getAssistantById(
+  assistantId: string,
+  userId: string,
+): Promise<Assistant | null> {
   const assistant = (await prisma.assistant.findUnique({
     where: {
-      id: assistantId,
+      assistantCompoundId: {
+        id: assistantId,
+        createdById: userId,
+      },
     },
     include: {
       createdBy: true,
@@ -51,15 +62,12 @@ export async function getAssistantById(assistantId: string): Promise<Assistant |
   return assistant ? AssistantSchema.parse(assistant) : null
 }
 
-export async function searchAssistants(
-  userId: string,
-  query: string,
-  limit: number,
-  cursor?: string,
-): Promise<{
+export async function searchAssistants(input: AssistantSearchInput): Promise<{
   assistants: Assistant[]
   nextCursor: string | null
 }> {
+  const { limit, cursor, query, userId } = AssistantSearchInputSchema.parse(input)
+
   const assistants = (await prisma.assistant.findMany({
     where: {
       createdById: userId,
@@ -87,13 +95,12 @@ export async function searchAssistants(
   }
 }
 
-export async function getAllPublicAssistants(
-  limit: number,
-  cursor?: string,
-): Promise<{
+export async function getAllPublicAssistants(input: AssistantListInput): Promise<{
   assistants: Assistant[]
   nextCursor: string | null
 }> {
+  const { limit, cursor } = AssistantListInputSchema.parse(input)
+
   const assistants = (await prisma.assistant.findMany({
     where: {
       isPublic: true,

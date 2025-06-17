@@ -112,6 +112,7 @@ model Assistant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique(name: "assistantCompoundId", [id, createdById])
   @@map("assistant")
 }
 
@@ -135,6 +136,7 @@ model Thread {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique(name: "threadCompoundId", [id, userId])
   @@index([createdAt, id])
   @@index([userId])
   @@index([parentId])
@@ -167,6 +169,7 @@ model Message {
 
   createdAt DateTime @default(now())
 
+  @@unique(name: "messageCompoundId", [id, threadId])
   @@index([threadId])
   @@index([parentId])
   @@index([createdAt, id])

@@ -1,4 +1,15 @@
-import { type Thread, ThreadSchema } from '@chad-chat/brain-domain'
+import {
+  type Thread,
+  type ThreadByAssistantInput,
+  ThreadByAssistantInputSchema,
+  type ThreadListInput,
+  ThreadListInputSchema,
+  ThreadSchema,
+  type ThreadSearchInput,
+  ThreadSearchInputSchema,
+  type ThreadWithMessagesInput,
+  ThreadWithMessagesInputSchema,
+} from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -17,12 +28,13 @@ type Message = Prisma.MessageGetPayload<{
 
 export async function getAllThreads(
   userId: string,
-  limit: number,
-  cursor?: string,
+  input: ThreadListInput,
 ): Promise<{
   threads: Thread[]
   nextCursor: string | null
 }> {
+  const { limit, cursor } = ThreadListInputSchema.parse(input)
+
   const threads = (await prisma.thread.findMany({
     where: {
       userId,
@@ -49,8 +61,10 @@ export async function getAllThreads(
 export async function getThreadById(threadId: string, userId: string): Promise<Thread | null> {
   const thread = (await prisma.thread.findUnique({
     where: {
-      id: threadId,
-      userId,
+      threadCompoundId: {
+        id: threadId,
+        userId: userId,
+      },
     },
     include: {
       user: true,
@@ -61,20 +75,19 @@ export async function getThreadById(threadId: string, userId: string): Promise<T
   return thread ? ThreadSchema.parse(thread) : null
 }
 
-export async function getThreadWithMessages(
-  threadId: string,
-  userId: string,
-  limit: number,
-  cursor?: string,
-): Promise<{
+export async function getThreadWithMessages(input: ThreadWithMessagesInput): Promise<{
   thread: Thread
   messages: Message[]
   nextCursor: string | null
 } | null> {
+  const { threadId, userId, limit, cursor } = ThreadWithMessagesInputSchema.parse(input)
+
   const thread = (await prisma.thread.findUnique({
     where: {
-      id: threadId,
-      userId,
+      threadCompoundId: {
+        id: threadId,
+        userId: userId,
+      },
     },
     include: {
       messages: {
@@ -109,12 +122,13 @@ export async function getThreadWithMessages(
 export async function getMessagesInThread(
   threadId: string,
   userId: string,
-  limit: number,
-  cursor?: string,
+  input: ThreadListInput,
 ): Promise<{
   messages: Message[]
   nextCursor: string | null
 }> {
+  const { limit, cursor } = ThreadListInputSchema.parse(input)
+
   const messages = (await prisma.message.findMany({
     where: {
       threadId,
@@ -145,13 +159,13 @@ export async function getMessagesInThread(
 
 export async function searchThreads(
   userId: string,
-  query: string,
-  limit: number,
-  cursor?: string,
+  input: ThreadSearchInput,
 ): Promise<{
   threads: Thread[]
   nextCursor: string | null
 }> {
+  const { limit, cursor, query } = ThreadSearchInputSchema.parse(input)
+
   const threads = (await prisma.thread.findMany({
     where: {
       userId,
@@ -181,13 +195,13 @@ export async function searchThreads(
 
 export async function getThreadsByAssistant(
   userId: string,
-  assistantId: string,
-  limit: number,
-  cursor?: string,
+  input: ThreadByAssistantInput,
 ): Promise<{
   threads: Thread[]
   nextCursor: string | null
 }> {
+  const { limit, cursor, assistantId } = ThreadByAssistantInputSchema.parse(input)
+
   const threads = (await prisma.thread.findMany({
     where: {
       userId,

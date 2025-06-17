@@ -1,4 +1,9 @@
-import { type Message, MessageSchema } from '@chad-chat/brain-domain'
+import { 
+  type Message, 
+  type MessageListInput,
+  MessageListInputSchema,
+  MessageSchema
+} from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -8,12 +13,13 @@ type MessageWithRelations = Prisma.MessageGetPayload<{
 
 export async function getAllMessages(
   threadId: string,
-  limit: number,
-  cursor?: string,
+  input: MessageListInput
 ): Promise<{
   messages: Message[]
   nextCursor: string | null
 }> {
+  const { limit, cursor } = MessageListInputSchema.parse(input)
+
   const messages = (await prisma.message.findMany({
     where: {
       threadId,
@@ -39,8 +45,10 @@ export async function getAllMessages(
 export async function getMessageById(messageId: string, threadId: string): Promise<Message | null> {
   const message = (await prisma.message.findUnique({
     where: {
-      id: messageId,
-      threadId,
+      messageCompoundId:{
+        id: messageId,
+        threadId: threadId,
+      }
     },
     include: {
       thread: true,
@@ -48,4 +56,43 @@ export async function getMessageById(messageId: string, threadId: string): Promi
   })) as MessageWithRelations | null
 
   return message ? MessageSchema.parse(message) : null
+}
+
+export async function getMessagesUpToId(
+  threadId: string,
+  upToMessageId: string
+): Promise<Message[]> {
+  
+  const targetMessage = await prisma.message.findUnique({
+    where: {
+      messageCompoundId: {
+        id: upToMessageId,
+        threadId,
+      }
+    },
+    select: {
+      createdAt: true
+    }
+  })
+
+  if (!targetMessage) {
+    return []
+  }
+
+  const messages = (await prisma.message.findMany({
+    where: {
+      threadId,
+      createdAt: {
+        lte: targetMessage.createdAt
+      }
+    },
+    include: {
+      thread: true,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    }
+  })) as MessageWithRelations[]
+
+  return messages.map((message) => MessageSchema.parse(message))
 }
