@@ -18,10 +18,7 @@ type MessageWithRelations = Prisma.MessageGetPayload<{
   include: { thread: true }
 }>
 
-export async function addThreadToMessage(
-  messageId: string,
-  threadId: string,
-): Promise<Message> {
+export async function addThreadToMessage(messageId: string, threadId: string): Promise<Message> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedThreadId = ThreadIdSchema.parse(threadId)
 
@@ -40,10 +37,7 @@ export async function addThreadToMessage(
   return MessageSchema.parse(message)
 }
 
-export async function addUserToMessage(
-  messageId: string,
-  userId: string,
-): Promise<Message> {
+export async function addUserToMessage(messageId: string, userId: string): Promise<Message> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedUserId = UserIdSchema.parse(userId)
 
@@ -84,10 +78,7 @@ export async function addAssistantToMessage(
   return MessageSchema.parse(message)
 }
 
-export async function addModelToMessage(
-  messageId: string,
-  modelId: string,
-): Promise<Message> {
+export async function addModelToMessage(messageId: string, modelId: string): Promise<Message> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedModelId = LLMModelIdSchema.parse(modelId)
 
@@ -106,10 +97,7 @@ export async function addModelToMessage(
   return MessageSchema.parse(message)
 }
 
-export async function addParentToMessage(
-  messageId: string,
-  parentId: string,
-): Promise<Message> {
+export async function addParentToMessage(messageId: string, parentId: string): Promise<Message> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedParentId = MessageIdSchema.parse(parentId)
 

@@ -63,7 +63,10 @@ export async function addCreatorToAssistant(
 }
 
 export async function createAssistant(
-  data: Omit<AssistantCreateInput, 'defaultModel' | 'createdBy'> & { createdById: string; defaultModelId?: string },
+  data: Omit<AssistantCreateInput, 'defaultModel' | 'createdBy'> & {
+    createdById: string
+    defaultModelId?: string
+  },
 ): Promise<Assistant> {
   const validatedData = AssistantCreateInputSchema.parse(data)
 

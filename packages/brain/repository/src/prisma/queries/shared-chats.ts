@@ -70,7 +70,10 @@ export async function getSharedChatById(sharedChatId: string): Promise<SharedCha
   return sharedChat ? SharedChatSchema.parse(sharedChat) : null
 }
 
-export async function getSharedChatByUserId(sharedChatId: string, userId: string): Promise<SharedChat | null> {
+export async function getSharedChatByUserId(
+  sharedChatId: string,
+  userId: string,
+): Promise<SharedChat | null> {
   const validatedId = SharedChatIdSchema.parse(sharedChatId)
   const validatedUserId = UserIdSchema.parse(userId)
 

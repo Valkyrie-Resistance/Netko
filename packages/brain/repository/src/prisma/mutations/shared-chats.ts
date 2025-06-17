@@ -63,7 +63,10 @@ export async function addSharedByToSharedChat(
 }
 
 export async function createSharedChat(
-  data: Omit<SharedChatCreateInput, 'thread' | 'sharedBy'> & { threadId: string; sharedById: string },
+  data: Omit<SharedChatCreateInput, 'thread' | 'sharedBy'> & {
+    threadId: string
+    sharedById: string
+  },
 ): Promise<SharedChat> {
   const validatedData = SharedChatCreateInputSchema.parse(data)
 

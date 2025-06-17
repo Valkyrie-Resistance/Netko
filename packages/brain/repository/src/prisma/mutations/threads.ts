@@ -15,10 +15,7 @@ type ThreadWithRelations = Prisma.ThreadGetPayload<{
   include: { user: true; assistant: true }
 }>
 
-export async function addUserToThread(
-  threadId: string,
-  userId: string,
-): Promise<Thread> {
+export async function addUserToThread(threadId: string, userId: string): Promise<Thread> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
   const validatedUserId = ThreadIdSchema.parse(userId)
 
@@ -38,10 +35,7 @@ export async function addUserToThread(
   return ThreadSchema.parse(thread)
 }
 
-export async function addAssistantToThread(
-  threadId: string,
-  assistantId: string,
-): Promise<Thread> {
+export async function addAssistantToThread(threadId: string, assistantId: string): Promise<Thread> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
   const validatedAssistantId = AssistantIdSchema.parse(assistantId)
 
@@ -61,10 +55,7 @@ export async function addAssistantToThread(
   return ThreadSchema.parse(thread)
 }
 
-export async function addParentToThread(
-  threadId: string,
-  parentId: string,
-): Promise<Thread> {
+export async function addParentToThread(threadId: string, parentId: string): Promise<Thread> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
   const validatedParentId = ThreadIdSchema.parse(parentId)
 

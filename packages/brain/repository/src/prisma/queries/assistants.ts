@@ -61,8 +61,8 @@ export async function getAssistantById(
 
   const assistant = (await prisma.assistant.findFirst({
     where: {
-        id: validatedId,
-        createdById: userId,
+      id: validatedId,
+      createdById: userId,
     },
     include: {
       createdBy: true,
