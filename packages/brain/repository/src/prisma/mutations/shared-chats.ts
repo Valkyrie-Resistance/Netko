@@ -2,6 +2,7 @@ import {
   type SharedChat,
   type SharedChatCreateInput,
   SharedChatCreateInputSchema,
+  SharedChatIdSchema,
   SharedChatSchema,
   type SharedChatUpdateInput,
   SharedChatUpdateInputSchema,
@@ -39,12 +40,13 @@ export async function createSharedChat(
 export async function updateSharedChat(
   sharedChatId: string,
   data: SharedChatUpdateInput,
-): Promise<SharedChat | null> {
+): Promise<SharedChat> {
+  const validatedId = SharedChatIdSchema.parse(sharedChatId)
   const validatedData = SharedChatUpdateInputSchema.parse(data)
 
   const sharedChat = (await prisma.sharedChat.update({
     where: {
-      id: sharedChatId,
+      id: validatedId,
     },
     data: validatedData,
     include: {
@@ -56,10 +58,12 @@ export async function updateSharedChat(
   return SharedChatSchema.parse(sharedChat)
 }
 
-export async function deleteSharedChat(sharedChatId: string): Promise<SharedChat | null> {
+export async function deleteSharedChat(sharedChatId: string): Promise<SharedChat> {
+  const validatedId = SharedChatIdSchema.parse(sharedChatId)
+  
   const sharedChat = (await prisma.sharedChat.delete({
     where: {
-      id: sharedChatId,
+      id: validatedId,
     },
     include: {
       thread: true,

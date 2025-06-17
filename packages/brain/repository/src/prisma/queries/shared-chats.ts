@@ -2,6 +2,7 @@ import {
   type SharedChat,
   type SharedChatByShareIdInput,
   SharedChatByShareIdInputSchema,
+  SharedChatIdSchema,
   type SharedChatListInput,
   SharedChatListInputSchema,
   SharedChatSchema,
@@ -27,25 +28,31 @@ export async function getAllSharedChats(input: SharedChatListInput): Promise<{
       thread: true,
       sharedBy: true,
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: [
+      { createdAt: 'desc' },
+      { id: 'desc' }
+    ],
     take: limit + 1,
-    cursor: cursor ? { id: cursor } : undefined,
+    cursor: cursor ? { 
+      createdAt: cursor,
+      id: cursor
+    } : undefined,
   })) as SharedChatWithRelations[]
 
-  const nextCursor = sharedChats.length > limit ? (sharedChats.pop()?.id ?? null) : null
-
+  const nextCursor = sharedChats.length > limit ? sharedChats[limit]?.createdAt.toISOString() ?? null : null
+  const page = sharedChats.slice(0, limit)
   return {
-    sharedChats: sharedChats.map((sharedChat) => SharedChatSchema.parse(sharedChat)),
+    sharedChats: page.map((sharedChat) => SharedChatSchema.parse(sharedChat)),
     nextCursor,
   }
 }
 
 export async function getSharedChatById(sharedChatId: string): Promise<SharedChat | null> {
+  const validatedId = SharedChatIdSchema.parse(sharedChatId)
+  
   const sharedChat = (await prisma.sharedChat.findUnique({
     where: {
-      id: sharedChatId,
+      id: validatedId,
     },
     include: {
       thread: true,

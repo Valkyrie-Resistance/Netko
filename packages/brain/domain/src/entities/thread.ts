@@ -2,12 +2,15 @@ import { z } from 'zod'
 import { AssistantSchema } from './assistant'
 import { UserSchema } from './user'
 
+export const ThreadIdSchema = z.string()
+export type ThreadId = z.infer<typeof ThreadIdSchema>
+
 export const ThreadSchema = z.object({
-  id: z.string(),
+  id: ThreadIdSchema,
   title: z.string().nullish(),
   user: UserSchema.optional(),
   assistant: AssistantSchema.optional(),
-  parentId: z.string().nullish(),
+  parentId: ThreadIdSchema.nullish(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

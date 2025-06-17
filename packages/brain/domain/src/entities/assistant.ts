@@ -2,8 +2,11 @@ import { z } from 'zod'
 import { LLMModelSchema } from './llm-model'
 import { UserSchema } from './user'
 
+export const AssistantIdSchema = z.string()
+export type AssistantId = z.infer<typeof AssistantIdSchema>
+
 export const AssistantSchema = z.object({
-  id: z.string(),
+  id: AssistantIdSchema,
   name: z.string(),
   description: z.string().nullish(),
   systemPrompt: z.string(),

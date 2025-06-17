@@ -2,6 +2,7 @@ import {
   type Thread,
   type ThreadCreateInput,
   ThreadCreateInputSchema,
+  ThreadIdSchema,
   ThreadSchema,
   type ThreadUpdateInput,
   ThreadUpdateInputSchema,
@@ -16,16 +17,18 @@ type ThreadWithRelations = Prisma.ThreadGetPayload<{
 export async function createThread(
   data: Omit<ThreadCreateInput, 'user' | 'assistant'> & { userId: string; assistantId: string },
 ): Promise<Thread> {
+  const validatedUserId = ThreadIdSchema.parse(data.userId)
+  const validatedAssistantId = ThreadIdSchema.parse(data.assistantId)
   const validatedData = ThreadCreateInputSchema.parse({
     ...data,
     user: {
       connect: {
-        id: data.userId,
+        id: validatedUserId,
       },
     },
     assistant: {
       connect: {
-        id: data.assistantId,
+        id: validatedAssistantId,
       },
     },
   })
@@ -45,13 +48,14 @@ export async function updateThread(
   threadId: string,
   data: Omit<ThreadUpdateInput, 'assistant'> & { assistantId?: string },
 ): Promise<Thread | null> {
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
   const { assistantId, ...updateData } = data
   const validatedData = ThreadUpdateInputSchema.parse({
     ...updateData,
     ...(assistantId && {
       assistant: {
         connect: {
-          id: assistantId,
+          id: ThreadIdSchema.parse(assistantId),
         },
       },
     }),
@@ -59,7 +63,7 @@ export async function updateThread(
 
   const thread = (await prisma.thread.update({
     where: {
-      id: threadId,
+      id: validatedThreadId,
     },
     data: validatedData,
     include: {
@@ -72,9 +76,11 @@ export async function updateThread(
 }
 
 export async function deleteThread(threadId: string): Promise<Thread | null> {
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
+  
   const thread = (await prisma.thread.delete({
     where: {
-      id: threadId,
+      id: validatedThreadId,
     },
     include: {
       user: true,

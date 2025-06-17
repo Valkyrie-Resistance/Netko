@@ -2,6 +2,7 @@ import {
   type Message,
   type MessageCreateInput,
   MessageCreateInputSchema,
+  MessageIdSchema,
   MessageSchema,
   type MessageUpdateInput,
   MessageUpdateInputSchema,
@@ -16,11 +17,12 @@ type MessageWithRelations = Prisma.MessageGetPayload<{
 export async function createMessage(
   data: Omit<MessageCreateInput, 'thread'> & { threadId: string },
 ): Promise<Message> {
+  const validatedThreadId = MessageIdSchema.parse(data.threadId)
   const validatedData = MessageCreateInputSchema.parse({
     ...data,
     thread: {
       connect: {
-        id: data.threadId,
+        id: validatedThreadId,
       },
     },
   })
@@ -40,12 +42,14 @@ export async function updateMessage(
   threadId: string,
   data: MessageUpdateInput,
 ): Promise<Message | null> {
+  const validatedMessageId = MessageIdSchema.parse(messageId)
+  const validatedThreadId = MessageIdSchema.parse(threadId)
   const validatedData = MessageUpdateInputSchema.parse(data)
 
   const message = (await prisma.message.update({
     where: {
-      id: messageId,
-      threadId,
+      id: validatedMessageId,
+      threadId: validatedThreadId,
     },
     data: validatedData,
     include: {
@@ -57,10 +61,13 @@ export async function updateMessage(
 }
 
 export async function deleteMessage(messageId: string, threadId: string): Promise<Message | null> {
+  const validatedMessageId = MessageIdSchema.parse(messageId)
+  const validatedThreadId = MessageIdSchema.parse(threadId)
+  
   const message = (await prisma.message.delete({
     where: {
-      id: messageId,
-      threadId,
+      id: validatedMessageId,
+      threadId: validatedThreadId,
     },
     include: {
       thread: true,

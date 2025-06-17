@@ -2,6 +2,7 @@ import {
   type Thread,
   type ThreadByAssistantInput,
   ThreadByAssistantInputSchema,
+  ThreadIdSchema,
   type ThreadListInput,
   ThreadListInputSchema,
   ThreadSchema,
@@ -43,26 +44,32 @@ export async function getAllThreads(
       user: true,
       assistant: true,
     },
-    orderBy: {
-      updatedAt: 'desc',
-    },
+    orderBy: [
+      { updatedAt: 'desc' },
+      { id: 'desc' }
+    ],
     take: limit + 1,
-    cursor: cursor ? { id: cursor } : undefined,
+    cursor: cursor ? { 
+      updatedAt: cursor,
+      id: cursor
+    } : undefined,
   })) as ThreadWithRelations[]
 
-  const nextCursor = threads.length > limit ? (threads.pop()?.id ?? null) : null
-
+  const nextCursor = threads.length > limit ? threads[limit]?.updatedAt.toISOString() ?? null : null
+  const page = threads.slice(0, limit)
   return {
-    threads: threads.map((thread) => ThreadSchema.parse(thread)),
+    threads: page.map((thread) => ThreadSchema.parse(thread)),
     nextCursor,
   }
 }
 
 export async function getThreadById(threadId: string, userId: string): Promise<Thread | null> {
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
+  
   const thread = (await prisma.thread.findUnique({
     where: {
       threadCompoundId: {
-        id: threadId,
+        id: validatedThreadId,
         userId: userId,
       },
     },
@@ -81,21 +88,26 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
   nextCursor: string | null
 } | null> {
   const { threadId, userId, limit, cursor } = ThreadWithMessagesInputSchema.parse(input)
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
 
   const thread = (await prisma.thread.findUnique({
     where: {
       threadCompoundId: {
-        id: threadId,
+        id: validatedThreadId,
         userId: userId,
       },
     },
     include: {
       messages: {
-        orderBy: {
-          createdAt: 'asc',
-        },
+        orderBy: [
+          { createdAt: 'asc' },
+          { id: 'asc' }
+        ],
         take: limit + 1,
-        cursor: cursor ? { id: cursor } : undefined,
+        cursor: cursor ? { 
+          createdAt: cursor,
+          id: cursor
+        } : undefined,
         select: {
           id: true,
           content: true,
@@ -110,11 +122,12 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
     return null
   }
 
-  const nextCursor = thread.messages.length > limit ? (thread.messages.pop()?.id ?? null) : null
+  const nextCursor = thread.messages.length > limit ? thread.messages[limit]?.createdAt.toISOString() ?? null : null
+  const page = thread.messages.slice(0, limit)
 
   return {
     thread: ThreadSchema.parse(thread),
-    messages: thread.messages,
+    messages: page,
     nextCursor,
   }
 }
@@ -127,20 +140,25 @@ export async function getMessagesInThread(
   messages: Message[]
   nextCursor: string | null
 }> {
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
   const { limit, cursor } = ThreadListInputSchema.parse(input)
 
   const messages = (await prisma.message.findMany({
     where: {
-      threadId,
+      threadId: validatedThreadId,
       thread: {
         userId,
       },
     },
-    orderBy: {
-      createdAt: 'asc',
-    },
+    orderBy: [
+      { createdAt: 'asc' },
+      { id: 'asc' }
+    ],
     take: limit + 1,
-    cursor: cursor ? { id: cursor } : undefined,
+    cursor: cursor ? { 
+      createdAt: cursor,
+      id: cursor
+    } : undefined,
     select: {
       id: true,
       content: true,
@@ -149,10 +167,11 @@ export async function getMessagesInThread(
     },
   })) as Message[]
 
-  const nextCursor = messages.length > limit ? (messages.pop()?.id ?? null) : null
+  const nextCursor = messages.length > limit ? messages[limit]?.createdAt.toISOString() ?? null : null
+  const page = messages.slice(0, limit)
 
   return {
-    messages,
+    messages: page,
     nextCursor,
   }
 }
@@ -178,17 +197,21 @@ export async function searchThreads(
       user: true,
       assistant: true,
     },
-    orderBy: {
-      updatedAt: 'desc',
-    },
+    orderBy: [
+      { updatedAt: 'desc' },
+      { id: 'desc' }
+    ],
     take: limit + 1,
-    cursor: cursor ? { id: cursor } : undefined,
+    cursor: cursor ? { 
+      updatedAt: cursor,
+      id: cursor
+    } : undefined,
   })) as ThreadWithRelations[]
 
-  const nextCursor = threads.length > limit ? (threads.pop()?.id ?? null) : null
-
+  const nextCursor = threads.length > limit ? threads[limit]?.updatedAt.toISOString() ?? null : null
+  const page = threads.slice(0, limit)
   return {
-    threads: threads.map((thread) => ThreadSchema.parse(thread)),
+    threads: page.map((thread) => ThreadSchema.parse(thread)),
     nextCursor,
   }
 }
@@ -211,17 +234,21 @@ export async function getThreadsByAssistant(
       user: true,
       assistant: true,
     },
-    orderBy: {
-      updatedAt: 'desc',
-    },
+    orderBy: [
+      { updatedAt: 'desc' },
+      { id: 'desc' }
+    ],
     take: limit + 1,
-    cursor: cursor ? { id: cursor } : undefined,
+    cursor: cursor ? { 
+      updatedAt: cursor,
+      id: cursor
+    } : undefined,
   })) as ThreadWithRelations[]
 
-  const nextCursor = threads.length > limit ? (threads.pop()?.id ?? null) : null
-
+  const nextCursor = threads.length > limit ? threads[limit]?.updatedAt.toISOString() ?? null : null
+  const page = threads.slice(0, limit)
   return {
-    threads: threads.map((thread) => ThreadSchema.parse(thread)),
+    threads: page.map((thread) => ThreadSchema.parse(thread)),
     nextCursor,
   }
 }

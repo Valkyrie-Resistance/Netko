@@ -1,5 +1,6 @@
 import {
   type Message,
+  MessageIdSchema,
   type MessageListInput,
   MessageListInputSchema,
   MessageSchema,
@@ -27,27 +28,34 @@ export async function getAllMessages(
     include: {
       thread: true,
     },
-    orderBy: {
-      createdAt: 'asc',
-    },
+    orderBy: [
+      { createdAt: 'asc' },
+      { id: 'asc' }
+    ],
     take: limit + 1,
-    cursor: cursor ? { id: cursor } : undefined,
+    cursor: cursor ? { 
+      createdAt: cursor,
+      id: cursor
+    } : undefined,
   })) as MessageWithRelations[]
 
-  const nextCursor = messages.length > limit ? (messages.pop()?.id ?? null) : null
-
+  const nextCursor = messages.length > limit ? messages[limit]?.createdAt.toISOString() ?? null : null
+  const page = messages.slice(0, limit)
   return {
-    messages: messages.map((message) => MessageSchema.parse(message)),
+    messages: page.map((message) => MessageSchema.parse(message)),
     nextCursor,
   }
 }
 
 export async function getMessageById(messageId: string, threadId: string): Promise<Message | null> {
+  const validatedMessageId = MessageIdSchema.parse(messageId)
+  const validatedThreadId = MessageIdSchema.parse(threadId)
+  
   const message = (await prisma.message.findUnique({
     where: {
       messageCompoundId: {
-        id: messageId,
-        threadId: threadId,
+        id: validatedMessageId,
+        threadId: validatedThreadId,
       },
     },
     include: {
@@ -62,11 +70,14 @@ export async function getMessagesUpToId(
   threadId: string,
   upToMessageId: string,
 ): Promise<Message[]> {
+  const validatedThreadId = MessageIdSchema.parse(threadId)
+  const validatedMessageId = MessageIdSchema.parse(upToMessageId)
+  
   const targetMessage = await prisma.message.findUnique({
     where: {
       messageCompoundId: {
-        id: upToMessageId,
-        threadId,
+        id: validatedMessageId,
+        threadId: validatedThreadId,
       },
     },
     select: {
@@ -80,7 +91,7 @@ export async function getMessagesUpToId(
 
   const messages = (await prisma.message.findMany({
     where: {
-      threadId,
+      threadId: validatedThreadId,
       createdAt: {
         lte: targetMessage.createdAt,
       },

@@ -2,6 +2,7 @@ import {
   type Assistant,
   type AssistantCreateInput,
   AssistantCreateInputSchema,
+  AssistantIdSchema,
   AssistantSchema,
   type AssistantUpdateInput,
   AssistantUpdateInputSchema,
@@ -40,11 +41,12 @@ export async function updateAssistant(
   assistantId: string,
   data: AssistantUpdateInput,
 ): Promise<Assistant> {
+  const validatedId = AssistantIdSchema.parse(assistantId)
   const validatedData = AssistantUpdateInputSchema.parse(data)
 
   const assistant = (await prisma.assistant.update({
     where: {
-      id: assistantId,
+      id: validatedId,
     },
     data: validatedData,
     include: {
@@ -57,9 +59,11 @@ export async function updateAssistant(
 }
 
 export async function deleteAssistant(assistantId: string): Promise<Assistant | null> {
+  const validatedId = AssistantIdSchema.parse(assistantId)
+  
   const assistant = (await prisma.assistant.delete({
     where: {
-      id: assistantId,
+      id: validatedId,
     },
     include: {
       createdBy: true,
