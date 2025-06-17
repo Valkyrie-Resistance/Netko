@@ -63,7 +63,7 @@ export async function updateMessage(
 export async function deleteMessage(messageId: string, threadId: string): Promise<Message | null> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedThreadId = MessageIdSchema.parse(threadId)
-  
+
   const message = (await prisma.message.delete({
     where: {
       id: validatedMessageId,

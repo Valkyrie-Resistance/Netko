@@ -28,18 +28,18 @@ export async function getAllAssistants(input: AssistantListInput): Promise<{
       createdBy: true,
       defaultModel: true,
     },
-    orderBy: [
-      { updatedAt: 'desc' },
-      { id: 'desc' }
-    ],
+    orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
-    cursor: cursor ? { 
-      updatedAt: cursor,
-      id: cursor
-    } : undefined,
+    cursor: cursor
+      ? {
+          updatedAt: cursor,
+          id: cursor,
+        }
+      : undefined,
   })) as AssistantWithRelations[]
 
-  const nextCursor = assistants.length > limit ? assistants[limit]?.updatedAt.toISOString() ?? null : null
+  const nextCursor =
+    assistants.length > limit ? (assistants[limit]?.updatedAt.toISOString() ?? null) : null
   const page = assistants.slice(0, limit)
   return {
     assistants: page.map((assistant) => AssistantSchema.parse(assistant)),
@@ -52,7 +52,7 @@ export async function getAssistantById(
   userId: string,
 ): Promise<Assistant | null> {
   const validatedId = AssistantIdSchema.parse(assistantId)
-  
+
   const assistant = (await prisma.assistant.findUnique({
     where: {
       assistantCompoundId: {
@@ -87,18 +87,18 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
       createdBy: true,
       defaultModel: true,
     },
-    orderBy: [
-      { updatedAt: 'desc' },
-      { id: 'desc' }
-    ],
+    orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
-    cursor: cursor ? { 
-      updatedAt: cursor,
-      id: cursor
-    } : undefined,
+    cursor: cursor
+      ? {
+          updatedAt: cursor,
+          id: cursor,
+        }
+      : undefined,
   })) as AssistantWithRelations[]
 
-  const nextCursor = assistants.length > limit ? assistants[limit]?.updatedAt.toISOString() ?? null : null
+  const nextCursor =
+    assistants.length > limit ? (assistants[limit]?.updatedAt.toISOString() ?? null) : null
 
   return {
     assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
@@ -120,18 +120,18 @@ export async function getAllPublicAssistants(input: AssistantListInput): Promise
       createdBy: true,
       defaultModel: true,
     },
-    orderBy: [
-      { updatedAt: 'desc' },
-      { id: 'desc' }
-    ],
+    orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
-    cursor: cursor ? { 
-      updatedAt: cursor,
-      id: cursor
-    } : undefined,
+    cursor: cursor
+      ? {
+          updatedAt: cursor,
+          id: cursor,
+        }
+      : undefined,
   })) as AssistantWithRelations[]
 
-  const nextCursor = assistants.length > limit ? assistants[limit]?.updatedAt.toISOString() ?? null : null
+  const nextCursor =
+    assistants.length > limit ? (assistants[limit]?.updatedAt.toISOString() ?? null) : null
 
   return {
     assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
@@ -141,7 +141,7 @@ export async function getAllPublicAssistants(input: AssistantListInput): Promise
 
 export async function getPublicAssistantById(assistantId: string): Promise<Assistant | null> {
   const validatedId = AssistantIdSchema.parse(assistantId)
-  
+
   const assistant = (await prisma.assistant.findUnique({
     where: {
       id: validatedId,

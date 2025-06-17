@@ -77,7 +77,7 @@ export async function updateThread(
 
 export async function deleteThread(threadId: string): Promise<Thread | null> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
-  
+
   const thread = (await prisma.thread.delete({
     where: {
       id: validatedThreadId,

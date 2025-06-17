@@ -60,7 +60,7 @@ export async function updateAssistant(
 
 export async function deleteAssistant(assistantId: string): Promise<Assistant | null> {
   const validatedId = AssistantIdSchema.parse(assistantId)
-  
+
   const assistant = (await prisma.assistant.delete({
     where: {
       id: validatedId,

@@ -60,7 +60,7 @@ export async function updateSharedChat(
 
 export async function deleteSharedChat(sharedChatId: string): Promise<SharedChat> {
   const validatedId = SharedChatIdSchema.parse(sharedChatId)
-  
+
   const sharedChat = (await prisma.sharedChat.delete({
     where: {
       id: validatedId,

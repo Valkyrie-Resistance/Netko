@@ -28,18 +28,18 @@ export async function getAllMessages(
     include: {
       thread: true,
     },
-    orderBy: [
-      { createdAt: 'asc' },
-      { id: 'asc' }
-    ],
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     take: limit + 1,
-    cursor: cursor ? { 
-      createdAt: cursor,
-      id: cursor
-    } : undefined,
+    cursor: cursor
+      ? {
+          createdAt: cursor,
+          id: cursor,
+        }
+      : undefined,
   })) as MessageWithRelations[]
 
-  const nextCursor = messages.length > limit ? messages[limit]?.createdAt.toISOString() ?? null : null
+  const nextCursor =
+    messages.length > limit ? (messages[limit]?.createdAt.toISOString() ?? null) : null
   const page = messages.slice(0, limit)
   return {
     messages: page.map((message) => MessageSchema.parse(message)),
@@ -50,7 +50,7 @@ export async function getAllMessages(
 export async function getMessageById(messageId: string, threadId: string): Promise<Message | null> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedThreadId = MessageIdSchema.parse(threadId)
-  
+
   const message = (await prisma.message.findUnique({
     where: {
       messageCompoundId: {
@@ -72,7 +72,7 @@ export async function getMessagesUpToId(
 ): Promise<Message[]> {
   const validatedThreadId = MessageIdSchema.parse(threadId)
   const validatedMessageId = MessageIdSchema.parse(upToMessageId)
-  
+
   const targetMessage = await prisma.message.findUnique({
     where: {
       messageCompoundId: {
