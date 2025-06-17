@@ -7,6 +7,7 @@ import {
   ThreadSchema,
   type ThreadUpdateInput,
   ThreadUpdateInputSchema,
+  UserIdSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -17,7 +18,7 @@ type ThreadWithRelations = Prisma.ThreadGetPayload<{
 
 export async function addUserToThread(threadId: string, userId: string): Promise<Thread> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
-  const validatedUserId = ThreadIdSchema.parse(userId)
+  const validatedUserId = UserIdSchema.parse(userId)
 
   const thread = (await prisma.thread.update({
     where: {
@@ -79,7 +80,7 @@ export async function createThread(
   data: Omit<ThreadCreateInput, 'user' | 'assistant'> & { userId: string; assistantId: string },
 ): Promise<Thread> {
   const validatedData = ThreadCreateInputSchema.parse(data)
-  const validatedUserId = ThreadIdSchema.parse(data.userId)
+  const validatedUserId = UserIdSchema.parse(data.userId)
   const validatedAssistantId = AssistantIdSchema.parse(data.assistantId)
 
   const thread = (await prisma.thread.create({

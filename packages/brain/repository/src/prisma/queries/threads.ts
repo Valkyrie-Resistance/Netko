@@ -8,6 +8,7 @@ import {
   ThreadSchema,
   type ThreadSearchInput,
   ThreadSearchInputSchema,
+  ThreadWithMessagesInThreadSchema,
   type ThreadWithMessagesInput,
   ThreadWithMessagesInputSchema,
 } from '@chad-chat/brain-domain'
@@ -153,7 +154,7 @@ export async function getMessagesInThread(
   nextCursor: { createdAt: string; id: string } | null
 }> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
-  const { limit, cursor } = ThreadListInputSchema.parse(input)
+  const { limit, cursor } = ThreadWithMessagesInThreadSchema.parse(input)
 
   const messages = (await prisma.message.findMany({
     where: {

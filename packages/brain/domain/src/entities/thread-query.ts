@@ -29,6 +29,11 @@ export const ThreadWithMessagesInputSchema = z.object({
   cursor: ThreadWithMessagesCursorSchema.optional(),
 })
 
+export const ThreadWithMessagesInThreadSchema = z.object({
+  threadId: ThreadIdSchema,
+  limit: z.number().int().positive(),
+  cursor: ThreadWithMessagesCursorSchema.optional(),
+})
 export const ThreadByAssistantInputSchema = ThreadListInputSchema.extend({
   assistantId: AssistantIdSchema,
 })
