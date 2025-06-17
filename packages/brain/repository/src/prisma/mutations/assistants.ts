@@ -35,20 +35,19 @@ export async function createAssistant(
     }),
   }
 
-  const assistant = await prisma.assistant.create({
+  const assistant = (await prisma.assistant.create({
     data: createData,
     include: {
       createdBy: true,
       defaultModel: true,
     },
-  }) as AssistantWithRelations
+  })) as AssistantWithRelations
 
   return AssistantSchema.parse(assistant)
 }
 
 export async function updateAssistant(
   assistantId: string,
-  userId: string,
   data: {
     name?: string
     description?: string
@@ -57,12 +56,11 @@ export async function updateAssistant(
     maxTokens?: number
     defaultModelId?: string
   },
-): Promise<Assistant | null> {
+): Promise<Assistant> {
   const { defaultModelId, ...updateData } = data
-  const assistant = await prisma.assistant.update({
+  const assistant = (await prisma.assistant.update({
     where: {
       id: assistantId,
-      createdById: userId,
     },
     data: {
       ...updateData,
@@ -78,25 +76,21 @@ export async function updateAssistant(
       createdBy: true,
       defaultModel: true,
     },
-  }) as AssistantWithRelations
+  })) as AssistantWithRelations
 
   return AssistantSchema.parse(assistant)
 }
 
-export async function deleteAssistant(
-  assistantId: string,
-  userId: string,
-): Promise<Assistant | null> {
-  const assistant = await prisma.assistant.delete({
+export async function deleteAssistant(assistantId: string): Promise<Assistant | null> {
+  const assistant = (await prisma.assistant.delete({
     where: {
       id: assistantId,
-      createdById: userId,
     },
     include: {
       createdBy: true,
       defaultModel: true,
     },
-  }) as AssistantWithRelations
+  })) as AssistantWithRelations
 
   return AssistantSchema.parse(assistant)
 }

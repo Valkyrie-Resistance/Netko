@@ -23,7 +23,7 @@ export async function getAllThreads(
   threads: Thread[]
   nextCursor: string | null
 }> {
-  const threads = await prisma.thread.findMany({
+  const threads = (await prisma.thread.findMany({
     where: {
       userId,
     },
@@ -36,7 +36,7 @@ export async function getAllThreads(
     },
     take: limit + 1,
     cursor: cursor ? { id: cursor } : undefined,
-  }) as ThreadWithRelations[]
+  })) as ThreadWithRelations[]
 
   const nextCursor = threads.length > limit ? (threads.pop()?.id ?? null) : null
 
@@ -46,11 +46,8 @@ export async function getAllThreads(
   }
 }
 
-export async function getThreadById(
-  threadId: string,
-  userId: string,
-): Promise<Thread | null> {
-  const thread = await prisma.thread.findUnique({
+export async function getThreadById(threadId: string, userId: string): Promise<Thread | null> {
+  const thread = (await prisma.thread.findUnique({
     where: {
       id: threadId,
       userId,
@@ -59,7 +56,7 @@ export async function getThreadById(
       user: true,
       assistant: true,
     },
-  }) as ThreadWithRelations | null
+  })) as ThreadWithRelations | null
 
   return thread ? ThreadSchema.parse(thread) : null
 }
@@ -74,7 +71,7 @@ export async function getThreadWithMessages(
   messages: Message[]
   nextCursor: string | null
 } | null> {
-  const thread = await prisma.thread.findUnique({
+  const thread = (await prisma.thread.findUnique({
     where: {
       id: threadId,
       userId,
@@ -94,13 +91,13 @@ export async function getThreadWithMessages(
         },
       },
     },
-  }) as (ThreadWithRelations & { messages: Message[] }) | null
+  })) as (ThreadWithRelations & { messages: Message[] }) | null
 
   if (!thread) {
     return null
   }
 
-  const nextCursor = thread.messages.length > limit ? thread.messages.pop()?.id ?? null : null
+  const nextCursor = thread.messages.length > limit ? (thread.messages.pop()?.id ?? null) : null
 
   return {
     thread: ThreadSchema.parse(thread),
@@ -117,7 +114,7 @@ export async function getMessagesInThread(
   messages: Message[]
   nextCursor: string | null
 }> {
-  const messages = await prisma.message.findMany({
+  const messages = (await prisma.message.findMany({
     where: {
       threadId,
     },
@@ -132,9 +129,9 @@ export async function getMessagesInThread(
       role: true,
       createdAt: true,
     },
-  }) as Message[]
+  })) as Message[]
 
-  const nextCursor = messages.length > limit ? messages.pop()?.id ?? null : null
+  const nextCursor = messages.length > limit ? (messages.pop()?.id ?? null) : null
 
   return {
     messages,
@@ -151,7 +148,7 @@ export async function searchThreads(
   threads: Thread[]
   nextCursor: string | null
 }> {
-  const threads = await prisma.thread.findMany({
+  const threads = (await prisma.thread.findMany({
     where: {
       userId,
       title: {
@@ -168,7 +165,7 @@ export async function searchThreads(
     },
     take: limit + 1,
     cursor: cursor ? { id: cursor } : undefined,
-  }) as ThreadWithRelations[]
+  })) as ThreadWithRelations[]
 
   const nextCursor = threads.length > limit ? (threads.pop()?.id ?? null) : null
 
@@ -187,7 +184,7 @@ export async function getThreadsByAssistant(
   threads: Thread[]
   nextCursor: string | null
 }> {
-  const threads = await prisma.thread.findMany({
+  const threads = (await prisma.thread.findMany({
     where: {
       userId,
       assistantId,
@@ -201,7 +198,7 @@ export async function getThreadsByAssistant(
     },
     take: limit + 1,
     cursor: cursor ? { id: cursor } : undefined,
-  }) as ThreadWithRelations[]
+  })) as ThreadWithRelations[]
 
   const nextCursor = threads.length > limit ? (threads.pop()?.id ?? null) : null
 

@@ -14,7 +14,7 @@ export async function getAllAssistants(
   assistants: Assistant[]
   nextCursor: string | null
 }> {
-  const assistants = await prisma.assistant.findMany({
+  const assistants = (await prisma.assistant.findMany({
     where: {
       createdById: userId,
     },
@@ -27,9 +27,9 @@ export async function getAllAssistants(
     },
     take: limit + 1,
     cursor: cursor ? { id: cursor } : undefined,
-  }) as AssistantWithRelations[]
+  })) as AssistantWithRelations[]
 
-  const nextCursor = assistants.length > limit ? (assistants.pop()?.id ?? null) : null
+  const nextCursor = assistants.length > limit ? (assistants[limit]?.id ?? null) : null
 
   return {
     assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
@@ -37,20 +37,16 @@ export async function getAllAssistants(
   }
 }
 
-export async function getAssistantById(
-  assistantId: string,
-  userId: string,
-): Promise<Assistant | null> {
-  const assistant = await prisma.assistant.findUnique({
+export async function getAssistantById(assistantId: string): Promise<Assistant | null> {
+  const assistant = (await prisma.assistant.findUnique({
     where: {
       id: assistantId,
-      createdById: userId,
     },
     include: {
       createdBy: true,
       defaultModel: true,
     },
-  }) as AssistantWithRelations | null
+  })) as AssistantWithRelations | null
 
   return assistant ? AssistantSchema.parse(assistant) : null
 }
@@ -64,7 +60,7 @@ export async function searchAssistants(
   assistants: Assistant[]
   nextCursor: string | null
 }> {
-  const assistants = await prisma.assistant.findMany({
+  const assistants = (await prisma.assistant.findMany({
     where: {
       createdById: userId,
       name: {
@@ -81,7 +77,7 @@ export async function searchAssistants(
     },
     take: limit + 1,
     cursor: cursor ? { id: cursor } : undefined,
-  }) as AssistantWithRelations[]
+  })) as AssistantWithRelations[]
 
   const nextCursor = assistants.length > limit ? (assistants.pop()?.id ?? null) : null
 
@@ -91,64 +87,47 @@ export async function searchAssistants(
   }
 }
 
-export const assistants = {
-  getAllPublic: async (
-    limit: number,
-    cursor?: string,
-  ): Promise<{
-    assistants: Assistant[]
-    nextCursor: string | null
-  }> => {
-    const assistants = (await prisma.assistant.findMany({
-      where: {
-        isPublic: true,
-      },
-      include: {
-        createdBy: true,
-        defaultModel: true,
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-      take: limit + 1,
-      skip: cursor ? 1 : 0,
-      cursor: cursor ? { id: cursor } : undefined,
-    })) as AssistantWithRelations[]
-    const nextCursor = assistants.length > limit ? (assistants.pop()?.id ?? null) : null
-    return {
-      assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
-      nextCursor,
-    }
-  },
+export async function getAllPublicAssistants(
+  limit: number,
+  cursor?: string,
+): Promise<{
+  assistants: Assistant[]
+  nextCursor: string | null
+}> {
+  const assistants = (await prisma.assistant.findMany({
+    where: {
+      isPublic: true,
+    },
+    include: {
+      createdBy: true,
+      defaultModel: true,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    take: limit + 1,
+    cursor: cursor ? { id: cursor } : undefined,
+  })) as AssistantWithRelations[]
 
-  getPrivateByUserId: async (
-    userId: string,
-    limit: number,
-    cursor?: string,
-  ): Promise<{
-    assistants: Assistant[]
-    nextCursor: string | null
-  }> => {
-    const assistants = (await prisma.assistant.findMany({
-      where: {
-        createdById: userId,
-        isPublic: false,
-      },
-      include: {
-        createdBy: true,
-        defaultModel: true,
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-      take: limit + 1,
-      skip: cursor ? 1 : 0,
-      cursor: cursor ? { id: cursor } : undefined,
-    })) as AssistantWithRelations[]
-    const nextCursor = assistants.length > limit ? (assistants.pop()?.id ?? null) : null
-    return {
-      assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
-      nextCursor,
-    }
-  },
+  const nextCursor = assistants.length > limit ? (assistants.pop()?.id ?? null) : null
+
+  return {
+    assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
+    nextCursor,
+  }
+}
+
+export async function getPublicAssistantById(assistantId: string): Promise<Assistant | null> {
+  const assistant = (await prisma.assistant.findUnique({
+    where: {
+      id: assistantId,
+      isPublic: true,
+    },
+    include: {
+      createdBy: true,
+      defaultModel: true,
+    },
+  })) as AssistantWithRelations | null
+
+  return assistant ? AssistantSchema.parse(assistant) : null
 }

@@ -14,7 +14,7 @@ export async function getAllMessages(
   messages: Message[]
   nextCursor: string | null
 }> {
-  const messages = await prisma.message.findMany({
+  const messages = (await prisma.message.findMany({
     where: {
       threadId,
     },
@@ -26,7 +26,7 @@ export async function getAllMessages(
     },
     take: limit + 1,
     cursor: cursor ? { id: cursor } : undefined,
-  }) as MessageWithRelations[]
+  })) as MessageWithRelations[]
 
   const nextCursor = messages.length > limit ? (messages.pop()?.id ?? null) : null
 
@@ -36,11 +36,8 @@ export async function getAllMessages(
   }
 }
 
-export async function getMessageById(
-  messageId: string,
-  threadId: string,
-): Promise<Message | null> {
-  const message = await prisma.message.findUnique({
+export async function getMessageById(messageId: string, threadId: string): Promise<Message | null> {
+  const message = (await prisma.message.findUnique({
     where: {
       id: messageId,
       threadId,
@@ -48,7 +45,7 @@ export async function getMessageById(
     include: {
       thread: true,
     },
-  }) as MessageWithRelations | null
+  })) as MessageWithRelations | null
 
   return message ? MessageSchema.parse(message) : null
 }

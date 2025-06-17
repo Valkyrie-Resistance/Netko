@@ -12,7 +12,7 @@ export async function createThread(
   title?: string,
   parentId?: string,
 ): Promise<Thread> {
-  const thread = await prisma.thread.create({
+  const thread = (await prisma.thread.create({
     data: {
       title,
       user: {
@@ -37,24 +37,22 @@ export async function createThread(
       user: true,
       assistant: true,
     },
-  }) as ThreadWithRelations
+  })) as ThreadWithRelations
 
   return ThreadSchema.parse(thread)
 }
 
 export async function updateThread(
   threadId: string,
-  userId: string,
   data: {
     title?: string
     assistantId?: string
   },
 ): Promise<Thread | null> {
   const { assistantId, ...updateData } = data
-  const thread = await prisma.thread.update({
+  const thread = (await prisma.thread.update({
     where: {
       id: threadId,
-      userId,
     },
     data: {
       ...updateData,
@@ -70,25 +68,21 @@ export async function updateThread(
       user: true,
       assistant: true,
     },
-  }) as ThreadWithRelations
+  })) as ThreadWithRelations
 
   return ThreadSchema.parse(thread)
 }
 
-export async function deleteThread(
-  threadId: string,
-  userId: string,
-): Promise<Thread | null> {
-  const thread = await prisma.thread.delete({
+export async function deleteThread(threadId: string): Promise<Thread | null> {
+  const thread = (await prisma.thread.delete({
     where: {
       id: threadId,
-      userId,
     },
     include: {
       user: true,
       assistant: true,
     },
-  }) as ThreadWithRelations
+  })) as ThreadWithRelations
 
   return ThreadSchema.parse(thread)
 }

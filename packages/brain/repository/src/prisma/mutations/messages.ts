@@ -16,7 +16,7 @@ export async function createMessage(
   parentId?: string,
   tokenCount?: number,
 ): Promise<Message> {
-  const message = await prisma.message.create({
+  const message = (await prisma.message.create({
     data: {
       content,
       role,
@@ -58,7 +58,7 @@ export async function createMessage(
     include: {
       thread: true,
     },
-  }) as MessageWithRelations
+  })) as MessageWithRelations
 
   return MessageSchema.parse(message)
 }
@@ -71,7 +71,7 @@ export async function updateMessage(
     tokenCount?: number
   },
 ): Promise<Message | null> {
-  const message = await prisma.message.update({
+  const message = (await prisma.message.update({
     where: {
       id: messageId,
       threadId,
@@ -80,16 +80,13 @@ export async function updateMessage(
     include: {
       thread: true,
     },
-  }) as MessageWithRelations
+  })) as MessageWithRelations
 
   return MessageSchema.parse(message)
 }
 
-export async function deleteMessage(
-  messageId: string,
-  threadId: string,
-): Promise<Message | null> {
-  const message = await prisma.message.delete({
+export async function deleteMessage(messageId: string, threadId: string): Promise<Message | null> {
+  const message = (await prisma.message.delete({
     where: {
       id: messageId,
       threadId,
@@ -97,7 +94,7 @@ export async function deleteMessage(
     include: {
       thread: true,
     },
-  }) as MessageWithRelations
+  })) as MessageWithRelations
 
   return MessageSchema.parse(message)
 }
