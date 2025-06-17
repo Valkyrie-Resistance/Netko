@@ -17,7 +17,7 @@ export async function getAllMessages(
   input: MessageListInput,
 ): Promise<{
   messages: Message[]
-  nextCursor: string | null
+  nextCursor: { createdAt: string; id: string } | null
 }> {
   const { limit, cursor } = MessageListInputSchema.parse(input)
 
@@ -32,14 +32,19 @@ export async function getAllMessages(
     take: limit + 1,
     cursor: cursor
       ? {
-          createdAt: cursor,
-          id: cursor,
+          createdAt: cursor.createdAt,
+          id: cursor.id,
         }
       : undefined,
   })) as MessageWithRelations[]
 
   const nextCursor =
-    messages.length > limit ? (messages[limit]?.createdAt.toISOString() ?? null) : null
+    messages.length > limit
+      ? {
+          createdAt: messages[limit]?.createdAt.toISOString() ?? '',
+          id: messages[limit]?.id ?? '',
+        }
+      : null
   const page = messages.slice(0, limit)
   return {
     messages: page.map((message) => MessageSchema.parse(message)),

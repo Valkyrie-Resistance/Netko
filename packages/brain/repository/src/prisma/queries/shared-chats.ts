@@ -16,7 +16,7 @@ type SharedChatWithRelations = Prisma.SharedChatGetPayload<{
 
 export async function getAllSharedChats(input: SharedChatListInput): Promise<{
   sharedChats: SharedChat[]
-  nextCursor: string | null
+  nextCursor: { createdAt: string; id: string } | null
 }> {
   const { limit, cursor, userId } = SharedChatListInputSchema.parse(input)
 
@@ -32,14 +32,19 @@ export async function getAllSharedChats(input: SharedChatListInput): Promise<{
     take: limit + 1,
     cursor: cursor
       ? {
-          createdAt: cursor,
-          id: cursor,
+          createdAt: cursor.createdAt,
+          id: cursor.id,
         }
       : undefined,
   })) as SharedChatWithRelations[]
 
   const nextCursor =
-    sharedChats.length > limit ? (sharedChats[limit]?.createdAt.toISOString() ?? null) : null
+    sharedChats.length > limit
+      ? {
+          createdAt: sharedChats[limit]?.createdAt.toISOString() ?? '',
+          id: sharedChats[limit]?.id ?? '',
+        }
+      : null
   const page = sharedChats.slice(0, limit)
   return {
     sharedChats: page.map((sharedChat) => SharedChatSchema.parse(sharedChat)),

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { ThreadSchema } from './thread'
 import { UserSchema } from './user'
 
-export const SharedChatIdSchema = z.string()
+export const SharedChatIdSchema = z.string().cuid()
 export type SharedChatId = z.infer<typeof SharedChatIdSchema>
 
 export const SharedChatSchema = z.object({

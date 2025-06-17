@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { AssistantSchema } from './assistant'
 import { UserSchema } from './user'
 
-export const ThreadIdSchema = z.string()
+export const ThreadIdSchema = z.string().cuid()
 export type ThreadId = z.infer<typeof ThreadIdSchema>
 
 export const ThreadSchema = z.object({

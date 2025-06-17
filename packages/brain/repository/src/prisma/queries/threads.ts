@@ -32,7 +32,7 @@ export async function getAllThreads(
   input: ThreadListInput,
 ): Promise<{
   threads: Thread[]
-  nextCursor: string | null
+  nextCursor: { updatedAt: string; id: string } | null
 }> {
   const { limit, cursor } = ThreadListInputSchema.parse(input)
 
@@ -48,14 +48,19 @@ export async function getAllThreads(
     take: limit + 1,
     cursor: cursor
       ? {
-          updatedAt: cursor,
-          id: cursor,
+          updatedAt: cursor.updatedAt,
+          id: cursor.id,
         }
       : undefined,
   })) as ThreadWithRelations[]
 
   const nextCursor =
-    threads.length > limit ? (threads[limit]?.updatedAt.toISOString() ?? null) : null
+    threads.length > limit
+      ? {
+          updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
+          id: threads[limit]?.id ?? '',
+        }
+      : null
   const page = threads.slice(0, limit)
   return {
     threads: page.map((thread) => ThreadSchema.parse(thread)),
@@ -85,7 +90,7 @@ export async function getThreadById(threadId: string, userId: string): Promise<T
 export async function getThreadWithMessages(input: ThreadWithMessagesInput): Promise<{
   thread: Thread
   messages: Message[]
-  nextCursor: string | null
+  nextCursor: { createdAt: string; id: string } | null
 } | null> {
   const { threadId, userId, limit, cursor } = ThreadWithMessagesInputSchema.parse(input)
   const validatedThreadId = ThreadIdSchema.parse(threadId)
@@ -103,8 +108,8 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
         take: limit + 1,
         cursor: cursor
           ? {
-              createdAt: cursor,
-              id: cursor,
+              createdAt: cursor.createdAt,
+              id: cursor.id,
             }
           : undefined,
         select: {
@@ -123,7 +128,10 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
 
   const nextCursor =
     thread.messages.length > limit
-      ? (thread.messages[limit]?.createdAt.toISOString() ?? null)
+      ? {
+          createdAt: thread.messages[limit]?.createdAt.toISOString() ?? '',
+          id: thread.messages[limit]?.id ?? '',
+        }
       : null
   const page = thread.messages.slice(0, limit)
 
@@ -140,7 +148,7 @@ export async function getMessagesInThread(
   input: ThreadListInput,
 ): Promise<{
   messages: Message[]
-  nextCursor: string | null
+  nextCursor: { createdAt: string; id: string } | null
 }> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
   const { limit, cursor } = ThreadListInputSchema.parse(input)
@@ -156,8 +164,8 @@ export async function getMessagesInThread(
     take: limit + 1,
     cursor: cursor
       ? {
-          createdAt: cursor,
-          id: cursor,
+          createdAt: cursor.updatedAt,
+          id: cursor.id,
         }
       : undefined,
     select: {
@@ -169,7 +177,12 @@ export async function getMessagesInThread(
   })) as Message[]
 
   const nextCursor =
-    messages.length > limit ? (messages[limit]?.createdAt.toISOString() ?? null) : null
+    messages.length > limit
+      ? {
+          createdAt: messages[limit]?.createdAt.toISOString() ?? '',
+          id: messages[limit]?.id ?? '',
+        }
+      : null
   const page = messages.slice(0, limit)
 
   return {
@@ -183,7 +196,7 @@ export async function searchThreads(
   input: ThreadSearchInput,
 ): Promise<{
   threads: Thread[]
-  nextCursor: string | null
+  nextCursor: { updatedAt: string; id: string } | null
 }> {
   const { limit, cursor, query } = ThreadSearchInputSchema.parse(input)
 
@@ -203,14 +216,19 @@ export async function searchThreads(
     take: limit + 1,
     cursor: cursor
       ? {
-          updatedAt: cursor,
-          id: cursor,
+          updatedAt: cursor.updatedAt,
+          id: cursor.id,
         }
       : undefined,
   })) as ThreadWithRelations[]
 
   const nextCursor =
-    threads.length > limit ? (threads[limit]?.updatedAt.toISOString() ?? null) : null
+    threads.length > limit
+      ? {
+          updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
+          id: threads[limit]?.id ?? '',
+        }
+      : null
   const page = threads.slice(0, limit)
   return {
     threads: page.map((thread) => ThreadSchema.parse(thread)),
@@ -223,7 +241,7 @@ export async function getThreadsByAssistant(
   input: ThreadByAssistantInput,
 ): Promise<{
   threads: Thread[]
-  nextCursor: string | null
+  nextCursor: { updatedAt: string; id: string } | null
 }> {
   const { limit, cursor, assistantId } = ThreadByAssistantInputSchema.parse(input)
 
@@ -240,14 +258,19 @@ export async function getThreadsByAssistant(
     take: limit + 1,
     cursor: cursor
       ? {
-          updatedAt: cursor,
-          id: cursor,
+          updatedAt: cursor.updatedAt,
+          id: cursor.id,
         }
       : undefined,
   })) as ThreadWithRelations[]
 
   const nextCursor =
-    threads.length > limit ? (threads[limit]?.updatedAt.toISOString() ?? null) : null
+    threads.length > limit
+      ? {
+          updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
+          id: threads[limit]?.id ?? '',
+        }
+      : null
   const page = threads.slice(0, limit)
   return {
     threads: page.map((thread) => ThreadSchema.parse(thread)),
