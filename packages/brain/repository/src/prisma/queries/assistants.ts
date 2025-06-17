@@ -30,9 +30,9 @@ export async function getAllAssistants(
   })) as AssistantWithRelations[]
 
   const nextCursor = assistants.length > limit ? (assistants[limit]?.id ?? null) : null
-
+  const page = assistants.slice(0, limit)
   return {
-    assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
+    assistants: page.map((assistant) => AssistantSchema.parse(assistant)),
     nextCursor,
   }
 }

@@ -108,6 +108,7 @@ export async function getThreadWithMessages(
 
 export async function getMessagesInThread(
   threadId: string,
+  userId: string,
   limit: number,
   cursor?: string,
 ): Promise<{
@@ -117,6 +118,9 @@ export async function getMessagesInThread(
   const messages = (await prisma.message.findMany({
     where: {
       threadId,
+      thread: {
+        userId,
+      },
     },
     orderBy: {
       createdAt: 'asc',
