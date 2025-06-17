@@ -1,5 +1,5 @@
 import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
-import { trpc } from '@/lib/trpc'
+import { trpcHttp } from '@/lib/trpc'
 import { Button } from '@chad-chat/ui/components/shadcn/button'
 import {
   Card,
@@ -31,7 +31,9 @@ function ProvidersLoader() {
 }
 
 export function LoginForm() {
-  const { data: providers, isLoading } = useQuery(trpc.auth.getEnabledAuthMethods.queryOptions())
+  const { data: providers, isLoading } = useQuery(
+    trpcHttp.auth.getEnabledAuthMethods.queryOptions(),
+  )
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
 
   const enabledProviders = socialProviders.filter((provider) =>

@@ -1,23 +1,12 @@
-import { observable } from '@trpc/server/observable'
+import { sleep } from 'bun'
 import { z } from 'zod'
-import { protectedProcedure, router } from '../../lib/trpc'
+import { publicProcedure, router } from '../../lib/trpc'
 
 export const threadsSubscriptions = router({
-  onThreadUpdate: protectedProcedure
+  onThreadUpdate: publicProcedure
     .input(z.object({ threadId: z.string() }))
-    .query(async ({ input }) => {
-      return observable<{ threadId: string; type: 'update' | 'delete' }>((emit) => {
-        const onUpdate = (data: { threadId: string; type: 'update' | 'delete' }) => {
-          if (data.threadId === input.threadId) {
-            emit.next(data)
-          }
-        }
-
-        // TODO: Subscribe to the event emitter here (ask)
-
-        return () => {
-          // TODO: Unsubscribe from the event emitter here (ask)
-        }
-      })
+    .subscription(async function* ({ input: _ }) {
+      await sleep(1000)
+      yield Math.random()
     }),
 })

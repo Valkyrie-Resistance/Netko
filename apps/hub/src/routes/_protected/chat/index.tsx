@@ -1,7 +1,9 @@
 import { AppSidebar } from '@/components/core/nav/app-sidebar'
+import { trpcWs } from '@/lib/trpc'
 import { Chat } from '@chad-chat/ui/components/chat/chat'
 import type { Message } from '@chad-chat/ui/components/chat/chat-message'
 import { SidebarInset, SidebarProvider } from '@chad-chat/ui/components/shadcn/sidebar'
+import { useSubscription } from '@trpc/tanstack-react-query'
 import { useState } from 'react'
 
 export const Route = createFileRoute({
@@ -9,6 +11,19 @@ export const Route = createFileRoute({
 })
 
 function Index() {
+  const sub = useSubscription(
+    trpcWs.threads.onThreadUpdate.subscriptionOptions(
+      {
+        threadId: '1',
+      },
+      {
+        onData: (data) => {
+          console.log('new thread update', data)
+        },
+      },
+    ),
+  )
+
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
