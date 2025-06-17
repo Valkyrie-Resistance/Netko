@@ -11,4 +11,4 @@ export const SharedChatByShareIdInputSchema = z.object({
 })
 
 export type SharedChatListInput = z.infer<typeof SharedChatListInputSchema>
-export type SharedChatByShareIdInput = z.infer<typeof SharedChatByShareIdInputSchema> 
+export type SharedChatByShareIdInput = z.infer<typeof SharedChatByShareIdInputSchema>

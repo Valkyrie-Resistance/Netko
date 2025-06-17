@@ -1,10 +1,10 @@
-import { 
-  type SharedChat, 
+import {
+  type SharedChat,
   type SharedChatCreateInput,
   SharedChatCreateInputSchema,
   SharedChatSchema,
   type SharedChatUpdateInput,
-  SharedChatUpdateInputSchema
+  SharedChatUpdateInputSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -14,7 +14,7 @@ type SharedChatWithRelations = Prisma.SharedChatGetPayload<{
 }>
 
 export async function createSharedChat(
-  data: Omit<SharedChatCreateInput, 'sharedBy'> & { sharedById: string }
+  data: Omit<SharedChatCreateInput, 'sharedBy'> & { sharedById: string },
 ): Promise<SharedChat> {
   const validatedData = SharedChatCreateInputSchema.parse({
     ...data,
@@ -38,7 +38,7 @@ export async function createSharedChat(
 
 export async function updateSharedChat(
   sharedChatId: string,
-  data: SharedChatUpdateInput
+  data: SharedChatUpdateInput,
 ): Promise<SharedChat | null> {
   const validatedData = SharedChatUpdateInputSchema.parse(data)
 
@@ -68,4 +68,4 @@ export async function deleteSharedChat(sharedChatId: string): Promise<SharedChat
   })) as SharedChatWithRelations
 
   return SharedChatSchema.parse(sharedChat)
-} 
+}

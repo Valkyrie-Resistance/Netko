@@ -1,8 +1,8 @@
-import { 
-  type Message, 
+import {
+  type Message,
   type MessageListInput,
   MessageListInputSchema,
-  MessageSchema
+  MessageSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -13,7 +13,7 @@ type MessageWithRelations = Prisma.MessageGetPayload<{
 
 export async function getAllMessages(
   threadId: string,
-  input: MessageListInput
+  input: MessageListInput,
 ): Promise<{
   messages: Message[]
   nextCursor: string | null
@@ -45,10 +45,10 @@ export async function getAllMessages(
 export async function getMessageById(messageId: string, threadId: string): Promise<Message | null> {
   const message = (await prisma.message.findUnique({
     where: {
-      messageCompoundId:{
+      messageCompoundId: {
         id: messageId,
         threadId: threadId,
-      }
+      },
     },
     include: {
       thread: true,
@@ -60,19 +60,18 @@ export async function getMessageById(messageId: string, threadId: string): Promi
 
 export async function getMessagesUpToId(
   threadId: string,
-  upToMessageId: string
+  upToMessageId: string,
 ): Promise<Message[]> {
-  
   const targetMessage = await prisma.message.findUnique({
     where: {
       messageCompoundId: {
         id: upToMessageId,
         threadId,
-      }
+      },
     },
     select: {
-      createdAt: true
-    }
+      createdAt: true,
+    },
   })
 
   if (!targetMessage) {
@@ -83,15 +82,15 @@ export async function getMessagesUpToId(
     where: {
       threadId,
       createdAt: {
-        lte: targetMessage.createdAt
-      }
+        lte: targetMessage.createdAt,
+      },
     },
     include: {
       thread: true,
     },
     orderBy: {
       createdAt: 'asc',
-    }
+    },
   })) as MessageWithRelations[]
 
   return messages.map((message) => MessageSchema.parse(message))

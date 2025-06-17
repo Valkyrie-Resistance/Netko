@@ -1,10 +1,10 @@
-import { 
-  type SharedChat, 
+import {
+  type SharedChat,
   type SharedChatByShareIdInput,
   SharedChatByShareIdInputSchema,
   type SharedChatListInput,
   SharedChatListInputSchema,
-  SharedChatSchema
+  SharedChatSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -13,9 +13,7 @@ type SharedChatWithRelations = Prisma.SharedChatGetPayload<{
   include: { thread: true; sharedBy: true }
 }>
 
-export async function getAllSharedChats(
-  input: SharedChatListInput
-): Promise<{
+export async function getAllSharedChats(input: SharedChatListInput): Promise<{
   sharedChats: SharedChat[]
   nextCursor: string | null
 }> {
@@ -59,7 +57,7 @@ export async function getSharedChatById(sharedChatId: string): Promise<SharedCha
 }
 
 export async function getSharedChatByShareId(
-  input: SharedChatByShareIdInput
+  input: SharedChatByShareIdInput,
 ): Promise<SharedChat | null> {
   const { shareId } = SharedChatByShareIdInputSchema.parse(input)
 
@@ -74,4 +72,4 @@ export async function getSharedChatByShareId(
   })) as SharedChatWithRelations | null
 
   return sharedChat ? SharedChatSchema.parse(sharedChat) : null
-} 
+}

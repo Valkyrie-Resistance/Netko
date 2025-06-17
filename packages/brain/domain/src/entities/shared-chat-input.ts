@@ -22,4 +22,4 @@ export const SharedChatCreateInputSchema = SharedChatBaseSchema.extend({
 export const SharedChatUpdateInputSchema = SharedChatBaseSchema.partial()
 
 export type SharedChatCreateInput = z.infer<typeof SharedChatCreateInputSchema>
-export type SharedChatUpdateInput = z.infer<typeof SharedChatUpdateInputSchema> 
+export type SharedChatUpdateInput = z.infer<typeof SharedChatUpdateInputSchema>
