@@ -30,6 +30,7 @@ export async function getAllAssistants(input: AssistantListInput): Promise<{
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           updatedAt: cursor.updatedAt,
@@ -94,6 +95,7 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           updatedAt: cursor.updatedAt,
@@ -132,6 +134,7 @@ export async function getAllPublicAssistants(input: AssistantListInput): Promise
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           updatedAt: cursor.updatedAt,

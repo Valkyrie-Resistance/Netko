@@ -5,6 +5,7 @@ import {
   MessageListInputSchema,
   MessageSchema,
 } from '@chad-chat/brain-domain'
+import { ThreadIdSchema } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -20,16 +21,18 @@ export async function getAllMessages(
   nextCursor: { createdAt: string; id: string } | null
 }> {
   const { limit, cursor } = MessageListInputSchema.parse(input)
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
 
   const messages = (await prisma.message.findMany({
     where: {
-      threadId,
+      threadId: validatedThreadId,
     },
     include: {
       thread: true,
     },
     orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           createdAt: cursor.createdAt,
@@ -54,7 +57,7 @@ export async function getAllMessages(
 
 export async function getMessageById(messageId: string, threadId: string): Promise<Message | null> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
-  const validatedThreadId = MessageIdSchema.parse(threadId)
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
 
   const message = (await prisma.message.findUnique({
     where: {
@@ -75,7 +78,7 @@ export async function getMessagesUpToId(
   threadId: string,
   upToMessageId: string,
 ): Promise<Message[]> {
-  const validatedThreadId = MessageIdSchema.parse(threadId)
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
   const validatedMessageId = MessageIdSchema.parse(upToMessageId)
 
   const targetMessage = await prisma.message.findUnique({
@@ -87,6 +90,7 @@ export async function getMessagesUpToId(
     },
     select: {
       createdAt: true,
+      id: true,
     },
   })
 

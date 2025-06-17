@@ -30,6 +30,7 @@ export async function getAllSharedChats(input: SharedChatListInput): Promise<{
     },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           createdAt: cursor.createdAt,

@@ -46,6 +46,7 @@ export async function getAllThreads(
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           updatedAt: cursor.updatedAt,
@@ -151,7 +152,7 @@ export async function getMessagesInThread(
   nextCursor: { createdAt: string; id: string } | null
 }> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
-  const { limit, cursor } = ThreadListInputSchema.parse(input)
+  const { limit, cursor } = ThreadWithMessagesInputSchema.parse(input)
 
   const messages = (await prisma.message.findMany({
     where: {
@@ -162,9 +163,10 @@ export async function getMessagesInThread(
     },
     orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          createdAt: cursor.updatedAt,
+          createdAt: cursor.createdAt,
           id: cursor.id,
         }
       : undefined,
@@ -214,6 +216,7 @@ export async function searchThreads(
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           updatedAt: cursor.updatedAt,
@@ -256,6 +259,7 @@ export async function getThreadsByAssistant(
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
+    skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
           updatedAt: cursor.updatedAt,
