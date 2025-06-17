@@ -112,7 +112,6 @@ model Assistant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique(name: "assistantCompoundId", [id, createdById])
   @@map("assistant")
 }
 

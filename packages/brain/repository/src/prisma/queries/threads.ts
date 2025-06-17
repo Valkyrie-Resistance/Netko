@@ -63,7 +63,7 @@ export async function getAllThreads(
         }
       : null
   const page = threads.slice(0, limit)
-  return {
+  return {  
     threads: page.map((thread) => ThreadSchema.parse(thread)),
     nextCursor,
   }

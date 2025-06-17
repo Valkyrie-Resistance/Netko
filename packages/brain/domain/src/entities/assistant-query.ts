@@ -1,14 +1,16 @@
 import { z } from 'zod'
+import { AssistantIdSchema } from './assistant'
+import { UserIdSchema } from './user'
 
 export const AssistantCursorSchema = z.object({
-  updatedAt: z.string(),
-  id: z.string().cuid(),
+  updatedAt: z.coerce.date(),
+  id: AssistantIdSchema,
 })
 
 export const AssistantListInputSchema = z.object({
   limit: z.number().int().positive(),
   cursor: AssistantCursorSchema.optional(),
-  userId: z.string(),
+  userId: UserIdSchema,
 })
 
 export const AssistantSearchInputSchema = AssistantListInputSchema.extend({

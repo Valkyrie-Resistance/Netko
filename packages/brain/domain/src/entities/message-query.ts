@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { MessageIdSchema } from './message'
 
 export const MessageCursorSchema = z.object({
-  createdAt: z.string(),
-  id: z.string().cuid(),
+  createdAt: z.coerce.date(),
+  id: MessageIdSchema,
 })
 
 export const MessageListInputSchema = z.object({

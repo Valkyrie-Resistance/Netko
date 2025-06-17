@@ -1,18 +1,20 @@
 import { z } from 'zod'
+import { SharedChatIdSchema } from './shared-chat'
+import { UserIdSchema } from './user'
 
 export const SharedChatCursorSchema = z.object({
-  createdAt: z.string(),
-  id: z.string().cuid(),
+  createdAt: z.coerce.date(),
+  id: SharedChatIdSchema,
 })
 
 export const SharedChatListInputSchema = z.object({
   limit: z.number().int().positive(),
   cursor: SharedChatCursorSchema.optional(),
-  userId: z.string(),
+  userId: UserIdSchema,
 })
 
 export const SharedChatByShareIdInputSchema = z.object({
-  shareId: z.string(),
+  shareId: SharedChatIdSchema
 })
 
 export type SharedChatListInput = z.infer<typeof SharedChatListInputSchema>

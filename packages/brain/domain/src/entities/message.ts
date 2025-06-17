@@ -7,7 +7,7 @@ import { UserSchema } from './user'
 export const MessageRoleEnum = z.enum(['USER', 'ASSISTANT', 'SYSTEM'])
 export type MessageRole = z.infer<typeof MessageRoleEnum>
 
-export const MessageIdSchema = z.string().cuid()
+export const MessageIdSchema = z.string()
 export type MessageId = z.infer<typeof MessageIdSchema>
 
 export const MessageSchema = z.object({

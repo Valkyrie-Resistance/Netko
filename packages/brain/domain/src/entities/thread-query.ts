@@ -1,8 +1,11 @@
 import { z } from 'zod'
+import { AssistantIdSchema } from './assistant'
+import { ThreadIdSchema } from './thread'
+import { UserIdSchema } from './user'
 
 export const ThreadCursorSchema = z.object({
-  updatedAt: z.string(),
-  id: z.string().cuid(),
+  updatedAt: z.coerce.date(),
+  id: ThreadIdSchema,
 })
 
 export const ThreadListInputSchema = z.object({
@@ -15,19 +18,19 @@ export const ThreadSearchInputSchema = ThreadListInputSchema.extend({
 })
 
 export const ThreadWithMessagesCursorSchema = z.object({
-  createdAt: z.string(),
-  id: z.string().cuid(),
+  createdAt: z.coerce.date(),
+  id: ThreadIdSchema,
 })
 
 export const ThreadWithMessagesInputSchema = z.object({
-  threadId: z.string(),
-  userId: z.string(),
+  threadId: ThreadIdSchema,
+  userId: UserIdSchema,
   limit: z.number().int().positive(),
   cursor: ThreadWithMessagesCursorSchema.optional(),
 })
 
 export const ThreadByAssistantInputSchema = ThreadListInputSchema.extend({
-  assistantId: z.string(),
+  assistantId: AssistantIdSchema,
 })
 
 export type ThreadListInput = z.infer<typeof ThreadListInputSchema>

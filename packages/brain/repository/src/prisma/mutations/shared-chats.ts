@@ -6,6 +6,8 @@ import {
   SharedChatSchema,
   type SharedChatUpdateInput,
   SharedChatUpdateInputSchema,
+  ThreadIdSchema,
+  UserIdSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -14,20 +16,63 @@ type SharedChatWithRelations = Prisma.SharedChatGetPayload<{
   include: { thread: true; sharedBy: true }
 }>
 
-export async function createSharedChat(
-  data: Omit<SharedChatCreateInput, 'sharedBy'> & { sharedById: string },
+export async function addThreadToSharedChat(
+  sharedChatId: string,
+  threadId: string,
 ): Promise<SharedChat> {
-  const validatedData = SharedChatCreateInputSchema.parse({
-    ...data,
-    sharedBy: {
-      connect: {
-        id: data.sharedById,
-      },
+  const validatedSharedChatId = SharedChatIdSchema.parse(sharedChatId)
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
+
+  const sharedChat = (await prisma.sharedChat.update({
+    where: {
+      id: validatedSharedChatId,
     },
-  })
+    data: {
+      threadId: validatedThreadId,
+    },
+    include: {
+      thread: true,
+      sharedBy: true,
+    },
+  })) as SharedChatWithRelations
+
+  return SharedChatSchema.parse(sharedChat)
+}
+
+export async function addSharedByToSharedChat(
+  sharedChatId: string,
+  userId: string,
+): Promise<SharedChat> {
+  const validatedSharedChatId = SharedChatIdSchema.parse(sharedChatId)
+  const validatedUserId = UserIdSchema.parse(userId)
+
+  const sharedChat = (await prisma.sharedChat.update({
+    where: {
+      id: validatedSharedChatId,
+    },
+    data: {
+      sharedById: validatedUserId,
+    },
+    include: {
+      thread: true,
+      sharedBy: true,
+    },
+  })) as SharedChatWithRelations
+
+  return SharedChatSchema.parse(sharedChat)
+}
+
+export async function createSharedChat(
+  data: Omit<SharedChatCreateInput, 'thread' | 'sharedBy'> & { threadId: string; sharedById: string },
+): Promise<SharedChat> {
+  const validatedData = SharedChatCreateInputSchema.parse(data)
 
   const sharedChat = (await prisma.sharedChat.create({
-    data: validatedData,
+    data: {
+      ...validatedData,
+      threadId: data.threadId,
+      sharedById: data.sharedById,
+    },
     include: {
       thread: true,
       sharedBy: true,
@@ -40,7 +85,7 @@ export async function createSharedChat(
 export async function updateSharedChat(
   sharedChatId: string,
   data: SharedChatUpdateInput,
-): Promise<SharedChat> {
+): Promise<SharedChat | null> {
   const validatedId = SharedChatIdSchema.parse(sharedChatId)
   const validatedData = SharedChatUpdateInputSchema.parse(data)
 

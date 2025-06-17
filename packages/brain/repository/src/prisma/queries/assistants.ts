@@ -59,12 +59,10 @@ export async function getAssistantById(
 ): Promise<Assistant | null> {
   const validatedId = AssistantIdSchema.parse(assistantId)
 
-  const assistant = (await prisma.assistant.findUnique({
+  const assistant = (await prisma.assistant.findFirst({
     where: {
-      assistantCompoundId: {
         id: validatedId,
         createdById: userId,
-      },
     },
     include: {
       createdBy: true,

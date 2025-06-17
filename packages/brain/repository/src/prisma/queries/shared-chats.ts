@@ -6,6 +6,7 @@ import {
   type SharedChatListInput,
   SharedChatListInputSchema,
   SharedChatSchema,
+  UserIdSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -59,6 +60,24 @@ export async function getSharedChatById(sharedChatId: string): Promise<SharedCha
   const sharedChat = (await prisma.sharedChat.findUnique({
     where: {
       id: validatedId,
+    },
+    include: {
+      thread: true,
+      sharedBy: true,
+    },
+  })) as SharedChatWithRelations | null
+
+  return sharedChat ? SharedChatSchema.parse(sharedChat) : null
+}
+
+export async function getSharedChatByUserId(sharedChatId: string, userId: string): Promise<SharedChat | null> {
+  const validatedId = SharedChatIdSchema.parse(sharedChatId)
+  const validatedUserId = UserIdSchema.parse(userId)
+
+  const sharedChat = (await prisma.sharedChat.findFirst({
+    where: {
+      id: validatedId,
+      sharedById: validatedUserId,
     },
     include: {
       thread: true,

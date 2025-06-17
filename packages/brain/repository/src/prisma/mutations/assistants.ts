@@ -6,6 +6,8 @@ import {
   AssistantSchema,
   type AssistantUpdateInput,
   AssistantUpdateInputSchema,
+  LLMModelIdSchema,
+  UserIdSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -14,20 +16,63 @@ type AssistantWithRelations = Prisma.AssistantGetPayload<{
   include: { createdBy: true; defaultModel: true }
 }>
 
-export async function createAssistant(
-  data: Omit<AssistantCreateInput, 'createdBy'> & { createdById: string },
+export async function addDefaultModelToAssistant(
+  assistantId: string,
+  modelId: string,
 ): Promise<Assistant> {
-  const validatedData = AssistantCreateInputSchema.parse({
-    ...data,
-    createdBy: {
-      connect: {
-        id: data.createdById,
-      },
+  const validatedAssistantId = AssistantIdSchema.parse(assistantId)
+  const validatedModelId = LLMModelIdSchema.parse(modelId)
+
+  const assistant = (await prisma.assistant.update({
+    where: {
+      id: validatedAssistantId,
     },
-  })
+    data: {
+      defaultModelId: validatedModelId,
+    },
+    include: {
+      createdBy: true,
+      defaultModel: true,
+    },
+  })) as AssistantWithRelations
+
+  return AssistantSchema.parse(assistant)
+}
+
+export async function addCreatorToAssistant(
+  assistantId: string,
+  userId: string,
+): Promise<Assistant> {
+  const validatedAssistantId = AssistantIdSchema.parse(assistantId)
+  const validatedUserId = UserIdSchema.parse(userId)
+
+  const assistant = (await prisma.assistant.update({
+    where: {
+      id: validatedAssistantId,
+    },
+    data: {
+      createdById: validatedUserId,
+    },
+    include: {
+      createdBy: true,
+      defaultModel: true,
+    },
+  })) as AssistantWithRelations
+
+  return AssistantSchema.parse(assistant)
+}
+
+export async function createAssistant(
+  data: Omit<AssistantCreateInput, 'defaultModel' | 'createdBy'> & { createdById: string; defaultModelId?: string },
+): Promise<Assistant> {
+  const validatedData = AssistantCreateInputSchema.parse(data)
 
   const assistant = (await prisma.assistant.create({
-    data: validatedData,
+    data: {
+      ...validatedData,
+      createdById: data.createdById,
+      defaultModelId: data.defaultModelId,
+    },
     include: {
       createdBy: true,
       defaultModel: true,
@@ -39,10 +84,11 @@ export async function createAssistant(
 
 export async function updateAssistant(
   assistantId: string,
-  data: AssistantUpdateInput,
+  data: Omit<AssistantUpdateInput, 'defaultModel'> & { defaultModelId?: string },
 ): Promise<Assistant> {
   const validatedId = AssistantIdSchema.parse(assistantId)
-  const validatedData = AssistantUpdateInputSchema.parse(data)
+  const { defaultModelId, ...updateData } = data
+  const validatedData = AssistantUpdateInputSchema.parse(updateData)
 
   const assistant = (await prisma.assistant.update({
     where: {
@@ -55,10 +101,14 @@ export async function updateAssistant(
     },
   })) as AssistantWithRelations
 
+  if (defaultModelId) {
+    return addDefaultModelToAssistant(assistant.id, defaultModelId)
+  }
+
   return AssistantSchema.parse(assistant)
 }
 
-export async function deleteAssistant(assistantId: string): Promise<Assistant | null> {
+export async function deleteAssistant(assistantId: string): Promise<Assistant> {
   const validatedId = AssistantIdSchema.parse(assistantId)
 
   const assistant = (await prisma.assistant.delete({
