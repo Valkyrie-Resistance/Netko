@@ -6,6 +6,7 @@ import {
   AssistantSchema,
   type AssistantSearchInput,
   AssistantSearchInputSchema,
+  UserIdSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
@@ -58,11 +59,12 @@ export async function getAssistantById(
   userId: string,
 ): Promise<Assistant | null> {
   const validatedId = AssistantIdSchema.parse(assistantId)
+  const validatedUserId = UserIdSchema.parse(userId)
 
   const assistant = (await prisma.assistant.findFirst({
     where: {
       id: validatedId,
-      createdById: userId,
+      createdById: validatedUserId,
     },
     include: {
       createdBy: true,
@@ -109,9 +111,9 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
           id: assistants[limit]?.id ?? '',
         }
       : null
-
+  const page = assistants.slice(0, limit)
   return {
-    assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
+    assistants: page.map((assistant) => AssistantSchema.parse(assistant)),
     nextCursor,
   }
 }
@@ -148,9 +150,9 @@ export async function getAllPublicAssistants(input: AssistantListInput): Promise
           id: assistants[limit]?.id ?? '',
         }
       : null
-
+  const page = assistants.slice(0, limit)
   return {
-    assistants: assistants.map((assistant) => AssistantSchema.parse(assistant)),
+    assistants: page.map((assistant) => AssistantSchema.parse(assistant)),
     nextCursor,
   }
 }

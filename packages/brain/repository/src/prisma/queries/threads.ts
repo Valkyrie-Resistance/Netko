@@ -107,6 +107,7 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
       messages: {
         orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
         take: limit + 1,
+        skip: cursor ? 1 : 0,
         cursor: cursor
           ? {
               createdAt: cursor.createdAt,
@@ -152,7 +153,7 @@ export async function getMessagesInThread(
   nextCursor: { createdAt: string; id: string } | null
 }> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
-  const { limit, cursor } = ThreadWithMessagesInputSchema.parse(input)
+  const { limit, cursor } = ThreadListInputSchema.parse(input)
 
   const messages = (await prisma.message.findMany({
     where: {

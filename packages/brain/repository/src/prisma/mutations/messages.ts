@@ -119,12 +119,14 @@ export async function addParentToMessage(messageId: string, parentId: string): P
 export async function createMessage(
   data: Omit<MessageCreateInput, 'thread'> & { threadId: string },
 ): Promise<Message> {
-  const validatedData = MessageCreateInputSchema.parse(data)
+  const { threadId, ...rest } = data
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
+  const validatedData = MessageCreateInputSchema.parse(rest)
 
   const message = (await prisma.message.create({
     data: {
       ...validatedData,
-      threadId: data.threadId,
+      threadId: validatedThreadId,
     },
     include: {
       thread: true,

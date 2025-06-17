@@ -69,12 +69,14 @@ export async function createAssistant(
   },
 ): Promise<Assistant> {
   const validatedData = AssistantCreateInputSchema.parse(data)
-
+  const {createdById, defaultModelId, ...rest} = data
+  const validatedDefaultModelId = defaultModelId ? LLMModelIdSchema.parse(defaultModelId) : undefined
+  const validatedCreatedById = UserIdSchema.parse(createdById)
   const assistant = (await prisma.assistant.create({
     data: {
       ...validatedData,
-      createdById: data.createdById,
-      defaultModelId: data.defaultModelId,
+      createdById: validatedCreatedById,
+      defaultModelId: validatedDefaultModelId,
     },
     include: {
       createdBy: true,
@@ -91,7 +93,11 @@ export async function updateAssistant(
 ): Promise<Assistant> {
   const validatedId = AssistantIdSchema.parse(assistantId)
   const { defaultModelId, ...updateData } = data
-  const validatedData = AssistantUpdateInputSchema.parse(updateData)
+  const validatedDefaultModelId = defaultModelId ? LLMModelIdSchema.parse(defaultModelId): undefined
+  const validatedData = AssistantUpdateInputSchema.parse({
+    ...updateData,
+    defaultModelId: validatedDefaultModelId,
+  })
 
   const assistant = (await prisma.assistant.update({
     where: {

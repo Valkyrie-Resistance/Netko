@@ -79,13 +79,14 @@ export async function createThread(
   data: Omit<ThreadCreateInput, 'user' | 'assistant'> & { userId: string; assistantId: string },
 ): Promise<Thread> {
   const validatedData = ThreadCreateInputSchema.parse(data)
+  const validatedUserId = ThreadIdSchema.parse(data.userId)
+  const validatedAssistantId = AssistantIdSchema.parse(data.assistantId)
 
-  // Create thread with required relationships for Prisma
   const thread = (await prisma.thread.create({
     data: {
       ...validatedData,
-      userId: data.userId,
-      assistantId: data.assistantId,
+      userId: validatedUserId,
+      assistantId: validatedAssistantId,
     },
     include: {
       user: true,
