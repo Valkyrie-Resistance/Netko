@@ -79,7 +79,12 @@ export class LLMService {
     userId: string,
     messages: Message[],
   ): Promise<StreamTextResult<never, never>> {
-    const apiKey = await this.getUserApiKey(userId)
+    try {
+      await this.getUserApiKey(userId)
+    } catch (_error: unknown) {
+      throw new Error('User does not have an active API key. Please add an API key to continue.')
+    }
+
     const chatModel = this.openRouterClient.chat(modelId)
 
     const assistant = await prisma.assistant.findUnique({
