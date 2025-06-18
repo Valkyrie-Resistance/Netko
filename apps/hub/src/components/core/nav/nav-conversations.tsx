@@ -29,6 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@chad-chat/ui/components/shadcn/sidebar'
+import { useRouter } from '@tanstack/react-router'
 
 export type ConversationGroup = {
   label: string
@@ -56,6 +57,7 @@ export function NavConversations({
 }: {
   conversationGroups: ConversationGroup[]
 }) {
+  const router = useRouter()
   const { isMobile } = useSidebar()
 
   return (
@@ -87,6 +89,13 @@ export function NavConversations({
                         >
                           <a
                             href={`/chat/${conversation.id}`}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              router.navigate({
+                                to: '/chat/$threadId',
+                                params: { threadId: conversation.id },
+                              })
+                            }}
                             className="flex w-full items-center group/item"
                           >
                             {/* Hover indicator line */}

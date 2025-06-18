@@ -19,14 +19,30 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Bot, ChevronsUpDown, Plus, Sparkles } from 'lucide-react'
 import * as React from 'react'
 
-export function AssistantSwitcher({ assistants }: { assistants: Assistant[] }) {
+interface AssistantSwitcherProps {
+  assistants: Assistant[]
+  currentAssistant?: Assistant | null
+  onAssistantChange?: (assistant: Assistant) => void
+}
+
+export function AssistantSwitcher({
+  assistants,
+  currentAssistant,
+  onAssistantChange,
+}: AssistantSwitcherProps) {
   const { isMobile } = useSidebar()
 
-  const [activeAssistant, setActiveAssistant] = React.useState(() => assistants[0])
+  // Use the store-provided currentAssistant or fallback to first assistant 🎯
+  const activeAssistant = currentAssistant || assistants[0]
   const [isOpen, setIsOpen] = React.useState(false)
 
   if (!activeAssistant) {
     return null
+  }
+
+  const handleAssistantSelect = (assistant: Assistant) => {
+    onAssistantChange?.(assistant)
+    setIsOpen(false)
   }
 
   return (
@@ -99,8 +115,7 @@ export function AssistantSwitcher({ assistants }: { assistants: Assistant[] }) {
                 >
                   <DropdownMenuItem
                     onClick={() => {
-                      setActiveAssistant(assistant)
-                      setIsOpen(false)
+                      handleAssistantSelect(assistant)
                     }}
                     className={cn(
                       'gap-2 p-2 transition-all duration-200',

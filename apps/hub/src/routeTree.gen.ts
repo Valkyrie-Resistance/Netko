@@ -17,6 +17,7 @@ import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as ProtectedChatRouteImport } from './routes/_protected/chat'
 import { Route as ProtectedProfileIndexRouteImport } from './routes/_protected/profile/index'
 import { Route as ProtectedChatIndexRouteImport } from './routes/_protected/chat/index'
+import { Route as ProtectedChatThreadIdRouteImport } from './routes/_protected/chat/$threadId'
 
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
@@ -47,12 +48,18 @@ const ProtectedChatIndexRoute = ProtectedChatIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProtectedChatRoute,
 } as any)
+const ProtectedChatThreadIdRoute = ProtectedChatThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => ProtectedChatRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof ProtectedRouteWithChildren
   '/chat': typeof ProtectedChatRouteWithChildren
   '/auth': typeof AuthIndexRoute
+  '/chat/$threadId': typeof ProtectedChatThreadIdRoute
   '/chat/': typeof ProtectedChatIndexRoute
   '/profile': typeof ProtectedProfileIndexRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof ProtectedRouteWithChildren
   '/auth': typeof AuthIndexRoute
+  '/chat/$threadId': typeof ProtectedChatThreadIdRoute
   '/chat': typeof ProtectedChatIndexRoute
   '/profile': typeof ProtectedProfileIndexRoute
 }
@@ -69,20 +77,29 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteWithChildren
   '/_protected/chat': typeof ProtectedChatRouteWithChildren
   '/auth/': typeof AuthIndexRoute
+  '/_protected/chat/$threadId': typeof ProtectedChatThreadIdRoute
   '/_protected/chat/': typeof ProtectedChatIndexRoute
   '/_protected/profile/': typeof ProtectedProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/chat' | '/auth' | '/chat/' | '/profile'
+  fullPaths:
+    | '/'
+    | ''
+    | '/chat'
+    | '/auth'
+    | '/chat/$threadId'
+    | '/chat/'
+    | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/auth' | '/chat' | '/profile'
+  to: '/' | '' | '/auth' | '/chat/$threadId' | '/chat' | '/profile'
   id:
     | '__root__'
     | '/'
     | '/_protected'
     | '/_protected/chat'
     | '/auth/'
+    | '/_protected/chat/$threadId'
     | '/_protected/chat/'
     | '/_protected/profile/'
   fileRoutesById: FileRoutesById
@@ -122,6 +139,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/chat/$threadId': {
+      id: '/_protected/chat/$threadId'
+      path: '/$threadId'
+      fullPath: '/chat/$threadId'
+      preLoaderRoute: typeof ProtectedChatThreadIdRouteImport
+      parentRoute: typeof ProtectedChatRoute
     }
     '/_protected/chat/': {
       id: '/_protected/chat/'
@@ -176,6 +200,15 @@ declare module './routes/auth/index' {
     FileRoutesByPath['/auth/']['fullPath']
   >
 }
+declare module './routes/_protected/chat/$threadId' {
+  const createFileRoute: CreateFileRoute<
+    '/_protected/chat/$threadId',
+    FileRoutesByPath['/_protected/chat/$threadId']['parentRoute'],
+    FileRoutesByPath['/_protected/chat/$threadId']['id'],
+    FileRoutesByPath['/_protected/chat/$threadId']['path'],
+    FileRoutesByPath['/_protected/chat/$threadId']['fullPath']
+  >
+}
 declare module './routes/_protected/chat/index' {
   const createFileRoute: CreateFileRoute<
     '/_protected/chat/',
@@ -196,10 +229,12 @@ declare module './routes/_protected/profile/index' {
 }
 
 interface ProtectedChatRouteChildren {
+  ProtectedChatThreadIdRoute: typeof ProtectedChatThreadIdRoute
   ProtectedChatIndexRoute: typeof ProtectedChatIndexRoute
 }
 
 const ProtectedChatRouteChildren: ProtectedChatRouteChildren = {
+  ProtectedChatThreadIdRoute: ProtectedChatThreadIdRoute,
   ProtectedChatIndexRoute: ProtectedChatIndexRoute,
 }
 
