@@ -5,7 +5,6 @@ import {
   createWSClient,
   httpBatchLink,
   httpSubscriptionLink,
-  loggerLink,
   splitLink,
   wsLink,
 } from '@trpc/client'
@@ -18,7 +17,6 @@ const trpcHttpClient = createTRPCClient<AppRouter>({
    * @see https://trpc.io/docs/v11/client/links
    */
   links: [
-    loggerLink(),
     splitLink({
       condition: (op) => op.type === 'subscription',
       true: httpSubscriptionLink({
