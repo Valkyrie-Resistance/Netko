@@ -15,7 +15,7 @@ interface OpenRouterError {
 export class LLMService {
   private static instance: LLMService
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): LLMService {
     if (!LLMService.instance) {
@@ -75,28 +75,30 @@ export class LLMService {
         maxTokens: assistant.maxTokens ?? undefined,
       })
 
-      const existingSystemMessage = await prisma.message.findFirst({
-        where: {
-          threadId,
-          role: 'SYSTEM',
-        },
-      })
-
-      if (!existingSystemMessage) {
-        await prisma.message.create({
-          data: {
-            content: assistant.systemPrompt,
-            role: 'SYSTEM',
+      await prisma.$transaction(async (tx) => {
+        const existingSystemMessage = await tx.message.findFirst({
+          where: {
             threadId,
-            assistantId: validatedAssistantId,
-            modelId,
-            metadata: {
-              contextLength: modelMetadata.contextLength,
-              pricing: modelMetadata.pricing,
-            },
+            role: 'SYSTEM',
           },
         })
-      }
+
+        if (!existingSystemMessage) {
+          await tx.message.create({
+            data: {
+              content: assistant.systemPrompt,
+              role: 'SYSTEM',
+              threadId,
+              assistantId: validatedAssistantId,
+              modelId,
+              metadata: {
+                contextLength: modelMetadata.contextLength,
+                pricing: modelMetadata.pricing,
+              },
+            },
+          })
+        }
+      })
 
       return stream
     } catch (error: unknown) {
