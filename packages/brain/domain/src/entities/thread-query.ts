@@ -8,6 +8,10 @@ export const ThreadCursorSchema = z.object({
   id: ThreadIdSchema,
 })
 
+export const ThreadSearchSchemaInput = z.object({
+  query: z.string(),
+})
+
 export const ThreadListInputSchema = z.object({
   limit: z.number().int().positive(),
   cursor: ThreadCursorSchema.optional(),

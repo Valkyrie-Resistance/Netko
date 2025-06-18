@@ -8,12 +8,7 @@ import {
   SharedChatSchema,
   UserIdSchema,
 } from '@chad-chat/brain-domain'
-import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
-
-type SharedChatWithRelations = Prisma.SharedChatGetPayload<{
-  include: { thread: true; sharedBy: true }
-}>
 
 export async function getAllSharedChats(input: SharedChatListInput): Promise<{
   sharedChats: SharedChat[]
@@ -21,7 +16,7 @@ export async function getAllSharedChats(input: SharedChatListInput): Promise<{
 }> {
   const { limit, cursor, userId } = SharedChatListInputSchema.parse(input)
 
-  const sharedChats = (await prisma.sharedChat.findMany({
+  const sharedChats = await prisma.sharedChat.findMany({
     where: {
       sharedById: userId,
     },
@@ -38,7 +33,7 @@ export async function getAllSharedChats(input: SharedChatListInput): Promise<{
           id: cursor.id,
         }
       : undefined,
-  })) as SharedChatWithRelations[]
+  })
 
   const nextCursor =
     sharedChats.length > limit
@@ -57,7 +52,7 @@ export async function getAllSharedChats(input: SharedChatListInput): Promise<{
 export async function getSharedChatById(sharedChatId: string): Promise<SharedChat | null> {
   const validatedId = SharedChatIdSchema.parse(sharedChatId)
 
-  const sharedChat = (await prisma.sharedChat.findUnique({
+  const sharedChat = await prisma.sharedChat.findUnique({
     where: {
       id: validatedId,
     },
@@ -65,7 +60,7 @@ export async function getSharedChatById(sharedChatId: string): Promise<SharedCha
       thread: true,
       sharedBy: true,
     },
-  })) as SharedChatWithRelations | null
+  })
 
   return sharedChat ? SharedChatSchema.parse(sharedChat) : null
 }
@@ -77,7 +72,7 @@ export async function getSharedChatByUserId(
   const validatedId = SharedChatIdSchema.parse(sharedChatId)
   const validatedUserId = UserIdSchema.parse(userId)
 
-  const sharedChat = (await prisma.sharedChat.findFirst({
+  const sharedChat = await prisma.sharedChat.findFirst({
     where: {
       id: validatedId,
       sharedById: validatedUserId,
@@ -86,7 +81,7 @@ export async function getSharedChatByUserId(
       thread: true,
       sharedBy: true,
     },
-  })) as SharedChatWithRelations | null
+  })
 
   return sharedChat ? SharedChatSchema.parse(sharedChat) : null
 }
@@ -96,7 +91,7 @@ export async function getSharedChatByShareId(
 ): Promise<SharedChat | null> {
   const { shareId } = SharedChatByShareIdInputSchema.parse(input)
 
-  const sharedChat = (await prisma.sharedChat.findUnique({
+  const sharedChat = await prisma.sharedChat.findUnique({
     where: {
       shareId,
     },
@@ -104,7 +99,7 @@ export async function getSharedChatByShareId(
       thread: true,
       sharedBy: true,
     },
-  })) as SharedChatWithRelations | null
+  })
 
   return sharedChat ? SharedChatSchema.parse(sharedChat) : null
 }

@@ -8,12 +8,7 @@ import {
   AssistantSearchInputSchema,
   UserIdSchema,
 } from '@chad-chat/brain-domain'
-import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
-
-type AssistantWithRelations = Prisma.AssistantGetPayload<{
-  include: { createdBy: true; defaultModel: true }
-}>
 
 export async function getAllAssistants(input: AssistantListInput): Promise<{
   assistants: Assistant[]
@@ -21,13 +16,12 @@ export async function getAllAssistants(input: AssistantListInput): Promise<{
 }> {
   const { limit, cursor, userId } = AssistantListInputSchema.parse(input)
 
-  const assistants = (await prisma.assistant.findMany({
+  const assistants = await prisma.assistant.findMany({
     where: {
       createdById: userId,
     },
     include: {
       createdBy: true,
-      defaultModel: true,
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
@@ -38,7 +32,7 @@ export async function getAllAssistants(input: AssistantListInput): Promise<{
           id: cursor.id,
         }
       : undefined,
-  })) as AssistantWithRelations[]
+  })
 
   const nextCursor =
     assistants.length > limit
@@ -61,16 +55,15 @@ export async function getAssistantById(
   const validatedId = AssistantIdSchema.parse(assistantId)
   const validatedUserId = UserIdSchema.parse(userId)
 
-  const assistant = (await prisma.assistant.findFirst({
+  const assistant = await prisma.assistant.findFirst({
     where: {
       id: validatedId,
       createdById: validatedUserId,
     },
     include: {
       createdBy: true,
-      defaultModel: true,
     },
-  })) as AssistantWithRelations | null
+  })
 
   return assistant ? AssistantSchema.parse(assistant) : null
 }
@@ -81,7 +74,7 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
 }> {
   const { limit, cursor, query, userId } = AssistantSearchInputSchema.parse(input)
 
-  const assistants = (await prisma.assistant.findMany({
+  const assistants = await prisma.assistant.findMany({
     where: {
       createdById: userId,
       name: {
@@ -91,7 +84,6 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
     },
     include: {
       createdBy: true,
-      defaultModel: true,
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
@@ -102,7 +94,7 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
           id: cursor.id,
         }
       : undefined,
-  })) as AssistantWithRelations[]
+  })
 
   const nextCursor =
     assistants.length > limit
@@ -118,19 +110,18 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
   }
 }
 
-export async function getAllPublicAssistants(input: AssistantListInput): Promise<{
+export async function getAllPublicAssistants(input: Omit<AssistantListInput, 'userId'>): Promise<{
   assistants: Assistant[]
   nextCursor: { updatedAt: string; id: string } | null
 }> {
-  const { limit, cursor } = AssistantListInputSchema.parse(input)
+  const { limit, cursor } = AssistantListInputSchema.omit({ userId: true }).parse(input)
 
-  const assistants = (await prisma.assistant.findMany({
+  const assistants = await prisma.assistant.findMany({
     where: {
       isPublic: true,
     },
     include: {
       createdBy: true,
-      defaultModel: true,
     },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: limit + 1,
@@ -141,7 +132,7 @@ export async function getAllPublicAssistants(input: AssistantListInput): Promise
           id: cursor.id,
         }
       : undefined,
-  })) as AssistantWithRelations[]
+  })
 
   const nextCursor =
     assistants.length > limit
@@ -160,16 +151,47 @@ export async function getAllPublicAssistants(input: AssistantListInput): Promise
 export async function getPublicAssistantById(assistantId: string): Promise<Assistant | null> {
   const validatedId = AssistantIdSchema.parse(assistantId)
 
-  const assistant = (await prisma.assistant.findFirst({
+  const assistant = await prisma.assistant.findFirst({
     where: {
       id: validatedId,
       isPublic: true,
     },
     include: {
       createdBy: true,
-      defaultModel: true,
     },
-  })) as AssistantWithRelations | null
+  })
 
   return assistant ? AssistantSchema.parse(assistant) : null
+}
+
+export async function getAssistants(userId: string): Promise<Assistant[]> {
+  const validatedUserId = UserIdSchema.parse(userId)
+
+  const [userAssistants, publicAssistants] = await prisma.$transaction([
+    prisma.assistant.findMany({
+      where: {
+        createdById: validatedUserId,
+      },
+      include: {
+        createdBy: true,
+      },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+    }),
+    prisma.assistant.findMany({
+      where: {
+        isPublic: true,
+        createdById: {
+          not: validatedUserId,
+        },
+      },
+      include: {
+        createdBy: true,
+      },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+    }),
+  ])
+
+  return [...userAssistants, ...publicAssistants].map((assistant) =>
+    AssistantSchema.parse(assistant),
+  )
 }
