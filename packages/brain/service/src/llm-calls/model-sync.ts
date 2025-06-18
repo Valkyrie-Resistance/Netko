@@ -13,10 +13,18 @@ interface OpenRouterModel {
   }
 }
 
+type ModelsCache = {
+  models: OpenRouterModel[]
+  fetchedAt: number
+}
+
+const MODELS_CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
 export class ModelSyncService {
   private static instances: Map<string, ModelSyncService> = new Map()
   private openrouter: ReturnType<typeof createOpenRouter>
   private apiKey: string
+  private modelsCache: ModelsCache = { models: [], fetchedAt: 0 }
 
   private constructor(apiKey: string) {
     this.apiKey = apiKey
@@ -37,20 +45,33 @@ export class ModelSyncService {
     return instance
   }
 
+  private async fetchModels(): Promise<OpenRouterModel[]> {
+    const now = Date.now()
+    if (this.modelsCache.models.length > 0 && now - this.modelsCache.fetchedAt < MODELS_CACHE_TTL) {
+      return this.modelsCache.models
+    }
+
+    const response = await fetch('https://openrouter.ai/api/v1/models', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        'HTTP-Referer': 'https://chad-chat.vercel.app',
+        'X-Title': 'Chad Chat',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch models from OpenRouter')
+    }
+
+    const { data: models } = (await response.json()) as { data: OpenRouterModel[] }
+    this.modelsCache = { models, fetchedAt: now }
+    return models
+  }
+
   public async syncModels(): Promise<void> {
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/models', {
-        headers: {
-          'HTTP-Referer': 'https://chad-chat.vercel.app',
-          'X-Title': 'Chad Chat',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch models from OpenRouter')
-      }
-
-      const { data: models } = (await response.json()) as { data: OpenRouterModel[] }
+      const models = await this.fetchModels()
 
       await prisma.$transaction(
         models.map((model) =>
@@ -105,20 +126,7 @@ export class ModelSyncService {
     modelId: string,
   ): Promise<{ contextLength: number; pricing: { prompt: number; completion: number } } | null> {
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/models', {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-          'HTTP-Referer': 'https://chad-chat.vercel.app',
-          'X-Title': 'Chad Chat',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch models from OpenRouter')
-      }
-
-      const { data: models } = (await response.json()) as { data: OpenRouterModel[] }
+      const models = await this.fetchModels()
       const model = models.find((m) => m.id === modelId)
 
       if (!model) {
