@@ -37,10 +37,11 @@ export async function getAllThreads(
   nextCursor: { updatedAt: string; id: string } | null
 }> {
   const { limit, cursor } = ThreadListInputSchema.parse(input)
+  const validatedUserId = UserIdSchema.parse(userId)
 
   const threads = (await prisma.thread.findMany({
     where: {
-      userId,
+      userId: validatedUserId,
     },
     include: {
       user: true,
@@ -51,18 +52,18 @@ export async function getAllThreads(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: new Date(cursor.updatedAt),
-          id: cursor.id,
-        }
+        updatedAt: new Date(cursor.updatedAt),
+        id: cursor.id,
+      }
       : undefined,
   })) as ThreadWithRelations[]
 
   const nextCursor =
     threads.length > limit
       ? {
-          updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
-          id: threads[limit]?.id ?? '',
-        }
+        updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
+        id: threads[limit]?.id ?? '',
+      }
       : null
   const page = threads.slice(0, limit)
   return {
@@ -73,12 +74,13 @@ export async function getAllThreads(
 
 export async function getThreadById(threadId: string, userId: string): Promise<Thread | null> {
   const validatedThreadId = ThreadIdSchema.parse(threadId)
+  const validatedUserId = UserIdSchema.parse(userId)
 
   const thread = (await prisma.thread.findUnique({
     where: {
       threadCompoundId: {
         id: validatedThreadId,
-        userId: userId,
+        userId: validatedUserId,
       },
     },
     include: {
@@ -97,12 +99,13 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
 } | null> {
   const { threadId, userId, limit, cursor } = ThreadWithMessagesInputSchema.parse(input)
   const validatedThreadId = threadId
+  const validatedUserId = UserIdSchema.parse(userId)
 
   const thread = (await prisma.thread.findUnique({
     where: {
       threadCompoundId: {
         id: validatedThreadId,
-        userId: userId,
+        userId: validatedUserId,
       },
     },
     include: {
@@ -112,9 +115,9 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
         skip: cursor ? 1 : 0,
         cursor: cursor
           ? {
-              createdAt: new Date(cursor.createdAt),
-              id: cursor.id,
-            }
+            createdAt: new Date(cursor.createdAt),
+            id: cursor.id,
+          }
           : undefined,
         select: {
           id: true,
@@ -133,9 +136,9 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
   const nextCursor =
     thread.messages.length > limit
       ? {
-          createdAt: thread.messages[limit]?.createdAt.toISOString() ?? '',
-          id: thread.messages[limit]?.id ?? '',
-        }
+        createdAt: thread.messages[limit]?.createdAt.toISOString() ?? '',
+        id: thread.messages[limit]?.id ?? '',
+      }
       : null
   const page = thread.messages.slice(0, limit)
 
@@ -174,9 +177,9 @@ export async function getMessagesInThread(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          createdAt: new Date(cursor.createdAt),
-          id: cursor.id,
-        }
+        createdAt: new Date(cursor.createdAt),
+        id: cursor.id,
+      }
       : undefined,
     select: {
       id: true,
@@ -189,9 +192,9 @@ export async function getMessagesInThread(
   const nextCursor =
     messages.length > limit
       ? {
-          createdAt: messages[limit]?.createdAt.toISOString() ?? '',
-          id: messages[limit]?.id ?? '',
-        }
+        createdAt: messages[limit]?.createdAt.toISOString() ?? '',
+        id: messages[limit]?.id ?? '',
+      }
       : null
   const page = messages.slice(0, limit)
 
@@ -209,10 +212,11 @@ export async function searchThreads(
   nextCursor: { updatedAt: string; id: string } | null
 }> {
   const { limit, cursor, query } = ThreadSearchInputSchema.parse(input)
+  const validatedUserId = UserIdSchema.parse(userId)
 
   const threads = (await prisma.thread.findMany({
     where: {
-      userId,
+      userId: validatedUserId,
       title: {
         contains: query,
         mode: 'insensitive',
@@ -227,18 +231,18 @@ export async function searchThreads(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: new Date(cursor.updatedAt),
-          id: cursor.id,
-        }
+        updatedAt: new Date(cursor.updatedAt),
+        id: cursor.id,
+      }
       : undefined,
   })) as ThreadWithRelations[]
 
   const nextCursor =
     threads.length > limit
       ? {
-          updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
-          id: threads[limit]?.id ?? '',
-        }
+        updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
+        id: threads[limit]?.id ?? '',
+      }
       : null
   const page = threads.slice(0, limit)
   return {
@@ -255,11 +259,13 @@ export async function getThreadsByAssistant(
   nextCursor: { updatedAt: string; id: string } | null
 }> {
   const { limit, cursor, assistantId } = ThreadByAssistantInputSchema.parse(input)
+  const validatedUserId = UserIdSchema.parse(userId)
+  const validatedAssistantId = ThreadIdSchema.parse(assistantId)
 
   const threads = (await prisma.thread.findMany({
     where: {
-      userId,
-      assistantId,
+      userId: validatedUserId,
+      assistantId: validatedAssistantId,
     },
     include: {
       user: true,
@@ -270,18 +276,18 @@ export async function getThreadsByAssistant(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: new Date(cursor.updatedAt),
-          id: cursor.id,
-        }
+        updatedAt: new Date(cursor.updatedAt),
+        id: cursor.id,
+      }
       : undefined,
   })) as ThreadWithRelations[]
 
   const nextCursor =
     threads.length > limit
       ? {
-          updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
-          id: threads[limit]?.id ?? '',
-        }
+        updatedAt: threads[limit]?.updatedAt.toISOString() ?? '',
+        id: threads[limit]?.id ?? '',
+      }
       : null
   const page = threads.slice(0, limit)
   return {
