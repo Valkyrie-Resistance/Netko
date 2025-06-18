@@ -1,71 +1,60 @@
 import { prisma } from '@chad-chat/brain-repository'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1'
+
 interface OpenRouterModel {
   id: string
   name: string
   displayName: string
-  description?: string
-  contextLength: number
-  pricing: {
-    prompt: number
-    completion: number
-    request: number
-    image?: number
-    webSearch?: number
-    internalReasoning?: number
-    inputCacheRead?: number
-    inputCacheWrite?: number
-  }
-  architecture?: {
+  description: string
+  architecture: {
     inputModalities: string[]
     outputModalities: string[]
-    tokenizer: string
-    instructType: string | null
+    instructType: string
   }
-  supportedParameters?: string[]
+  supportedParameters: string[]
 }
 
 interface InternalModel {
   id: string
   name: string
   displayName: string
-  description?: string
-  contextLength: number
-  pricing: {
-    prompt: number
-    completion: number
-  }
+  description: string
 }
 
-type ModelsCache = {
+interface ModelsCache {
   models: InternalModel[]
-  fetchedAt: number
+  timestamp: number
+}
+
+interface ModelSyncInstance {
+  service: ModelSyncService
+  lastAccessed: number
 }
 
 const MODELS_CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 const INSTANCE_TTL = 30 * 60 * 1000 // 30 minutes
 
-type ModelSyncInstance = {
-  service: ModelSyncService
-  lastAccessed: number
+export function createOpenRouterClient(apiKey: string) {
+  return createOpenRouter({
+    baseURL: OPENROUTER_BASE_URL,
+    apiKey,
+  })
 }
 
 export class ModelSyncService {
   private static instances: Map<string, ModelSyncInstance> = new Map()
-  private openrouter: ReturnType<typeof createOpenRouter>
-  private apiKey: string
-  private modelsCache: ModelsCache = { models: [], fetchedAt: 0 }
+  private modelsCache: ModelsCache | null = null
+  private readonly openRouterClient: ReturnType<typeof createOpenRouter>
+  private readonly apiKey: string
 
   private constructor(apiKey: string) {
     this.apiKey = apiKey
-    this.openrouter = createOpenRouter({
-      apiKey,
-      baseURL: 'https://openrouter.ai/api/v1',
-    })
+    this.openRouterClient = createOpenRouterClient(apiKey)
   }
 
-  public static getInstance(apiKey: string): ModelSyncService {
+  static getInstance(apiKey: string): ModelSyncService {
     const now = Date.now()
 
     for (const [key, instance] of ModelSyncService.instances.entries()) {
@@ -74,25 +63,22 @@ export class ModelSyncService {
       }
     }
 
-    if (!ModelSyncService.instances.has(apiKey)) {
-      ModelSyncService.instances.set(apiKey, {
-        service: new ModelSyncService(apiKey),
-        lastAccessed: now,
-      })
-    }
-
     const instance = ModelSyncService.instances.get(apiKey)
-    if (!instance) {
-      throw new Error('Failed to create ModelSyncService instance')
+    if (instance) {
+      instance.lastAccessed = now
+      return instance.service
     }
 
-    instance.lastAccessed = now
-    return instance.service
+    const newInstance = {
+      service: new ModelSyncService(apiKey),
+      lastAccessed: now,
+    }
+    ModelSyncService.instances.set(apiKey, newInstance)
+    return newInstance.service
   }
 
   private async fetchModels(): Promise<InternalModel[]> {
-    const now = Date.now()
-    if (this.modelsCache.models.length > 0 && now - this.modelsCache.fetchedAt < MODELS_CACHE_TTL) {
+    if (this.modelsCache && Date.now() - this.modelsCache.timestamp < MODELS_CACHE_TTL) {
       return this.modelsCache.models
     }
 
@@ -112,34 +98,30 @@ export class ModelSyncService {
 
       const data = (await response.json()) as { data: OpenRouterModel[] }
 
-      // Validate the response data
       if (!Array.isArray(data.data)) {
         throw new Error('Invalid response format from OpenRouter API')
       }
 
-      // Transform the data to match our internal model structure
-      const models = data.data.map((model) => ({
+      const models = data.data.map((model: OpenRouterModel) => ({
         id: model.id,
         name: model.name,
-        displayName: model.name, // Using name as displayName since it's human-readable
-        description: model.description,
-        contextLength: model.contextLength,
-        pricing: {
-          prompt: Number(model.pricing.prompt) || 0,
-          completion: Number(model.pricing.completion) || 0,
-        },
+        displayName: model.name,
+        description: model.description || '',
       }))
 
-      this.modelsCache = { models, fetchedAt: now }
+      this.modelsCache = {
+        models,
+        timestamp: Date.now(),
+      }
+
       return models
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      console.error('Error fetching models from OpenRouter:', errorMessage)
-      throw new Error(`Failed to fetch models: ${errorMessage}`)
+    } catch (error) {
+      console.error('Error fetching models from OpenRouter:', error)
+      throw error
     }
   }
 
-  public async syncModels(): Promise<void> {
+  async syncModels(): Promise<void> {
     try {
       const models = await this.fetchModels()
 
@@ -178,27 +160,15 @@ export class ModelSyncService {
             },
           },
           create: {
-            content: JSON.stringify({
-              contextLength: model.contextLength,
-              pricing: model.pricing,
-            }),
+            content: JSON.stringify({}),
             role: 'SYSTEM',
             threadId: 'model-metadata',
             modelId: model.id,
-            metadata: {
-              contextLength: model.contextLength,
-              pricing: model.pricing,
-            },
+            metadata: {},
           },
           update: {
-            content: JSON.stringify({
-              contextLength: model.contextLength,
-              pricing: model.pricing,
-            }),
-            metadata: {
-              contextLength: model.contextLength,
-              pricing: model.pricing,
-            },
+            content: JSON.stringify({}),
+            metadata: {},
           },
         })
       }
@@ -208,30 +178,15 @@ export class ModelSyncService {
     }
   }
 
-  public async validateModel(modelId: string): Promise<boolean> {
-    try {
-      const model = await prisma.lLMModel.findUnique({
-        where: {
-          provider_name: {
-            provider: 'OPENROUTER',
-            name: modelId,
-          },
-        },
-      })
-
-      return !!model && model.isActive
-    } catch (error) {
-      console.error('Failed to validate model:', error)
-      return false
-    }
+  async validateModel(modelId: string): Promise<boolean> {
+    const models = await this.fetchModels()
+    return models.some((model) => model.id === modelId)
   }
 
-  public async getModelMetadata(
-    modelId: string,
-  ): Promise<{ contextLength: number; pricing: { prompt: number; completion: number } } | null> {
+  async getModelMetadata(modelId: string): Promise<Record<string, unknown> | null> {
     const recentMessage = await prisma.message.findFirst({
       where: {
-        threadId: `model-metadata-${modelId}`,
+        threadId: 'model-metadata',
         role: 'SYSTEM',
       },
       orderBy: {
@@ -240,23 +195,7 @@ export class ModelSyncService {
     })
 
     if (recentMessage?.metadata) {
-      const metadata = recentMessage.metadata as {
-        contextLength?: number
-        pricing?: { prompt?: number; completion?: number }
-      }
-      const defaultContextLength = 2048
-      const defaultPricing = { prompt: 0, completion: 0 }
-      const contextLength =
-        typeof metadata.contextLength === 'number' ? metadata.contextLength : defaultContextLength
-      const pricing =
-        metadata.pricing &&
-        typeof metadata.pricing.prompt === 'number' &&
-        typeof metadata.pricing.completion === 'number'
-          ? { prompt: metadata.pricing.prompt, completion: metadata.pricing.completion }
-          : defaultPricing
-      if (contextLength && pricing) {
-        return { contextLength, pricing }
-      }
+      return recentMessage.metadata as Record<string, unknown>
     }
 
     const models = await this.fetchModels()
@@ -265,22 +204,6 @@ export class ModelSyncService {
       return null
     }
 
-    const defaultContextLength = 2048
-    const defaultPricing = { prompt: 0, completion: 0 }
-    return {
-      contextLength:
-        typeof openRouterModel.contextLength === 'number'
-          ? openRouterModel.contextLength
-          : defaultContextLength,
-      pricing:
-        openRouterModel.pricing &&
-        typeof openRouterModel.pricing.prompt === 'number' &&
-        typeof openRouterModel.pricing.completion === 'number'
-          ? {
-              prompt: openRouterModel.pricing.prompt,
-              completion: openRouterModel.pricing.completion,
-            }
-          : defaultPricing,
-    }
+    return {}
   }
 }
