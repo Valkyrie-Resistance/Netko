@@ -1,4 +1,5 @@
 import {
+  AssistantIdSchema,
   type Thread,
   type ThreadByAssistantInput,
   ThreadByAssistantInputSchema,
@@ -260,7 +261,7 @@ export async function getThreadsByAssistant(
 }> {
   const { limit, cursor, assistantId } = ThreadByAssistantInputSchema.parse(input)
   const validatedUserId = UserIdSchema.parse(userId)
-  const validatedAssistantId = ThreadIdSchema.parse(assistantId)
+  const validatedAssistantId = AssistantIdSchema.parse(assistantId)
 
   const threads = (await prisma.thread.findMany({
     where: {

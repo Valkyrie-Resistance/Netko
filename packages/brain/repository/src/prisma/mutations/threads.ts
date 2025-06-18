@@ -79,9 +79,10 @@ export async function addParentToThread(threadId: string, parentId: string): Pro
 export async function createThread(
   data: Omit<ThreadCreateInput, 'user' | 'assistant'> & { userId: string; assistantId: string },
 ): Promise<Thread> {
-  const validatedData = ThreadCreateInputSchema.parse(data)
-  const validatedUserId = UserIdSchema.parse(data.userId)
-  const validatedAssistantId = AssistantIdSchema.parse(data.assistantId)
+  const { userId, assistantId, ...rest } = data
+  const validatedData = ThreadCreateInputSchema.parse(rest)
+  const validatedUserId = UserIdSchema.parse(userId)
+  const validatedAssistantId = AssistantIdSchema.parse( assistantId)
 
   const thread = (await prisma.thread.create({
     data: {
@@ -110,16 +111,19 @@ export async function updateThread(
     where: {
       id: validatedThreadId,
     },
-    data: validatedData,
+    data: {
+      ...validatedData,
+      ...(assistantId && {
+        assistant: {
+          connect: { id: assistantId },
+        },
+      }),
+    },
     include: {
       user: true,
       assistant: true,
     },
   })) as ThreadWithRelations
-
-  if (assistantId) {
-    return addAssistantToThread(thread.id, assistantId)
-  }
 
   return ThreadSchema.parse(thread)
 }
