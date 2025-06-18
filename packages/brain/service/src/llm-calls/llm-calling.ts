@@ -80,7 +80,7 @@ export class LLMService {
     messages: Message[],
   ): Promise<StreamTextResult<never, never>> {
     const apiKey = await this.getUserApiKey(userId)
-    const llmService = LLMService.getInstance(apiKey)
+    const chatModel = this.openRouterClient.chat(modelId)
 
     const assistant = await prisma.assistant.findUnique({
       where: { id: assistantId },
@@ -105,8 +105,6 @@ export class LLMService {
     if (!model) {
       throw new Error('Model not found')
     }
-
-    const chatModel = llmService.openRouterClient.chat(model.name)
 
     const stream = await streamText({
       model: chatModel,
