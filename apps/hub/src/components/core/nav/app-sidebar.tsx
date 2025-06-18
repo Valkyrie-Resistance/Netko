@@ -1,18 +1,21 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Bot,
   ChevronRight,
-  History,
+  Loader2,
   MessageSquare,
   Plus,
   Search,
   Settings,
   Sparkles,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { AssistantSwitcher } from '@/components/core/nav/assistant-switcher'
-import { NavConversations, groupConversationsByTime } from '@/components/core/nav/nav-conversations'
+import {
+  type ConversationGroup,
+  NavConversations,
+  groupConversationsByTime,
+} from '@/components/core/nav/nav-conversations'
 import { NavUser } from '@/components/core/nav/nav-user'
 
 import {
@@ -33,239 +36,37 @@ import {
 
 import { Button } from '@chad-chat/ui/components/shadcn/button'
 
+import { trpcHttp } from '@/lib/trpc'
 import { useAuth } from '@/providers/auth-provider'
-
-// Mock conversation data with timestamps
-const mockConversations = [
-  // Today
-  {
-    id: '1',
-    title: 'How to implement TanStack Router with TypeScript?',
-    timestamp: new Date(),
-  },
-  {
-    id: '2',
-    title: 'Debugging React state management issues',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-  },
-  {
-    id: '3',
-    title: 'CSS Grid layout not working as expected',
-    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-  },
-  {
-    id: '4',
-    title: 'Help with Tailwind CSS custom utilities',
-    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-  },
-  {
-    id: '5',
-    title: 'Next.js App Router vs Pages Router differences',
-    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
-  },
-  {
-    id: '6',
-    title: 'ESLint configuration for React TypeScript project',
-    timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000),
-  },
-
-  // Yesterday
-  {
-    id: '7',
-    title: 'API rate limiting best practices',
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '8',
-    title: 'Prisma migration failing with foreign key constraints',
-    timestamp: new Date(Date.now() - 26 * 60 * 60 * 1000),
-  },
-  {
-    id: '9',
-    title: 'Optimizing bundle size with Webpack',
-    timestamp: new Date(Date.now() - 28 * 60 * 60 * 1000),
-  },
-  {
-    id: '10',
-    title: 'Understanding React 18 concurrent features',
-    timestamp: new Date(Date.now() - 30 * 60 * 60 * 1000),
-  },
-  {
-    id: '11',
-    title: 'Setting up Storybook for component library',
-    timestamp: new Date(Date.now() - 32 * 60 * 60 * 1000),
-  },
-
-  // Last Week
-  {
-    id: '12',
-    title: 'JWT authentication with refresh tokens',
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '13',
-    title: 'React performance optimization techniques',
-    timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '14',
-    title: 'Docker development environment setup',
-    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '15',
-    title: 'Implementing WebSocket real-time chat',
-    timestamp: new Date(Date.now() - 3.5 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '16',
-    title: 'Node.js serverless functions with Vercel',
-    timestamp: new Date(Date.now() - 4.5 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '17',
-    title: 'MongoDB aggregation pipeline optimization',
-    timestamp: new Date(Date.now() - 5.5 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '18',
-    title: 'TypeScript generic constraints explained',
-    timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '19',
-    title: 'React Hook Form with Zod validation',
-    timestamp: new Date(Date.now() - 6.5 * 24 * 60 * 60 * 1000),
-  },
-
-  // Last Month
-  {
-    id: '20',
-    title: 'Microservices vs monolith architecture decision',
-    timestamp: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '21',
-    title: 'Testing strategy: unit vs integration vs e2e',
-    timestamp: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '22',
-    title: 'GraphQL vs REST API comparison',
-    timestamp: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '23',
-    title: 'Implementing OAuth2 with multiple providers',
-    timestamp: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '24',
-    title: 'Redis caching strategies for high traffic apps',
-    timestamp: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '25',
-    title: 'Kubernetes deployment for Node.js applications',
-    timestamp: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '26',
-    title: 'Advanced TypeScript mapped types tutorial',
-    timestamp: new Date(Date.now() - 27 * 24 * 60 * 60 * 1000),
-  },
-
-  // Older (more than a month)
-  {
-    id: '27',
-    title: 'Setting up CI/CD pipeline with GitHub Actions',
-    timestamp: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '28',
-    title: 'Database design for multi-tenant application',
-    timestamp: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '29',
-    title: 'Understanding async/await vs promises in JavaScript',
-    timestamp: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '30',
-    title: 'Redux vs Zustand state management comparison',
-    timestamp: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '31',
-    title: 'Building scalable React component architecture',
-    timestamp: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '32',
-    title: 'PostgreSQL query optimization techniques',
-    timestamp: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '33',
-    title: 'AWS Lambda cold start optimization strategies',
-    timestamp: new Date(Date.now() - 65 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '34',
-    title: 'Implementing event sourcing with TypeScript',
-    timestamp: new Date(Date.now() - 80 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '35',
-    title: 'Web accessibility best practices checklist',
-    timestamp: new Date(Date.now() - 55 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '36',
-    title: 'Migrating from JavaScript to TypeScript gradually',
-    timestamp: new Date(Date.now() - 70 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '37',
-    title: 'Optimizing React Native app performance',
-    timestamp: new Date(Date.now() - 85 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '38',
-    title: 'Building custom Webpack plugins from scratch',
-    timestamp: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-  },
-]
-
-// Mock assistants data for the switcher
-const assistants = [
-  {
-    name: 'Claude Sonnet 3.5',
-    logo: Bot,
-    description: 'Your coding companion 🐱‍💻',
-  },
-  {
-    name: 'GPT-4 Turbo',
-    logo: MessageSquare,
-    description: 'Alternative assistant',
-  },
-  {
-    name: 'Gemini Pro',
-    logo: History,
-    description: "Google's assistant",
-  },
-]
+import { AssistantSchema, ThreadSchema } from '@chad-chat/brain-domain'
+import { useQuery } from '@tanstack/react-query'
+import { useRouter } from '@tanstack/react-router'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const router = useRouter()
+  const { data: assistants, isLoading } = useQuery(trpcHttp.threads.getAssistants.queryOptions())
+  const { data: conversations, isLoading: isConversationsLoading } = useQuery(
+    trpcHttp.threads.getSidebarThreads.queryOptions(),
+  )
+  const [conversationGroups, setConversationGroups] = useState<ConversationGroup[]>([])
+
   const { user } = useAuth()
   const [isCommandOpen, setIsCommandOpen] = useState(false)
   const [isNewChatHovered, setIsNewChatHovered] = useState(false)
-  const conversationGroups = groupConversationsByTime(mockConversations)
+
+  useEffect(() => {
+    if (conversations && !isConversationsLoading) {
+      setConversationGroups(
+        groupConversationsByTime(conversations.threads.map((c) => ThreadSchema.parse(c))),
+      )
+    }
+  }, [conversations, isConversationsLoading])
 
   const handleCreateChat = () => {
-    // TODO: Implement create new chat logic
-    console.log('Creating new chat... 🚀')
+    // tanstack router navigate to /chat
+    router.navigate({
+      to: '/chat',
+    })
   }
 
   const handleCommand = (command: string) => {
@@ -293,7 +94,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <Sidebar variant="inset" {...props}>
         <SidebarHeader>
           <div className="flex flex-col gap-2">
-            <AssistantSwitcher assistants={assistants} />
+            {isLoading ? (
+              <div className="flex h-10 w-full items-center justify-center">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
+            ) : (
+              <AssistantSwitcher
+                assistants={assistants?.map((c) => AssistantSchema.parse(c)) ?? []}
+              />
+            )}
 
             <div className="flex gap-2">
               <motion.div
@@ -435,7 +244,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </CommandGroup>
 
           <CommandGroup heading="Recent Conversations">
-            {mockConversations.slice(0, 5).map((conversation) => (
+            {conversations?.threads.map((conversation) => (
               <CommandItem
                 key={conversation.id}
                 onSelect={() => {

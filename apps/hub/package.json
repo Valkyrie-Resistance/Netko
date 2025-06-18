@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@chad-chat/brain": "workspace:*",
+    "@chad-chat/brain-domain": "workspace:*",
     "@chad-chat/ui": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-collapsible": "^1.1.11",
@@ -39,7 +40,8 @@
     "remark-gfm": "4",
     "remeda": "2",
     "shiki": "1",
-    "sonner": "^2.0.5"
+    "sonner": "^2.0.5",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@chad-chat/typescript-config": "workspace:*",

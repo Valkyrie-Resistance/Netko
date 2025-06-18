@@ -1,5 +1,6 @@
-import { ThreadSearchSchemaInput } from '@chad-chat/brain-domain'
+import { AssistantSchema, ThreadSearchSchemaInput } from '@chad-chat/brain-domain'
 import { assistantService, threadService } from '@chad-chat/brain-service'
+import z from 'zod'
 import { protectedProcedure, router } from '../../lib/trpc'
 
 export const threadsQueries = router({
@@ -11,7 +12,7 @@ export const threadsQueries = router({
     return threadService.getSidebarThreads(ctx.user.id)
   }),
 
-  getAssistants: protectedProcedure.query(async ({ ctx }) => {
+  getAssistants: protectedProcedure.output(z.array(AssistantSchema)).query(async ({ ctx }) => {
     return assistantService.getAssistants(ctx.user.id)
   }),
 })

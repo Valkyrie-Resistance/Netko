@@ -1,7 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronsUpDown, Plus, Sparkles } from 'lucide-react'
-import * as React from 'react'
-
+import type { Assistant } from '@chad-chat/brain-domain'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,18 +15,14 @@ import {
   useSidebar,
 } from '@chad-chat/ui/components/shadcn/sidebar'
 import { cn } from '@chad-chat/ui/lib/utils'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Bot, ChevronsUpDown, Plus, Sparkles } from 'lucide-react'
+import * as React from 'react'
 
-export function AssistantSwitcher({
-  assistants,
-}: {
-  assistants: {
-    name: string
-    logo: React.ElementType
-    description: string
-  }[]
-}) {
+export function AssistantSwitcher({ assistants }: { assistants: Assistant[] }) {
   const { isMobile } = useSidebar()
-  const [activeAssistant, setActiveAssistant] = React.useState(assistants[0])
+
+  const [activeAssistant, setActiveAssistant] = React.useState(() => assistants[0])
   const [isOpen, setIsOpen] = React.useState(false)
 
   if (!activeAssistant) {
@@ -61,7 +54,7 @@ export function AssistantSwitcher({
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
               >
-                <activeAssistant.logo className="size-4" />
+                <Bot className="size-4" />
                 <motion.div
                   className="absolute -top-1 -right-1"
                   initial={{ scale: 0 }}
@@ -121,7 +114,7 @@ export function AssistantSwitcher({
                       whileHover={{ scale: 1.1 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                     >
-                      <assistant.logo className="size-3.5 shrink-0" />
+                      <Bot className="size-3.5 shrink-0" />
                     </motion.div>
                     {assistant.name}
                     <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>

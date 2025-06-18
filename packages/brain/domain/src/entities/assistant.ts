@@ -10,13 +10,12 @@ export const AssistantSchema = z.object({
   name: z.string(),
   description: z.string().nullish(),
   systemPrompt: z.string(),
-  temperature: z.number(),
   maxTokens: z.number().nullish(),
   isPublic: z.boolean(),
   defaultModel: LLMModelSchema.nullish(),
   createdByUser: UserSchema.nullish(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdAt: z.any().nullish(),
+  updatedAt: z.any().nullish(),
 })
 
 export type Assistant = z.infer<typeof AssistantSchema>

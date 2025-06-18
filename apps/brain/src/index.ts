@@ -6,7 +6,7 @@ import { Hono } from 'hono'
 import { serveStatic } from 'hono/bun'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { createWsContext } from './lib/trpc'
+import { createContext, createWsContext } from './lib/trpc'
 import { appRouter } from './routes'
 
 //* App
@@ -50,6 +50,7 @@ app.use(
   trpcServer({
     router: appRouter,
     endpoint: '/api/trpc',
+    createContext,
   }),
 )
 

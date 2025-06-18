@@ -48,10 +48,7 @@ export async function getAllAssistants(input: AssistantListInput): Promise<{
   }
 }
 
-export async function getAssistantById(
-  assistantId: string,
-  userId: string,
-): Promise<Assistant | null> {
+export async function getAssistantById(assistantId: string, userId: string): Promise<Assistant> {
   const validatedId = AssistantIdSchema.parse(assistantId)
   const validatedUserId = UserIdSchema.parse(userId)
 
@@ -65,7 +62,7 @@ export async function getAssistantById(
     },
   })
 
-  return assistant ? AssistantSchema.parse(assistant) : null
+  return AssistantSchema.parse(assistant)
 }
 
 export async function searchAssistants(input: AssistantSearchInput): Promise<{
@@ -180,18 +177,12 @@ export async function getAssistants(userId: string): Promise<Assistant[]> {
     prisma.assistant.findMany({
       where: {
         isPublic: true,
-        createdById: {
-          not: validatedUserId,
-        },
-      },
-      include: {
-        createdBy: true,
       },
       orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     }),
   ])
 
-  return [...userAssistants, ...publicAssistants].map((assistant) =>
-    AssistantSchema.parse(assistant),
-  )
+  const assistants = [...userAssistants, ...publicAssistants]
+
+  return assistants.map((assistant) => AssistantSchema.parse(assistant))
 }

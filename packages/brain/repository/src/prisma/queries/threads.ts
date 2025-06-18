@@ -320,7 +320,7 @@ export async function searchThreadsByName(
 }
 
 export async function getSidebarThreads(userId: string): Promise<{
-  threads: { id: string; title: string | null }[]
+  threads: Thread[]
   nextCursor: { updatedAt: string; id: string } | null
 }> {
   const validatedUserId = UserIdSchema.parse(userId)
@@ -329,18 +329,11 @@ export async function getSidebarThreads(userId: string): Promise<{
     where: {
       userId: validatedUserId,
     },
-    select: {
-      id: true,
-      title: true,
-    },
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
   })
 
   return {
-    threads: threads.map((thread) => ({
-      id: thread.id,
-      title: thread.title,
-    })),
+    threads: threads.map((thread) => ThreadSchema.parse(thread)),
     nextCursor: null,
   }
 }
