@@ -5,6 +5,7 @@ import type { Message } from 'ai'
 import { type StreamTextResult, streamText } from 'ai'
 
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1'
+const INSTANCE_TTL = 30 * 60 * 1000
 
 export function createOpenRouterClient(apiKey: string) {
   return createOpenRouter({
@@ -15,8 +16,9 @@ export function createOpenRouterClient(apiKey: string) {
 
 export class LLMService {
   private static instances: Map<string, LLMService> = new Map()
-  private readonly openRouterClient: ReturnType<typeof createOpenRouter>
+  private openRouterClient: ReturnType<typeof createOpenRouter>
   private readonly apiKey: string
+  private lastAccessed: number
 
   private constructor(apiKey: string) {
     if (!apiKey) {
@@ -24,11 +26,21 @@ export class LLMService {
     }
     this.apiKey = apiKey
     this.openRouterClient = createOpenRouterClient(apiKey)
+    this.lastAccessed = Date.now()
   }
 
   static getInstance(apiKey: string): LLMService {
+    const now = Date.now()
+
+    for (const [key, instance] of LLMService.instances.entries()) {
+      if (now - instance.lastAccessed > INSTANCE_TTL) {
+        LLMService.instances.delete(key)
+      }
+    }
+
     const instance = LLMService.instances.get(apiKey)
     if (instance) {
+      instance.lastAccessed = now
       return instance
     }
 
@@ -55,7 +67,6 @@ export class LLMService {
       throw new Error('No active API key found for user')
     }
 
-    // Update lastUsedAt
     const oneHour = 60 * 60 * 1000
     const now = new Date()
     if (!apiKey.lastUsedAt || now.getTime() - apiKey.lastUsedAt.getTime() > oneHour) {
@@ -80,7 +91,8 @@ export class LLMService {
     messages: Message[],
   ): Promise<StreamTextResult<never, never>> {
     try {
-      await this.getUserApiKey(userId)
+      const userApiKey = await this.getUserApiKey(userId)
+      this.openRouterClient = createOpenRouterClient(userApiKey)
     } catch (_error: unknown) {
       throw new Error('User does not have an active API key. Please add an API key to continue.')
     }
