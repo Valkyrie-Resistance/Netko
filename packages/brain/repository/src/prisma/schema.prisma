@@ -14,6 +14,13 @@ enum MessageRole {
   SYSTEM
 }
 
+enum ModelProvider {
+  OPENAI
+  OPENROUTER
+  OLLAMA
+  CUSTOM
+}
+
 model User {
   id            String       @id
   name          String
@@ -28,9 +35,30 @@ model User {
   Assistant     Assistant[]
   Message       Message[]
   SharedChat    SharedChat[]
+  apiKeys       UserApiKey[]
 
   @@unique([email])
   @@map("user")
+}
+
+model UserApiKey {
+  id           String        @id @default(cuid(2))
+  provider     ModelProvider
+  keyName      String // User-friendly name like "My OpenAI Key"
+  encryptedKey String // Encrypted API key
+  isActive     Boolean       @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lastUsedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, provider, keyName])
+  @@index([userId, provider])
+  @@map("user_api_key")
 }
 
 model Session {
@@ -79,15 +107,19 @@ model Verification {
 }
 
 model LLMModel {
-  id          String  @id @default(cuid(2))
-  name        String  @unique
-  provider    String
-  displayName String
-  isActive    Boolean @default(true)
+  id          String        @id @default(cuid(2))
+  name        String // e.g., "gpt-4o", "claude-3-sonnet"
+  provider    ModelProvider
+  displayName String // User-friendly name
+  description String? // Model capabilities/description
+  isActive    Boolean       @default(true)
+  isDefault   Boolean       @default(false) // Default model for provider
 
-  assistants Assistant[]
-  messages   Message[]
+  messages Message[]
+  threads  Thread[]
 
+  @@unique([provider, name])
+  @@index([provider, isActive])
   @@map("llm_model")
 }
 
@@ -96,12 +128,7 @@ model Assistant {
   name         String
   description  String?
   systemPrompt String
-  temperature  Float   @default(0.7)
-  maxTokens    Int?
   isPublic     Boolean @default(false)
-
-  defaultModelId String?
-  defaultModel   LLMModel? @relation(fields: [defaultModelId], references: [id])
 
   createdById String?
   createdBy   User?   @relation(fields: [createdById], references: [id])
@@ -124,6 +151,9 @@ model Thread {
 
   assistantId String
   assistant   Assistant @relation(fields: [assistantId], references: [id])
+
+  currentModelId String?
+  currentModel   LLMModel? @relation(fields: [currentModelId], references: [id])
 
   parentId String?
   parent   Thread?  @relation("ThreadBranches", fields: [parentId], references: [id])
@@ -163,8 +193,7 @@ model Message {
   parent   Message?  @relation("MessageBranches", fields: [parentId], references: [id])
   branches Message[] @relation("MessageBranches")
 
-  tokenCount Int?
-  metadata   Json?
+  metadata Json?
 
   createdAt DateTime @default(now())
 
