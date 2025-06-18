@@ -1,4 +1,4 @@
-import { Bot, History, LifeBuoy, MessageSquare, Settings2 } from 'lucide-react'
+import { Bot, History, MessageSquare } from 'lucide-react'
 
 import { AssistantSwitcher } from '@/components/core/nav/assistant-switcher'
 import { NavConversations, groupConversationsByTime } from '@/components/core/nav/nav-conversations'
@@ -8,13 +8,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
 } from '@chad-chat/ui/components/shadcn/sidebar'
 
 import { useAuth } from '@/providers/auth-provider'
@@ -126,35 +120,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Conversations grouped by time */}
         <NavConversations conversationGroups={conversationGroups} />
-
-        {/* Quick Actions - kept at bottom */}
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel className="text-sidebar-foreground/70">
-            Quick Actions
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="/settings" className="flex items-center gap-2 text-sidebar-foreground">
-                    <Settings2 className="size-4" />
-                    Settings
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="/support" className="flex items-center gap-2 text-sidebar-foreground">
-                    <LifeBuoy className="size-4" />
-                    Support
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>{user ? <NavUser user={user} /> : null}</SidebarFooter>
