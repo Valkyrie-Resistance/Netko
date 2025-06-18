@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
+export const UserIdSchema = z.string()
+
 export const UserSchema = z.object({
-  id: z.string(),
+  id: UserIdSchema,
   name: z.string(),
   email: z.string().email(),
   emailVerified: z.boolean(),
