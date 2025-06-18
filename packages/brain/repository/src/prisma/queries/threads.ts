@@ -9,9 +9,9 @@ import {
   ThreadSchema,
   type ThreadSearchInput,
   ThreadSearchInputSchema,
-  ThreadWithMessagesInThreadSchema,
   type ThreadWithMessagesInput,
   ThreadWithMessagesInputSchema,
+  ThreadWithMessagesInThreadSchema,
   UserIdSchema,
 } from '@chad-chat/brain-domain'
 import type { Prisma } from '../../../generated/prisma'

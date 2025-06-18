@@ -1,23 +1,17 @@
-import {
-  forwardRef,
-  useCallback,
-  useRef,
-  useState,
-} from "react"
-import { ArrowDown, ThumbsDown, ThumbsUp } from "lucide-react"
-
-import { cn } from "@chad-chat/ui/lib/utils"
-import { useAutoScroll } from "@chad-chat/ui/hooks/use-auto-scroll"
-import { Button } from "@chad-chat/ui/components/shadcn/button"
-import {
-  type Message,
-  type ChatProps,
-  type ChatFormProps,
-} from "@chad-chat/ui/components/chat/definitions/types"
-import { CopyButton } from "@chad-chat/ui/components/chat/copy-button.js"
-import { MessageInput } from "@chad-chat/ui/components/chat/message-input.js"
-import { MessageList } from "@chad-chat/ui/components/chat/message-list.js"
-import { PromptSuggestions } from "@chad-chat/ui/components/chat/prompt-suggestions.js"
+import { CopyButton } from '@chad-chat/ui/components/chat/copy-button.js'
+import type {
+  ChatFormProps,
+  ChatProps,
+  Message,
+} from '@chad-chat/ui/components/chat/definitions/types'
+import { MessageInput } from '@chad-chat/ui/components/chat/message-input.js'
+import { MessageList } from '@chad-chat/ui/components/chat/message-list.js'
+import { PromptSuggestions } from '@chad-chat/ui/components/chat/prompt-suggestions.js'
+import { Button } from '@chad-chat/ui/components/shadcn/button'
+import { useAutoScroll } from '@chad-chat/ui/hooks/use-auto-scroll'
+import { cn } from '@chad-chat/ui/lib/utils'
+import { ArrowDown, ThumbsDown, ThumbsUp } from 'lucide-react'
+import { forwardRef, useCallback, useRef, useState } from 'react'
 
 export function Chat({
   userName,
@@ -35,7 +29,7 @@ export function Chat({
 }: ChatProps) {
   const lastMessage = messages.at(-1)
   const isEmpty = messages.length === 0
-  const isTyping = lastMessage?.role === "user"
+  const isTyping = lastMessage?.role === 'user'
 
   const messagesRef = useRef(messages)
   messagesRef.current = messages
@@ -48,7 +42,7 @@ export function Chat({
 
     const latestMessages = [...messagesRef.current]
     const lastAssistantMessage = latestMessages.findLast(
-      (m: { role: string }) => m.role === "assistant"
+      (m: { role: string }) => m.role === 'assistant',
     )
 
     if (!lastAssistantMessage) return
@@ -59,19 +53,19 @@ export function Chat({
     if (lastAssistantMessage.toolInvocations) {
       const updatedToolInvocations = lastAssistantMessage.toolInvocations.map(
         (toolInvocation: any) => {
-          if (toolInvocation.state === "call") {
+          if (toolInvocation.state === 'call') {
             needsUpdate = true
             return {
               ...toolInvocation,
-              state: "result",
+              state: 'result',
               result: {
-                content: "Tool execution was cancelled",
+                content: 'Tool execution was cancelled',
                 __cancelled: true, // Special marker to indicate cancellation
               },
             } as const
           }
           return toolInvocation
-        }
+        },
       )
 
       if (needsUpdate) {
@@ -85,18 +79,18 @@ export function Chat({
     if (lastAssistantMessage.parts && lastAssistantMessage.parts.length > 0) {
       const updatedParts = lastAssistantMessage.parts.map((part: any) => {
         if (
-          part.type === "tool-invocation" &&
+          part.type === 'tool-invocation' &&
           part.toolInvocation &&
-          part.toolInvocation.state === "call"
+          part.toolInvocation.state === 'call'
         ) {
           needsUpdate = true
           return {
             ...part,
             toolInvocation: {
               ...part.toolInvocation,
-              state: "result",
+              state: 'result',
               result: {
-                content: "Tool execution was cancelled",
+                content: 'Tool execution was cancelled',
                 __cancelled: true,
               },
             },
@@ -114,9 +108,7 @@ export function Chat({
     }
 
     if (needsUpdate) {
-      const messageIndex = latestMessages.findIndex(
-        (m) => m.id === lastAssistantMessage.id
-      )
+      const messageIndex = latestMessages.findIndex((m) => m.id === lastAssistantMessage.id)
       if (messageIndex !== -1) {
         latestMessages[messageIndex] = updatedMessage
         setMessages(latestMessages)
@@ -129,16 +121,13 @@ export function Chat({
       actions: onRateResponse ? (
         <>
           <div className="border-r pr-1">
-            <CopyButton
-              content={message.content}
-              copyMessage="Copied response to clipboard!"
-            />
+            <CopyButton content={message.content} copyMessage="Copied response to clipboard!" />
           </div>
           <Button
             size="icon"
             variant="ghost"
             className="h-6 w-6"
-            onClick={() => onRateResponse(message.id, "thumbs-up")}
+            onClick={() => onRateResponse(message.id, 'thumbs-up')}
           >
             <ThumbsUp className="h-4 w-4" />
           </Button>
@@ -146,48 +135,34 @@ export function Chat({
             size="icon"
             variant="ghost"
             className="h-6 w-6"
-            onClick={() => onRateResponse(message.id, "thumbs-down")}
+            onClick={() => onRateResponse(message.id, 'thumbs-down')}
           >
             <ThumbsDown className="h-4 w-4" />
           </Button>
         </>
       ) : (
-        <CopyButton
-          content={message.content}
-          copyMessage="Copied response to clipboard!"
-        />
+        <CopyButton content={message.content} copyMessage="Copied response to clipboard!" />
       ),
     }),
-    [onRateResponse]
+    [onRateResponse],
   )
 
   return (
     <ChatContainer className={className}>
       {messages.length > 0 ? (
         <ChatMessages messages={messages}>
-          <MessageList
-            messages={messages}
-            isTyping={isTyping}
-            messageOptions={messageOptions}
-          />
+          <MessageList messages={messages} isTyping={isTyping} messageOptions={messageOptions} />
         </ChatMessages>
       ) : null}
 
       {isEmpty && append && suggestions ? (
         <div className="flex-1 flex items-center justify-center">
-          <PromptSuggestions
-            userName={userName}
-            append={append}
-            suggestions={suggestions}
-          />
+          <PromptSuggestions userName={userName} append={append} suggestions={suggestions} />
         </div>
       ) : null}
-      
+
       <div className="flex-shrink-0">
-        <ChatForm
-          isPending={isGenerating || isTyping}
-          handleSubmit={handleSubmit}
-        >
+        <ChatForm isPending={isGenerating || isTyping} handleSubmit={handleSubmit}>
           {({ files, setFiles }) => (
             <MessageInput
               value={input}
@@ -204,7 +179,7 @@ export function Chat({
     </ChatContainer>
   )
 }
-Chat.displayName = "Chat"
+Chat.displayName = 'Chat'
 
 export function ChatMessages({
   messages,
@@ -212,13 +187,8 @@ export function ChatMessages({
 }: React.PropsWithChildren<{
   messages: Message[]
 }>) {
-  const {
-    containerRef,
-    scrollToBottom,
-    handleScroll,
-    shouldAutoScroll,
-    handleTouchStart,
-  } = useAutoScroll([messages])
+  const { containerRef, scrollToBottom, handleScroll, shouldAutoScroll, handleTouchStart } =
+    useAutoScroll([messages])
 
   return (
     <div
@@ -229,7 +199,7 @@ export function ChatMessages({
     >
       <div className="relative">
         {children}
-        
+
         {!shouldAutoScroll && (
           <div className="absolute bottom-0 right-0 flex justify-end">
             <Button
@@ -247,19 +217,12 @@ export function ChatMessages({
   )
 }
 
-export const ChatContainer = forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      className={cn("flex flex-col h-full w-full", className)}
-      {...props}
-    />
-  )
-})
-ChatContainer.displayName = "ChatContainer"
+export const ChatContainer = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => {
+    return <div ref={ref} className={cn('flex flex-col h-full w-full', className)} {...props} />
+  },
+)
+ChatContainer.displayName = 'ChatContainer'
 
 export const ChatForm = forwardRef<HTMLFormElement, ChatFormProps>(
   ({ children, handleSubmit, isPending, className }, ref) => {
@@ -281,9 +244,9 @@ export const ChatForm = forwardRef<HTMLFormElement, ChatFormProps>(
         {children({ files, setFiles })}
       </form>
     )
-  }
+  },
 )
-ChatForm.displayName = "ChatForm"
+ChatForm.displayName = 'ChatForm'
 
 function createFileList(files: File[] | FileList): FileList {
   const dataTransfer = new DataTransfer()

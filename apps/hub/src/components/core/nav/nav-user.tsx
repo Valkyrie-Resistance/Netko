@@ -1,20 +1,5 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
-import {
-  BadgeCheck,
-  ChevronsUpDown,
-  Database,
-  HelpCircle,
-  Key,
-  LogOut,
-  Settings,
-  Sparkles,
-} from 'lucide-react'
-import { useState } from 'react'
-
-import type { AuthUser } from '@/components/auth/definitions/types'
-import { signOut } from '@/lib/auth'
 import { Avatar, AvatarFallback, AvatarImage } from '@chad-chat/ui/components/shadcn/avatar'
 import {
   DropdownMenu,
@@ -31,6 +16,20 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@chad-chat/ui/components/shadcn/sidebar'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  BadgeCheck,
+  ChevronsUpDown,
+  Database,
+  HelpCircle,
+  Key,
+  LogOut,
+  Settings,
+  Sparkles,
+} from 'lucide-react'
+import { useState } from 'react'
+import type { AuthUser } from '@/components/auth/definitions/types'
+import { signOut } from '@/lib/auth'
 
 const menuItemVariants = {
   hidden: { opacity: 0, x: -20 },
@@ -45,11 +44,7 @@ const menuItemVariants = {
   }),
 }
 
-export function NavUser({
-  user,
-}: {
-  user: AuthUser | null
-}) {
+export function NavUser({ user }: { user: AuthUser | null }) {
   const { isMobile } = useSidebar()
   const [isHovered, setIsHovered] = useState(false)
   const [isOpen, setIsOpen] = useState(false)

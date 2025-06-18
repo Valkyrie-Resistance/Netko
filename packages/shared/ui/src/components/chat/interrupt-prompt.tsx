@@ -1,22 +1,22 @@
-import { AnimatePresence, motion } from "framer-motion"
-import { X } from "lucide-react"
-import { type InterruptPromptProps } from "@chad-chat/ui/components/chat/definitions/types"
+import type { InterruptPromptProps } from '@chad-chat/ui/components/chat/definitions/types'
+import { AnimatePresence, motion } from 'framer-motion'
+import { X } from 'lucide-react'
 
 export function InterruptPrompt({ isOpen, close }: InterruptPromptProps) {
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ top: 0, filter: "blur(5px)" }}
+          initial={{ top: 0, filter: 'blur(5px)' }}
           animate={{
             top: -40,
-            filter: "blur(0px)",
+            filter: 'blur(0px)',
             transition: {
-              type: "spring",
-              filter: { type: "tween" },
+              type: 'spring',
+              filter: { type: 'tween' },
             },
           }}
-          exit={{ top: 0, filter: "blur(5px)" }}
+          exit={{ top: 0, filter: 'blur(5px)' }}
           className="absolute left-1/2 flex -translate-x-1/2 overflow-hidden whitespace-nowrap rounded-full border bg-background py-1 text-center text-sm text-muted-foreground"
         >
           <span className="ml-2.5">Press Enter again to interrupt</span>

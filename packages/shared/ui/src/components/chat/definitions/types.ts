@@ -1,11 +1,12 @@
-import { type VariantProps } from "class-variance-authority"
-import React, { type ReactElement } from "react"
+import type { VariantProps } from 'class-variance-authority'
+import type React from 'react'
+import type { ReactElement } from 'react'
 
 // =============================================================================
 // ANIMATION & UI STATE TYPES
 // =============================================================================
 
-export type Animation = "none" | "slide" | "scale" | "fade"
+export type Animation = 'none' | 'slide' | 'scale' | 'fade'
 
 // =============================================================================
 // CORE MESSAGE & ATTACHMENT TYPES
@@ -19,7 +20,7 @@ export interface Attachment {
 
 export interface Message {
   id: string
-  role: "user" | "assistant" | (string & {})
+  role: 'user' | 'assistant' | (string & {})
   content: string
   createdAt?: Date
   experimental_attachments?: Attachment[]
@@ -32,17 +33,17 @@ export interface Message {
 // =============================================================================
 
 export interface PartialToolCall {
-  state: "partial-call"
+  state: 'partial-call'
   toolName: string
 }
 
 export interface ToolCall {
-  state: "call"
+  state: 'call'
   toolName: string
 }
 
 export interface ToolResult {
-  state: "result"
+  state: 'result'
   toolName: string
   result: {
     __cancelled?: boolean
@@ -57,23 +58,23 @@ export type ToolInvocation = PartialToolCall | ToolCall | ToolResult
 // =============================================================================
 
 export interface ReasoningPart {
-  type: "reasoning"
+  type: 'reasoning'
   reasoning: string
 }
 
 export interface ToolInvocationPart {
-  type: "tool-invocation"
+  type: 'tool-invocation'
   toolInvocation: ToolInvocation
 }
 
 export interface TextPart {
-  type: "text"
+  type: 'text'
   text: string
 }
 
 // For compatibility with AI SDK types, not used
 export interface SourcePart {
-  type: "source"
+  type: 'source'
 }
 
 export type MessagePart = TextPart | ReasoningPart | ToolInvocationPart | SourcePart
@@ -86,7 +87,7 @@ export interface ChatPropsBase {
   userName: string
   handleSubmit: (
     event?: { preventDefault?: () => void },
-    options?: { experimental_attachments?: FileList }
+    options?: { experimental_attachments?: FileList },
   ) => void
   messages: Array<Message>
   input: string
@@ -94,10 +95,7 @@ export interface ChatPropsBase {
   handleInputChange: React.ChangeEventHandler<HTMLTextAreaElement>
   isGenerating: boolean
   stop?: () => void
-  onRateResponse?: (
-    messageId: string,
-    rating: "thumbs-up" | "thumbs-down"
-  ) => void
+  onRateResponse?: (messageId: string, rating: 'thumbs-up' | 'thumbs-down') => void
   setMessages?: (messages: any[]) => void
 }
 
@@ -107,7 +105,7 @@ export interface ChatPropsWithoutSuggestions extends ChatPropsBase {
 }
 
 export interface ChatPropsWithSuggestions extends ChatPropsBase {
-  append: (message: { role: "user"; content: string }) => void
+  append: (message: { role: 'user'; content: string }) => void
   suggestions: string[]
 }
 
@@ -118,7 +116,7 @@ export interface ChatFormProps {
   isPending: boolean
   handleSubmit: (
     event?: { preventDefault?: () => void },
-    options?: { experimental_attachments?: FileList }
+    options?: { experimental_attachments?: FileList },
   ) => void
   children: (props: {
     files: File[] | null
@@ -142,17 +140,14 @@ export interface MessageListProps {
   messages: Message[]
   showTimeStamps?: boolean
   isTyping?: boolean
-  messageOptions?:
-    | AdditionalMessageOptions
-    | ((message: Message) => AdditionalMessageOptions)
+  messageOptions?: AdditionalMessageOptions | ((message: Message) => AdditionalMessageOptions)
 }
 
 // =============================================================================
 // INPUT COMPONENT PROPS
 // =============================================================================
 
-export interface MessageInputBaseProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface MessageInputBaseProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   value: string
   submitOnEnter?: boolean
   stop?: () => void
@@ -204,7 +199,7 @@ export interface InterruptPromptProps {
 
 export interface PromptSuggestionsProps {
   userName: string
-  append: (message: { role: "user"; content: string }) => void
+  append: (message: { role: 'user'; content: string }) => void
   suggestions: string[]
 }
 

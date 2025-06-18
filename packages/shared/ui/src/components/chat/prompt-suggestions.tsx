@@ -1,21 +1,17 @@
-import { type PromptSuggestionsProps } from "@chad-chat/ui/components/chat/definitions/types"
-import { useEffect, useState } from "react"
+import type { PromptSuggestionsProps } from '@chad-chat/ui/components/chat/definitions/types'
+import { useEffect, useState } from 'react'
 
-export function PromptSuggestions({
-  userName,
-  append,
-  suggestions,
-}: PromptSuggestionsProps) {
+export function PromptSuggestions({ userName, append, suggestions }: PromptSuggestionsProps) {
   const [greetingVisible, setGreetingVisible] = useState(false)
-  const [typewriterText, setTypewriterText] = useState("")
+  const [typewriterText, setTypewriterText] = useState('')
   const [showSubtext, setShowSubtext] = useState(false)
   const [isTyping, setIsTyping] = useState(true)
 
   const getGreeting = () => {
     const hour = new Date().getHours()
-    if (hour < 12) return "Good morning"
-    if (hour < 17) return "Good afternoon"
-    return "Good evening"
+    if (hour < 12) return 'Good morning'
+    if (hour < 17) return 'Good afternoon'
+    return 'Good evening'
   }
 
   const fullGreeting = `${getGreeting()}, ${userName}! 👋`
@@ -42,19 +38,18 @@ export function PromptSuggestions({
 
   return (
     <div className="flex flex-col h-full pt-16 pb-8 overflow-hidden relative">
-
       {/* Greeting Section with optimized rendering */}
       <div className="text-center space-y-2 relative z-10">
-        <div 
+        <div
           className={`transition-transform duration-1000 will-change-transform will-change-opacity transform-gpu ${
             greetingVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
           style={{
             willChange: 'transform, opacity',
-            isolation: 'isolate'
+            isolation: 'isolate',
           }}
         >
-          <h1 
+          <h1
             className="text-4xl font-bold relative inline-block py-4 transform-gpu"
             style={{
               willChange: 'transform',
@@ -68,8 +63,8 @@ export function PromptSuggestions({
             </span>
           </h1>
         </div>
-        
-        <div 
+
+        <div
           className={`transition-all duration-700 delay-300 ${
             showSubtext ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`}
@@ -78,14 +73,13 @@ export function PromptSuggestions({
             <span className="relative z-10">How can I help you today?</span>
           </p>
         </div>
-
       </div>
 
       {/* Spacer to push suggestions to bottom */}
       <div className="flex-1" />
 
       {/* Enhanced Suggestions Section */}
-      <div 
+      <div
         className={`transition-all duration-1000 delay-700 ${
           showSubtext ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}
@@ -104,7 +98,7 @@ export function PromptSuggestions({
             <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent dark:via-primary/40 motion-safe:animate-pulse" />
           </div>
         </div>
-        
+
         {/* Static suggestions grid */}
         <div className="mx-auto w-full px-2 py-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {suggestions.map((suggestion, index) => (
@@ -116,9 +110,7 @@ export function PromptSuggestions({
             >
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/15 dark:bg-primary/10 flex items-center justify-center group-hover:bg-primary/25 dark:group-hover:bg-primary/20 transition-colors">
-                  <span className="text-primary font-semibold text-sm">
-                    {index + 1}
-                  </span>
+                  <span className="text-primary font-semibold text-sm">{index + 1}</span>
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground leading-relaxed">

@@ -1,5 +1,5 @@
-import { signIn } from '@/lib/auth'
 import { RiAppleFill, RiDiscordFill, RiGithubFill, RiGoogleFill } from '@remixicon/react'
+import { signIn } from '@/lib/auth'
 
 export const SocialProviderEnum = {
   GOOGLE: 'google',

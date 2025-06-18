@@ -4,11 +4,11 @@ type RecordAudioType = {
   currentRecorder?: MediaRecorder
 }
 
-export const recordAudio = (function (): RecordAudioType {
+export const recordAudio = ((): RecordAudioType => {
   const func = async function recordAudio(stream: MediaStream): Promise<Blob> {
     try {
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "audio/webm;codecs=opus",
+        mimeType: 'audio/webm;codecs=opus',
       })
       const audioChunks: Blob[] = []
 
@@ -20,27 +20,26 @@ export const recordAudio = (function (): RecordAudioType {
         }
 
         mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: "audio/webm" })
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
           resolve(audioBlob)
         }
 
         mediaRecorder.onerror = () => {
-          reject(new Error("MediaRecorder error occurred"))
+          reject(new Error('MediaRecorder error occurred'))
         }
 
         mediaRecorder.start(1000)
         ;(func as RecordAudioType).currentRecorder = mediaRecorder
       })
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred"
-      throw new Error("Failed to start recording: " + errorMessage)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      throw new Error('Failed to start recording: ' + errorMessage)
     }
   }
 
   ;(func as RecordAudioType).stop = () => {
     const recorder = (func as RecordAudioType).currentRecorder
-    if (recorder && recorder.state !== "inactive") {
+    if (recorder && recorder.state !== 'inactive') {
       recorder.stop()
     }
     delete (func as RecordAudioType).currentRecorder

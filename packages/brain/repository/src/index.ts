@@ -1,4 +1,4 @@
-export { prisma } from './prisma/client'
 export * from '../generated/prisma'
-export * from './prisma/queries'
+export { prisma } from './prisma/client'
 export * from './prisma/mutations'
+export * from './prisma/queries'

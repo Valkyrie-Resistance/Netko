@@ -10,7 +10,7 @@ export const seed = async () => {
     )
     const marvinPrompt = await Bun.file(marvinPromptPath).text()
 
-    const marvin = await prisma.assistant.upsert({
+    await prisma.assistant.upsert({
       where: {
         id: 'y3javtpp7g9j9c6xxlg7g8qn',
       },

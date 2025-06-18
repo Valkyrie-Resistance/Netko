@@ -1,8 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
@@ -48,10 +46,18 @@
             ]
           }
         },
-        "useFilenamingConvention": "error",
+        "useFilenamingConvention": "off",
         "noUselessElse": "error",
         "useImportType": "error",
-        "useConst": "error"
+        "useConst": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error"
       }
     }
   },
@@ -83,19 +89,16 @@
     }
   },
   "files": {
-    "ignore": [
-      // Ignore client/prisma since is a prisma generated files
-      "client/prisma/**/**",
-      "node_modules/**",
-      "dist/**/**",
-      ".turbo/**",
-      ".next/**",
-      "generated/prisma/**/**",
-      // Ignore UI package since is shadcn/ui generated
-      "packages/shared/ui/**/**",
-      // Ignore routeTree.gen.ts since is a generated file
-      "routeTree.gen.ts",
-      "public/**/**"
+    "includes": [
+      "**",
+      "!**/node_modules/**",
+      "!**/.turbo/**",
+      "!**/.next/**",
+      "!**/routeTree.gen.ts",
+      "!**/public/**",
+      "!**/generated/**",
+      "!**/dist/**",
+      "!**/packages/shared/ui/**"
     ]
   }
 }

@@ -1,5 +1,3 @@
-import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
-import { trpcHttp } from '@/lib/trpc'
 import { Button } from '@chad-chat/ui/components/shadcn/button'
 import {
   Card,
@@ -12,6 +10,8 @@ import { Separator } from '@radix-ui/react-separator'
 import { useQuery } from '@tanstack/react-query'
 import { MessageCircle } from 'lucide-react'
 import { useState } from 'react'
+import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
+import { trpcHttp } from '@/lib/trpc'
 import { socialProviders } from './definitions/values'
 
 // Skeleton loader component for social providers

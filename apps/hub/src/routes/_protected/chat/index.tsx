@@ -1,10 +1,10 @@
-import { ThemeToggle } from '@/components/core/theme/theme-switcher'
-import { useAuth } from '@/providers/auth-provider'
 import { AnimatedBackground } from '@chad-chat/ui/components/chat/animated-background'
 import { Chat } from '@chad-chat/ui/components/chat/chat'
 import type { Message } from '@chad-chat/ui/components/chat/definitions/types'
 import { SidebarTrigger } from '@chad-chat/ui/components/shadcn/sidebar'
 import { useState } from 'react'
+import { ThemeToggle } from '@/components/core/theme/theme-switcher'
+import { useAuth } from '@/providers/auth-provider'
 
 export const Route = createFileRoute({
   component: Index,
@@ -15,14 +15,14 @@ function Index() {
 
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [stop, setStop] = useState<() => void>(() => {})
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const [append, setAppend] = useState<any>({})
+  const [isLoading, _setIsLoading] = useState(false)
+  const [stop, _setStop] = useState<() => void>(() => {})
+  // biome-ignore lint/suspicious/noExplicitAny: we need to use any here because the append object is not typed
+  const [append, _setAppend] = useState<any>({})
 
   const handleSubmit = (
     event?: { preventDefault?: () => void },
-    // biome-ignore lint/style/useNamingConvention: <explanation>
+    // biome-ignore lint/style/useNamingConvention: we need to use experimental_attachments here because it is a property of the options object
     options?: { experimental_attachments?: FileList },
   ) => {
     event?.preventDefault?.()

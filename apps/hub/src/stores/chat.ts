@@ -1,5 +1,4 @@
-import type { Assistant } from '@chad-chat/brain-domain'
-import type { LLMModel } from '@chad-chat/brain-domain'
+import type { Assistant, LLMModel } from '@chad-chat/brain-domain'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 

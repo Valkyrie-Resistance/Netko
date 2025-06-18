@@ -1,6 +1,6 @@
-import type { AuthRouterContext } from '@/components/auth/definitions/types'
 import { redirect } from '@tanstack/react-router'
 import { createAuthClient } from 'better-auth/react'
+import type { AuthRouterContext } from '@/components/auth/definitions/types'
 
 export const { useSession, signIn, signOut } = createAuthClient({
   basePath: '/auth/api',

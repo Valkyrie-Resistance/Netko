@@ -1,6 +1,6 @@
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import type { AuthRouterContext } from '@/components/auth/definitions/types'
 import { ThemeProvider } from '@/components/core/theme/theme-provider'
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 
 const rootLayout = () => {
   return (

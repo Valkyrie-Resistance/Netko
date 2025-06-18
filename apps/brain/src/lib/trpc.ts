@@ -1,6 +1,6 @@
 import type { Context } from '@chad-chat/brain-domain'
 import { auth } from '@chad-chat/brain-service'
-import { TRPCError, initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { CreateBunHonoWSSContextFnOptions } from '@valkyrie-resistance/trpc-ws-hono-bun-adapter'
 import type { AppRouter } from '../routes'
@@ -45,7 +45,7 @@ export const createContext = async ({ req }: FetchCreateContextFnOptions): Promi
 
 // create ws context
 export const createWsContext = async (
-  opt: CreateBunHonoWSSContextFnOptions<AppRouter>,
+  _opt: CreateBunHonoWSSContextFnOptions<AppRouter>,
 ): Promise<Context> => {
   return {
     user: null,

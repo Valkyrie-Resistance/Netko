@@ -8,25 +8,12 @@
     "lib": ["ESNext", "DOM"],
     "baseUrl": ".",
     "paths": {
-      "@chad-chat/ui/*": [
-        "./src/*"
-      ],
-      "@/hooks": [
-        "./src/hooks/*"
-      ],
-      "@/lib": [
-        "./src/lib/*"
-      ],
-      "@/components": [
-        "./src/components/*"
-      ]
+      "@chad-chat/ui/*": ["./src/*"],
+      "@/hooks": ["./src/hooks/*"],
+      "@/lib": ["./src/lib/*"],
+      "@/components": ["./src/components/*"]
     }
   },
-  "include": [
-    "."
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
 }
