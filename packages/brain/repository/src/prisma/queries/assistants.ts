@@ -34,7 +34,7 @@ export async function getAllAssistants(input: AssistantListInput): Promise<{
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: cursor.updatedAt,
+          updatedAt: new Date(cursor.updatedAt),
           id: cursor.id,
         }
       : undefined,
@@ -98,7 +98,7 @@ export async function searchAssistants(input: AssistantSearchInput): Promise<{
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: cursor.updatedAt,
+          updatedAt: new Date(cursor.updatedAt),
           id: cursor.id,
         }
       : undefined,
@@ -137,7 +137,7 @@ export async function getAllPublicAssistants(input: AssistantListInput): Promise
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: cursor.updatedAt,
+          updatedAt: new Date(cursor.updatedAt),
           id: cursor.id,
         }
       : undefined,

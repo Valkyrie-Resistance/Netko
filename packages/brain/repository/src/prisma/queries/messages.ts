@@ -35,7 +35,7 @@ export async function getAllMessages(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          createdAt: cursor.createdAt,
+          createdAt: new Date(cursor.createdAt),
           id: cursor.id,
         }
       : undefined,

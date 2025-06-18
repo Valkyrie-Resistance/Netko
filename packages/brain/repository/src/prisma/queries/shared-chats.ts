@@ -34,7 +34,7 @@ export async function getAllSharedChats(input: SharedChatListInput): Promise<{
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          createdAt: cursor.createdAt,
+          createdAt: new Date(cursor.createdAt),
           id: cursor.id,
         }
       : undefined,

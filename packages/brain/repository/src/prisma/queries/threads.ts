@@ -50,7 +50,7 @@ export async function getAllThreads(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: cursor.updatedAt,
+          updatedAt: new Date(cursor.updatedAt),
           id: cursor.id,
         }
       : undefined,
@@ -111,7 +111,7 @@ export async function getThreadWithMessages(input: ThreadWithMessagesInput): Pro
         skip: cursor ? 1 : 0,
         cursor: cursor
           ? {
-              createdAt: cursor.createdAt,
+              createdAt: new Date(cursor.createdAt),
               id: cursor.id,
             }
           : undefined,
@@ -168,7 +168,7 @@ export async function getMessagesInThread(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          createdAt: cursor.createdAt,
+          createdAt: new Date(cursor.createdAt),
           id: cursor.id,
         }
       : undefined,
@@ -221,7 +221,7 @@ export async function searchThreads(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: cursor.updatedAt,
+          updatedAt: new Date(cursor.updatedAt),
           id: cursor.id,
         }
       : undefined,
@@ -264,7 +264,7 @@ export async function getThreadsByAssistant(
     skip: cursor ? 1 : 0,
     cursor: cursor
       ? {
-          updatedAt: cursor.updatedAt,
+          updatedAt: new Date(cursor.updatedAt),
           id: cursor.id,
         }
       : undefined,
