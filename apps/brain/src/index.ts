@@ -65,10 +65,8 @@ if (!brainEnvConfig.app.dev) {
   app.use('*', serveStatic({ root: './public', path: 'index.html' }))
 }
 
-// Seed Marvin if in development
-if (brainEnvConfig.app.dev) {
-  seed().catch(console.error)
-}
+// Seed Marvin
+seed().catch(console.error)
 
 // Export the app
 export default {
