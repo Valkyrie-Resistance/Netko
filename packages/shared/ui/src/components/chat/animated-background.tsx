@@ -1,12 +1,31 @@
 import { cn } from "@chad-chat/ui/lib/utils"
 import * as React from "react"
+import { usePrefersReducedMotion } from "@chad-chat/ui/hooks/use-prefers-reduced-motion"
 
 /**
  * AnimatedBackground renders the floating particles, shapes and sparkles that were previously
  * embedded in the <PromptSuggestions /> component.  Place it inside a relatively-positioned
  * parent and it will fill the screen.
  */
-export function AnimatedBackground({ className }: { className?: string }) {
+export function AnimatedBackground({ className, durationMs = 5000 }: { className?: string; durationMs?: number }) {
+  const prefersReducedMotion = usePrefersReducedMotion()
+  // Animation is enabled by default unless the user prefers reduced motion.
+  const [isAnimating, setIsAnimating] = React.useState(!prefersReducedMotion)
+
+  // Stop animations after the specified duration or immediately if the user prefers reduced motion.
+  React.useEffect(() => {
+    if (prefersReducedMotion) {
+      setIsAnimating(false)
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsAnimating(false)
+    }, durationMs)
+
+    return () => window.clearTimeout(timer)
+  }, [durationMs, prefersReducedMotion])
+
   return (
     <div
       className={cn(
@@ -18,7 +37,10 @@ export function AnimatedBackground({ className }: { className?: string }) {
       {[...Array(10)].map((_, i) => (
         <div
           key={i}
-          className="absolute w-2 h-2 bg-gradient-to-r from-primary/40 to-purple-500/40 dark:from-primary/20 dark:to-purple-500/20 rounded-full animate-pulse shadow-lg"
+          className={cn(
+            "absolute w-2 h-2 bg-gradient-to-r from-primary/40 to-purple-500/40 dark:from-primary/20 dark:to-purple-500/20 rounded-full shadow-lg",
+            isAnimating && "animate-pulse",
+          )}
           style={{
             left: `${10 + i * 8}%`,
             top: `${20 + (i % 5) * 15}%`,
@@ -32,7 +54,10 @@ export function AnimatedBackground({ className }: { className?: string }) {
       {[...Array(6)].map((_, i) => (
         <div
           key={`shape-${i}`}
-          className="absolute w-3 h-3 border border-primary/30 dark:border-primary/20 rotate-45 animate-bounce"
+          className={cn(
+            "absolute w-3 h-3 border border-primary/30 dark:border-primary/20 rotate-45",
+            isAnimating && "animate-bounce",
+          )}
           style={{
             right: `${10 + i * 12}%`,
             top: `${25 + (i % 3) * 25}%`,
@@ -46,7 +71,10 @@ export function AnimatedBackground({ className }: { className?: string }) {
       {[...Array(6)].map((_, i) => (
         <div
           key={`sparkle-${i}`}
-          className="absolute text-yellow-400/60 dark:text-yellow-400/40 animate-bounce text-xl"
+          className={cn(
+            "absolute text-yellow-400/60 dark:text-yellow-400/40 text-xl",
+            isAnimating && "animate-bounce",
+          )}
           style={{
             right: `${5 + i * 15}%`,
             top: `${30 + (i % 4) * 12}%`,

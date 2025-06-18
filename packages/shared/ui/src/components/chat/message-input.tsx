@@ -13,6 +13,7 @@ import {
   ChevronDown
 } from "lucide-react"
 import { omit } from "remeda"
+import { usePrefersReducedMotion } from "@chad-chat/ui/hooks/use-prefers-reduced-motion"
 
 import { cn } from "@chad-chat/ui/lib/utils"
 import { useAutosizeTextArea } from "@chad-chat/ui/hooks/use-autosize-textarea"
@@ -55,12 +56,20 @@ export function MessageInput({
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(enableWebSearch)
   const [selectedModelId, setSelectedModelId] = useState(selectedModel)
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false)
+  const [animateModelIcon, setAnimateModelIcon] = useState(true)
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
     if (!isGenerating) {
       setShowInterruptPrompt(false)
     }
   }, [isGenerating])
+
+  // Stop the model icon animation after 6 seconds to reduce distraction
+  useEffect(() => {
+    const timeout = setTimeout(() => setAnimateModelIcon(false), 6000)
+    return () => clearTimeout(timeout)
+  }, [])
 
   const addFiles = (files: File[] | null) => {
     if (props.allowAttachments) {
@@ -237,13 +246,21 @@ export function MessageInput({
                     >
                       <motion.div
                         initial={{ rotate: 0 }}
-                        animate={{ rotate: [0, 15, -15, 0] }}
-                        transition={{
-                          duration: 1.5,
-                          repeat: Infinity,
-                          repeatType: "reverse",
-                          ease: "easeInOut"
-                        }}
+                        animate={
+                          prefersReducedMotion || !animateModelIcon
+                            ? { rotate: 0 }
+                            : { rotate: [0, 15, -15, 0] }
+                        }
+                        transition={
+                          prefersReducedMotion || !animateModelIcon
+                            ? { duration: 0 }
+                            : {
+                                duration: 1.5,
+                                repeat: Infinity,
+                                repeatType: "reverse",
+                                ease: "easeInOut",
+                              }
+                        }
                       >
                         <Sparkles className="h-3 w-3 text-primary" />
                       </motion.div>
@@ -324,22 +341,33 @@ export function MessageInput({
                   onClick={handleWebSearchToggle}
                 >
                   <motion.div
-                    animate={isWebSearchEnabled ? {
-                      rotate: [0, 360],
-                      scale: [1, 1.2, 1]
-                    } : {}}
-                    transition={{
-                      duration: 0.5,
-                      ease: "easeInOut"
-                    }}
-                    whileHover={{
-                      rotate: [-10, 10],
-                      transition: {
-                        duration: 0.3,
-                        repeat: Infinity,
-                        repeatType: "reverse"
-                      }
-                    }}
+                    animate={
+                      prefersReducedMotion
+                        ? {}
+                        : isWebSearchEnabled
+                          ? { rotate: [0, 360], scale: [1, 1.2, 1] }
+                          : {}
+                    }
+                    transition={
+                      prefersReducedMotion
+                        ? { duration: 0 }
+                        : {
+                            duration: 0.5,
+                            ease: "easeInOut",
+                          }
+                    }
+                    whileHover={
+                      prefersReducedMotion
+                        ? undefined
+                        : {
+                            rotate: [-10, 10],
+                            transition: {
+                              duration: 0.3,
+                              repeat: Infinity,
+                              repeatType: "reverse",
+                            },
+                          }
+                    }
                   >
                     <Search className={cn(
                       "h-3 w-3",

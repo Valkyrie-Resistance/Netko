@@ -9,6 +9,7 @@ export function PromptSuggestions({
   const [greetingVisible, setGreetingVisible] = useState(false)
   const [typewriterText, setTypewriterText] = useState("")
   const [showSubtext, setShowSubtext] = useState(false)
+  const [isTyping, setIsTyping] = useState(true)
 
   const getGreeting = () => {
     const hour = new Date().getHours()
@@ -29,6 +30,8 @@ export function PromptSuggestions({
         currentIndex++
       } else {
         clearInterval(typewriterInterval)
+        // Hide the caret once typing is finished
+        setIsTyping(false)
         // Show subtext shortly after typing completes
         setTimeout(() => setShowSubtext(true), 400)
       }
@@ -39,7 +42,6 @@ export function PromptSuggestions({
 
   return (
     <div className="flex flex-col h-full pt-16 pb-8 overflow-hidden relative">
-      {/* Background moved to <AnimatedBackground /> */}
 
       {/* Greeting Section with optimized rendering */}
       <div className="text-center space-y-2 relative z-10">
@@ -60,7 +62,9 @@ export function PromptSuggestions({
           >
             <span className="relative bg-gradient-to-r from-primary via-purple-500 to-primary/80 bg-clip-text text-transparent">
               {typewriterText}
-              <span className="absolute -right-1 top-0 w-0.5 h-full bg-primary animate-pulse" />
+              {isTyping && (
+                <span className="absolute -right-1 top-0 w-0.5 h-full bg-primary motion-safe:animate-pulse" />
+              )}
             </span>
           </h1>
         </div>
@@ -75,37 +79,6 @@ export function PromptSuggestions({
           </p>
         </div>
 
-        {/* Enhanced floating code symbols */}
-        <div 
-          className="absolute -top-4 -left-8 text-primary/70 dark:text-primary/50 text-2xl animate-bounce drop-shadow-md"
-          style={{ 
-            animationDelay: '0s',
-            animationDuration: '3s',
-            transform: 'translateY(0px) rotate(0deg)',
-          }}
-        >
-          &lt;/&gt;
-        </div>
-        <div 
-          className="absolute -top-2 -right-12 text-orange-500/80 dark:text-orange-400/60 text-xl animate-bounce drop-shadow-md" 
-          style={{ 
-            animationDelay: '1s',
-            animationDuration: '3s',
-            transform: 'translateY(0px) rotate(0deg)',
-          }}
-        >
-          🐱
-        </div>
-        <div 
-          className="absolute top-8 left-4 text-yellow-500/80 dark:text-yellow-400/60 text-lg animate-bounce drop-shadow-md" 
-          style={{ 
-            animationDelay: '0.5s',
-            animationDuration: '3s',
-            transform: 'translateY(0px) rotate(0deg)',
-          }}
-        >
-          ⚡
-        </div>
       </div>
 
       {/* Spacer to push suggestions to bottom */}
@@ -128,21 +101,7 @@ export function PromptSuggestions({
               </span>
             </h2>
             {/* Enhanced decorative underline */}
-            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent dark:via-primary/40 animate-pulse" />
-          </div>
-          
-          {/* Enhanced floating decorative elements around the title */}
-          <div className="absolute -top-2 -left-4 text-blue-600/70 dark:text-blue-400/40 text-sm animate-bounce">
-            ✦
-          </div>
-          <div className="absolute -top-2 -right-4 text-purple-600/70 dark:text-purple-400/40 text-sm animate-bounce" style={{ animationDelay: '0.5s' }}>
-            ✦
-          </div>
-          <div className="absolute -bottom-2 left-8 text-green-600/70 dark:text-green-400/40 text-sm animate-bounce" style={{ animationDelay: '1s' }}>
-            ✦
-          </div>
-          <div className="absolute -bottom-2 right-8 text-pink-600/70 dark:text-pink-400/40 text-sm animate-bounce" style={{ animationDelay: '1.5s' }}>
-            ✦
+            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent dark:via-primary/40 motion-safe:animate-pulse" />
           </div>
         </div>
         
