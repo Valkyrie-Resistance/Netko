@@ -17,5 +17,8 @@
     "node": ">=18"
   },
   "packageManager": "bun@1.2.14",
-  "workspaces": ["apps/*", "packages/shared/*", "packages/clients/*", "packages/brain/*"]
+  "workspaces": ["apps/*", "packages/shared/*", "packages/clients/*", "packages/brain/*"],
+  "dependencies": {
+    "@openrouter/ai-sdk-provider": "^0.7.2"
+  }
 }

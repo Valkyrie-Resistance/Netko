@@ -114,6 +114,8 @@ model LLMModel {
   description String? // Model capabilities/description
   isActive    Boolean       @default(true)
   isDefault   Boolean       @default(false) // Default model for provider
+  contextLength Int? // Maximum context length in tokens
+  pricing     Json? // Pricing information for prompt and completion tokens
 
   messages Message[]
   threads  Thread[]
