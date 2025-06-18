@@ -1,12 +1,39 @@
 import type { AppRouter } from '@chad-chat/brain'
 import { QueryClient } from '@tanstack/react-query'
-import { createTRPCClient, createWSClient, httpBatchLink, wsLink } from '@trpc/client'
+import {
+  createTRPCClient,
+  createWSClient,
+  httpBatchLink,
+  httpSubscriptionLink,
+  loggerLink,
+  splitLink,
+  wsLink,
+} from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
 
 export const queryClient = new QueryClient()
 
-export const trpcHttpClient = createTRPCClient<AppRouter>({
-  links: [httpBatchLink({ url: '/api/trpc' })],
+const trpcHttpClient = createTRPCClient<AppRouter>({
+  /**
+   * @see https://trpc.io/docs/v11/client/links
+   */
+  links: [
+    loggerLink(),
+    splitLink({
+      condition: (op) => op.type === 'subscription',
+      true: httpSubscriptionLink({
+        url: '/api/trpc',
+        eventSourceOptions() {
+          return {
+            withCredentials: true,
+          }
+        },
+      }),
+      false: httpBatchLink({
+        url: '/api/trpc',
+      }),
+    }),
+  ],
 })
 
 export const trpcHttp = createTRPCOptionsProxy<AppRouter>({
