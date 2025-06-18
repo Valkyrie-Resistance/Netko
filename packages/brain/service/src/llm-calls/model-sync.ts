@@ -229,43 +229,58 @@ export class ModelSyncService {
   public async getModelMetadata(
     modelId: string,
   ): Promise<{ contextLength: number; pricing: { prompt: number; completion: number } } | null> {
-    try {
-      const recentMessage = await prisma.message.findFirst({
-        where: {
-          modelId,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        select: {
-          metadata: true,
-        },
-      })
+    const recentMessage = await prisma.message.findFirst({
+      where: {
+        threadId: `model-metadata-${modelId}`,
+        role: 'SYSTEM',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
 
-      if (recentMessage?.metadata) {
-        const metadata = recentMessage.metadata as {
-          contextLength: number
-          pricing: { prompt: number; completion: number }
-        }
-        if (metadata.contextLength && metadata.pricing) {
-          return metadata
-        }
+    if (recentMessage?.metadata) {
+      const metadata = recentMessage.metadata as {
+        contextLength?: number
+        pricing?: { prompt?: number; completion?: number }
       }
-
-      const models = await this.fetchModels()
-      const openRouterModel = models.find((m) => m.id === modelId)
-
-      if (!openRouterModel) {
-        return null
+      const defaultContextLength = 2048
+      const defaultPricing = { prompt: 0, completion: 0 }
+      const contextLength =
+        typeof metadata.contextLength === 'number' ? metadata.contextLength : defaultContextLength
+      const pricing =
+        metadata.pricing &&
+        typeof metadata.pricing.prompt === 'number' &&
+        typeof metadata.pricing.completion === 'number'
+          ? { prompt: metadata.pricing.prompt, completion: metadata.pricing.completion }
+          : defaultPricing
+      if (contextLength && pricing) {
+        return { contextLength, pricing }
       }
+    }
 
-      return {
-        contextLength: openRouterModel.contextLength,
-        pricing: openRouterModel.pricing,
-      }
-    } catch (error) {
-      console.error('Failed to get model metadata:', error)
+    const models = await this.fetchModels()
+    const openRouterModel = models.find((m) => m.id === modelId)
+    if (!openRouterModel) {
       return null
+    }
+
+    const defaultContextLength = 2048
+    const defaultPricing = { prompt: 0, completion: 0 }
+    return {
+      contextLength:
+        typeof openRouterModel.contextLength === 'number'
+          ? openRouterModel.contextLength
+          : defaultContextLength,
+      pricing:
+        openRouterModel.pricing &&
+        typeof openRouterModel.pricing.prompt === 'number' &&
+        typeof openRouterModel.pricing.completion === 'number'
+          ? {
+              prompt: openRouterModel.pricing.prompt,
+              completion: openRouterModel.pricing.completion,
+            }
+          : defaultPricing,
     }
   }
 }

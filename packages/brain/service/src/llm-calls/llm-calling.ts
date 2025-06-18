@@ -15,7 +15,7 @@ interface OpenRouterError {
 export class LLMService {
   private static instance: LLMService
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): LLMService {
     if (!LLMService.instance) {
