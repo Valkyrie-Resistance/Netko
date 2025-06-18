@@ -1,13 +1,8 @@
+import { UserIdSchema } from '@chad-chat/brain-domain'
 import { prisma } from '@chad-chat/brain-repository'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import type { Message } from 'ai'
 import { type StreamTextResult, streamText } from 'ai'
-
-interface OpenRouterError {
-  error?: string
-  status?: number
-  statusText?: string
-}
 
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1'
 
@@ -24,6 +19,9 @@ export class LLMService {
   private readonly apiKey: string
 
   private constructor(apiKey: string) {
+    if (!apiKey) {
+      throw new Error('API key is required')
+    }
     this.apiKey = apiKey
     this.openRouterClient = createOpenRouterClient(apiKey)
   }
@@ -39,6 +37,41 @@ export class LLMService {
     return newInstance
   }
 
+  private async getUserApiKey(userId: string): Promise<string> {
+    const validatedUserId = UserIdSchema.parse(userId)
+
+    const apiKey = await prisma.userApiKey.findFirst({
+      where: {
+        userId: validatedUserId,
+        provider: 'OPENROUTER',
+        isActive: true,
+      },
+      orderBy: {
+        lastUsedAt: 'desc',
+      },
+    })
+
+    if (!apiKey) {
+      throw new Error('No active API key found for user')
+    }
+
+    // Update lastUsedAt
+    const oneHour = 60 * 60 * 1000
+    const now = new Date()
+    if (!apiKey.lastUsedAt || now.getTime() - apiKey.lastUsedAt.getTime() > oneHour) {
+      try {
+        await prisma.userApiKey.update({
+          where: { id: apiKey.id },
+          data: { lastUsedAt: now },
+        })
+      } catch (error) {
+        console.error('Failed to update lastUsedAt for userApiKey:', apiKey.id, error)
+      }
+    }
+
+    return apiKey.encryptedKey
+  }
+
   async createLLM(
     assistantId: string,
     modelId: string,
@@ -46,6 +79,9 @@ export class LLMService {
     userId: string,
     messages: Message[],
   ): Promise<StreamTextResult<never, never>> {
+    const apiKey = await this.getUserApiKey(userId)
+    const llmService = LLMService.getInstance(apiKey)
+
     const assistant = await prisma.assistant.findUnique({
       where: { id: assistantId },
       select: {
@@ -70,8 +106,7 @@ export class LLMService {
       throw new Error('Model not found')
     }
 
-    const validatedAssistantId = assistant.id
-    const chatModel = this.openRouterClient.chat(model.name)
+    const chatModel = llmService.openRouterClient.chat(model.name)
 
     const stream = await streamText({
       model: chatModel,
@@ -84,34 +119,15 @@ export class LLMService {
       ],
     })
 
-    await prisma.$transaction(async (tx) => {
-      const existingSystemMessage = await tx.message.findFirst({
-        where: {
-          threadId,
-          role: 'SYSTEM',
-        },
-      })
-
-      if (!existingSystemMessage) {
-        await tx.message.create({
-          data: {
-            content: assistant.systemPrompt,
-            role: 'SYSTEM',
-            threadId,
-            assistantId: validatedAssistantId,
-            modelId,
-            metadata: {},
-          },
-        })
-      } else if (existingSystemMessage.content !== assistant.systemPrompt) {
-        await tx.message.update({
-          where: { id: existingSystemMessage.id },
-          data: {
-            content: assistant.systemPrompt,
-            metadata: {},
-          },
-        })
-      }
+    await prisma.message.create({
+      data: {
+        content: assistant.systemPrompt,
+        role: 'SYSTEM',
+        threadId,
+        assistantId: assistant.id,
+        modelId,
+        metadata: {},
+      },
     })
 
     return stream
