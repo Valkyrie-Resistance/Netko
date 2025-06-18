@@ -15,7 +15,7 @@ interface OpenRouterError {
 export class LLMService {
   private static instance: LLMService
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): LLMService {
     if (!LLMService.instance) {
@@ -97,6 +97,28 @@ export class LLMService {
               },
             },
           })
+        } else {
+          const existingMetadata = existingSystemMessage.metadata as {
+            contextLength?: number
+            pricing?: { prompt: number; completion: number }
+          } | null
+
+          if (
+            existingSystemMessage.content !== assistant.systemPrompt ||
+            existingMetadata?.contextLength !== modelMetadata.contextLength ||
+            JSON.stringify(existingMetadata?.pricing) !== JSON.stringify(modelMetadata.pricing)
+          ) {
+            await tx.message.update({
+              where: { id: existingSystemMessage.id },
+              data: {
+                content: assistant.systemPrompt,
+                metadata: {
+                  contextLength: modelMetadata.contextLength,
+                  pricing: modelMetadata.pricing,
+                },
+              },
+            })
+          }
         }
       })
 

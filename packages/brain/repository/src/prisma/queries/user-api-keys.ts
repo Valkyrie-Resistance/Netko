@@ -25,14 +25,18 @@ export async function getUserApiKeyByProvider(
   const oneHour = 60 * 60 * 1000
   const now = new Date()
   if (!apiKey.lastUsedAt || now.getTime() - apiKey.lastUsedAt.getTime() > oneHour) {
-    await prisma.userApiKey.update({
-      where: {
-        id: apiKey.id,
-      },
-      data: {
-        lastUsedAt: now,
-      },
-    })
+    try {
+      await prisma.userApiKey.update({
+        where: {
+          id: apiKey.id,
+        },
+        data: {
+          lastUsedAt: now,
+        },
+      })
+    } catch (error) {
+      console.error('Failed to update lastUsedAt for userApiKey:', apiKey.id, error)
+    }
   }
 
   return apiKey.encryptedKey
