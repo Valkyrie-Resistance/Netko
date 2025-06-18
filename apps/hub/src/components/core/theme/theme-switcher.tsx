@@ -10,7 +10,7 @@ import { ThemeEnum } from './definitions/types'
 import { useTheme } from './theme-provider'
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme: _ } = useTheme()
 
   return (
     <DropdownMenu>

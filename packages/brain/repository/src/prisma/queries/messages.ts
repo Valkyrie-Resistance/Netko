@@ -4,8 +4,8 @@ import {
   type MessageListInput,
   MessageListInputSchema,
   MessageSchema,
+  ThreadIdSchema,
 } from '@chad-chat/brain-domain'
-import { ThreadIdSchema } from '@chad-chat/brain-domain'
 import { prisma } from '../client'
 
 export async function getAllMessages(

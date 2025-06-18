@@ -1,6 +1,6 @@
-import { AppSidebar } from '@/components/core/nav/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@chad-chat/ui/components/shadcn/sidebar'
 import { Outlet } from '@tanstack/react-router'
+import { AppSidebar } from '@/components/core/nav/app-sidebar'
 
 export const Route = createFileRoute({
   component: RouteComponent,

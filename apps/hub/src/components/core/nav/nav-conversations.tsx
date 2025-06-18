@@ -1,18 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import {
-  Archive,
-  Calendar,
-  Clock,
-  EllipsisVertical,
-  History,
-  type LucideIcon,
-  MessageSquare,
-  Share,
-  Trash2,
-} from 'lucide-react'
-
 import type { Thread } from '@chad-chat/brain-domain'
 import {
   DropdownMenu,
@@ -30,6 +17,18 @@ import {
   useSidebar,
 } from '@chad-chat/ui/components/shadcn/sidebar'
 import { useRouter } from '@tanstack/react-router'
+import { motion } from 'framer-motion'
+import {
+  Archive,
+  Calendar,
+  Clock,
+  EllipsisVertical,
+  History,
+  type LucideIcon,
+  MessageSquare,
+  Share,
+  Trash2,
+} from 'lucide-react'
 
 export type ConversationGroup = {
   label: string
@@ -80,7 +79,7 @@ export function NavConversations({
                   animate="show"
                   className="space-y-0.5"
                 >
-                  {group.conversations.map((conversation, index) => (
+                  {group.conversations.map((conversation, _index) => (
                     <motion.div key={conversation.id} variants={itemVariants}>
                       <SidebarMenuItem>
                         <SidebarMenuButton

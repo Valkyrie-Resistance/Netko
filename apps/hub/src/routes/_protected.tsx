@@ -1,6 +1,6 @@
+import { Navigate, Outlet } from '@tanstack/react-router'
 import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
 import { useAuth } from '@/providers/auth-provider'
-import { Navigate, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute({
   component: ProtectedRouteLayout,

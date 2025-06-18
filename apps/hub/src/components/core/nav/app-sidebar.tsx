@@ -1,3 +1,21 @@
+import { AssistantSchema, ThreadSchema } from '@chad-chat/brain-domain'
+import { Button } from '@chad-chat/ui/components/shadcn/button'
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@chad-chat/ui/components/shadcn/command'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+} from '@chad-chat/ui/components/shadcn/sidebar'
+import { useQuery } from '@tanstack/react-query'
+import { useRouter } from '@tanstack/react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ChevronRight,
@@ -9,39 +27,16 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
 import { AssistantSwitcher } from '@/components/core/nav/assistant-switcher'
 import {
   type ConversationGroup,
-  NavConversations,
   groupConversationsByTime,
+  NavConversations,
 } from '@/components/core/nav/nav-conversations'
 import { NavUser } from '@/components/core/nav/nav-user'
-
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-} from '@chad-chat/ui/components/shadcn/sidebar'
-
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@chad-chat/ui/components/shadcn/command'
-
-import { Button } from '@chad-chat/ui/components/shadcn/button'
-
 import { trpcHttp } from '@/lib/trpc'
 import { useAuth } from '@/providers/auth-provider'
 import { useChatStore } from '@/stores/chat'
-import { AssistantSchema, ThreadSchema } from '@chad-chat/brain-domain'
-import { useQuery } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()

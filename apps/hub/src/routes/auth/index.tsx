@@ -1,7 +1,7 @@
-import { LoginForm } from '@/components/auth/login-form'
-import { useAuth } from '@/providers/auth-provider'
 import { AnimatedBackground } from '@chad-chat/ui/components/chat/animated-background'
 import { Navigate } from '@tanstack/react-router'
+import { LoginForm } from '@/components/auth/login-form'
+import { useAuth } from '@/providers/auth-provider'
 
 export const Route = createFileRoute({
   component: Index,

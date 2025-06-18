@@ -36,8 +36,8 @@ export const elysiaLogger = (options?: LoggerOptions) => {
       })
     })
     .onError((ctx) => {
-      let errorMessage: string | undefined = undefined
-      let errorStack: string | undefined = undefined
+      let errorMessage: string | undefined
+      let errorStack: string | undefined
       if (ctx.error instanceof Error) {
         errorMessage = ctx.error.message
         errorStack = ctx.error.stack
