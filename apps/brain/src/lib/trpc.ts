@@ -13,9 +13,13 @@ export const mergeRouters = t.mergeRouters
 
 //* Context
 export const createContext = async ({ req }: FetchCreateContextFnOptions): Promise<Context> => {
-  const token = req.headers.get('Authorization')?.split(' ')[1]
+  const cookie = req.headers.get('Cookie')
+  const betterAuthCookie = cookie
+    ?.split('; ')
+    .find((cookie) => cookie.startsWith('better-auth.session_token'))
+    ?.split('=')[1]
 
-  if (!token) {
+  if (!betterAuthCookie) {
     return {
       user: null,
       session: null,

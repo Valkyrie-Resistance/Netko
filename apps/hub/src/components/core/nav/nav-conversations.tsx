@@ -13,6 +13,7 @@ import {
   Trash2,
 } from 'lucide-react'
 
+import type { Thread } from '@chad-chat/brain-domain'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,17 +30,10 @@ import {
   useSidebar,
 } from '@chad-chat/ui/components/shadcn/sidebar'
 
-type Conversation = {
-  id: string
-  title: string
-  timestamp: Date
-  preview?: string
-}
-
-type ConversationGroup = {
+export type ConversationGroup = {
   label: string
   icon: LucideIcon
-  conversations: Conversation[]
+  conversations: Thread[]
 }
 
 const listVariants = {
@@ -102,11 +96,6 @@ export function NavConversations({
                               <span className="truncate text-sm text-sidebar-foreground/90 group-hover/item:text-sidebar-foreground">
                                 {conversation.title}
                               </span>
-                              {conversation.preview && (
-                                <span className="truncate text-xs text-sidebar-foreground/50">
-                                  {conversation.preview}
-                                </span>
-                              )}
                             </div>
                           </a>
                         </SidebarMenuButton>
@@ -150,7 +139,7 @@ export function NavConversations({
 }
 
 // Helper function to group conversations by time periods
-export function groupConversationsByTime(conversations: Conversation[]): ConversationGroup[] {
+export function groupConversationsByTime(conversations: Thread[]): ConversationGroup[] {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
@@ -161,33 +150,33 @@ export function groupConversationsByTime(conversations: Conversation[]): Convers
     {
       label: 'Today',
       icon: Clock,
-      conversations: conversations.filter((conv) => conv.timestamp >= today),
+      conversations: conversations.filter((conv) => conv.createdAt >= today),
     },
     {
       label: 'Yesterday',
       icon: History,
       conversations: conversations.filter(
-        (conv) => conv.timestamp >= yesterday && conv.timestamp < today,
+        (conv) => conv.createdAt >= yesterday && conv.createdAt < today,
       ),
     },
     {
       label: 'Last Week',
       icon: Calendar,
       conversations: conversations.filter(
-        (conv) => conv.timestamp >= lastWeek && conv.timestamp < yesterday,
+        (conv) => conv.createdAt >= lastWeek && conv.createdAt < yesterday,
       ),
     },
     {
       label: 'Last Month',
       icon: MessageSquare,
       conversations: conversations.filter(
-        (conv) => conv.timestamp >= lastMonth && conv.timestamp < lastWeek,
+        (conv) => conv.createdAt >= lastMonth && conv.createdAt < lastWeek,
       ),
     },
     {
       label: 'Older',
       icon: Archive,
-      conversations: conversations.filter((conv) => conv.timestamp < lastMonth),
+      conversations: conversations.filter((conv) => conv.createdAt < lastMonth),
     },
   ]
 }

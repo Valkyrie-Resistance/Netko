@@ -1,14 +1,9 @@
-import { AppSidebar } from '@/components/core/nav/app-sidebar'
 import { ThemeToggle } from '@/components/core/theme/theme-switcher'
 import { useAuth } from '@/providers/auth-provider'
 import { AnimatedBackground } from '@chad-chat/ui/components/chat/animated-background'
 import { Chat } from '@chad-chat/ui/components/chat/chat'
 import type { Message } from '@chad-chat/ui/components/chat/definitions/types'
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@chad-chat/ui/components/shadcn/sidebar'
+import { SidebarTrigger } from '@chad-chat/ui/components/shadcn/sidebar'
 import { useState } from 'react'
 
 export const Route = createFileRoute({
@@ -47,44 +42,36 @@ function Index() {
   }
 
   return (
-    <div className="relative flex h-screen w-screen">
-      {/* Floating decorative background */}
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset className="flex flex-1">
-          <AnimatedBackground />
-
-          <header className="flex h-16 shrink-0 items-center justify-between px-4">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="-ml-1" />
-            </div>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-            </div>
-          </header>
-
-          <div className="flex flex-col w-full h-full min-h-0 p-4">
-            <Chat
-              userName={user?.name ?? ''}
-              className="flex-1 w-full max-w-4xl mx-auto min-h-0"
-              messages={messages}
-              handleSubmit={handleSubmit}
-              input={input}
-              handleInputChange={handleInputChange}
-              isGenerating={isLoading}
-              stop={stop}
-              append={append}
-              setMessages={setMessages}
-              suggestions={[
-                "Explain quantum computing like I'm 5 years old 🧠",
-                'Write a Python script to analyze CSV data',
-                'Help me brainstorm ideas for a weekend project',
-                'Create a workout plan for someone who works from home',
-              ]}
-            />
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+    <>
+      <AnimatedBackground />
+      <header className="flex h-16 shrink-0 items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          <SidebarTrigger className="-ml-1" />
+        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+        </div>
+      </header>
+      <div className="flex flex-col w-full h-full min-h-0 p-4">
+        <Chat
+          userName={user?.name ?? ''}
+          className="flex-1 w-full max-w-4xl mx-auto min-h-0"
+          messages={messages}
+          handleSubmit={handleSubmit}
+          input={input}
+          handleInputChange={handleInputChange}
+          isGenerating={isLoading}
+          stop={stop}
+          append={append}
+          setMessages={setMessages}
+          suggestions={[
+            "Explain quantum computing like I'm 5 years old 🧠",
+            'Write a Python script to analyze CSV data',
+            'Help me brainstorm ideas for a weekend project',
+            'Create a workout plan for someone who works from home',
+          ]}
+        />
+      </div>
+    </>
   )
 }

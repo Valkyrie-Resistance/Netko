@@ -26,12 +26,6 @@ export const seed = async () => {
         updatedAt: new Date(),
       },
     })
-
-    console.log('Assistant created:', {
-      id: marvin.id,
-      name: marvin.name,
-      description: marvin.description,
-    })
   } catch (error) {
     console.error('Error creating assistant:', error)
     throw error
