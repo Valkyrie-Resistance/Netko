@@ -4,12 +4,6 @@ const prisma = new PrismaClient()
 
 export const seed = async () => {
   try {
-    await prisma.assistant.deleteMany({
-      where: {
-        name: 'Marvin',
-      },
-    })
-
     const marvinPromptPath = new URL(
       '../../../domain/src/values/prompts/marvin.md',
       import.meta.url,
