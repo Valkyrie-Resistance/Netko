@@ -54,7 +54,7 @@ export class ModelSyncService {
     try {
       const response = await fetch('https://openrouter.ai/api/v1/models', {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'HTTP-Referer': 'https://chad-chat.vercel.app',
           'X-Title': 'Chad Chat',
         },
@@ -62,11 +62,13 @@ export class ModelSyncService {
       if (!response.ok) {
         throw new Error(`Error fetching models from OpenRouter: ${response.statusText}`)
       }
-      const data = await response.json() as { data: OpenRouterModel[] }
+      const data = (await response.json()) as { data: OpenRouterModel[] }
       this.modelsCache = { models: data.data, fetchedAt: now }
       return data.data
-    } catch (error: any) {
-      throw new Error(`Error fetching models from OpenRouter: ${error.message}`)
+    } catch (error: unknown) {
+      throw new Error(
+        `Error fetching models from OpenRouter: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 

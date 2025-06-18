@@ -1,8 +1,8 @@
 import { AssistantIdSchema } from '@chad-chat/brain-domain'
 import { AssistantQueries, getUserApiKeyByProvider } from '@chad-chat/brain-repository'
 import { prisma } from '@chad-chat/brain-repository'
-import type { Message } from 'ai'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
+import type { Message } from 'ai'
 import { streamText } from 'ai'
 import { ModelSyncService } from './model-sync'
 
@@ -15,7 +15,7 @@ interface OpenRouterError {
 export class LLMService {
   private static instance: LLMService
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): LLMService {
     if (!LLMService.instance) {
@@ -100,7 +100,7 @@ export class LLMService {
       }
 
       return stream as unknown as ReadableStream
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         throw error
       }
