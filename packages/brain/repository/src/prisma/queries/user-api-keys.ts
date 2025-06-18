@@ -32,4 +32,4 @@ export async function getUserApiKeyByProvider(
   })
 
   return apiKey.encryptedKey
-} 
+}

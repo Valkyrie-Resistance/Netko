@@ -78,7 +78,9 @@ export class LLMService {
       })
 
       if (!response.ok) {
-        const error = (await response.json().catch(() => ({ error: 'Unknown error' }))) as OpenRouterError
+        const error = (await response
+          .json()
+          .catch(() => ({ error: 'Unknown error' }))) as OpenRouterError
         throw new Error(`Failed to create LLM: ${error.error || response.statusText}`)
       }
 
