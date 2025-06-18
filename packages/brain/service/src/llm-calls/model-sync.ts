@@ -51,22 +51,23 @@ export class ModelSyncService {
       return this.modelsCache.models
     }
 
-    const response = await fetch('https://openrouter.ai/api/v1/models', {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-        'HTTP-Referer': 'https://chad-chat.vercel.app',
-        'X-Title': 'Chad Chat',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch models from OpenRouter')
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/models', {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'HTTP-Referer': 'https://chad-chat.vercel.app',
+          'X-Title': 'Chad Chat',
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Error fetching models from OpenRouter: ${response.statusText}`)
+      }
+      const data = await response.json() as { data: OpenRouterModel[] }
+      this.modelsCache = { models: data.data, fetchedAt: now }
+      return data.data
+    } catch (error: any) {
+      throw new Error(`Error fetching models from OpenRouter: ${error.message}`)
     }
-
-    const { data: models } = (await response.json()) as { data: OpenRouterModel[] }
-    this.modelsCache = { models, fetchedAt: now }
-    return models
   }
 
   public async syncModels(): Promise<void> {
@@ -126,16 +127,38 @@ export class ModelSyncService {
     modelId: string,
   ): Promise<{ contextLength: number; pricing: { prompt: number; completion: number } } | null> {
     try {
-      const models = await this.fetchModels()
-      const model = models.find((m) => m.id === modelId)
+      const recentMessage = await prisma.message.findFirst({
+        where: {
+          modelId,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          metadata: true,
+        },
+      })
 
-      if (!model) {
+      if (recentMessage?.metadata) {
+        const metadata = recentMessage.metadata as {
+          contextLength: number
+          pricing: { prompt: number; completion: number }
+        }
+        if (metadata.contextLength && metadata.pricing) {
+          return metadata
+        }
+      }
+
+      const models = await this.fetchModels()
+      const openRouterModel = models.find((m) => m.id === modelId)
+
+      if (!openRouterModel) {
         return null
       }
 
       return {
-        contextLength: model.contextLength,
-        pricing: model.pricing,
+        contextLength: openRouterModel.contextLength,
+        pricing: openRouterModel.pricing,
       }
     } catch (error) {
       console.error('Failed to get model metadata:', error)

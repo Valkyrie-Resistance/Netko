@@ -111,6 +111,7 @@
       "dependencies": {
         "@chad-chat/brain-domain": "workspace:*",
         "@chad-chat/brain-repository": "workspace:*",
+        "@openrouter/ai-sdk-provider": "^0.7.2",
         "better-auth": "^1.2.9",
       },
       "devDependencies": {
