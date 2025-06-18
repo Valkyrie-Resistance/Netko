@@ -98,7 +98,8 @@
       "!**/public/**",
       "!**/generated/**",
       "!**/dist/**",
-      "!**/packages/shared/ui/**"
+      "!**/packages/shared/ui/**",
+      "!**/.tanstack/**"
     ]
   }
 }
