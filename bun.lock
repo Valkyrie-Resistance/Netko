@@ -107,6 +107,7 @@
       "name": "@chad-chat/brain-service",
       "dependencies": {
         "@chad-chat/brain-domain": "workspace:*",
+        "@chad-chat/brain-repository": "workspace:*",
         "better-auth": "^1.2.9",
       },
       "devDependencies": {

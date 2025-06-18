@@ -1,7 +1,7 @@
 import { AppSidebar } from '@/components/core/nav/app-sidebar'
 import { ThemeToggle } from '@/components/core/theme/theme-switcher'
-import { trpcWs } from '@/lib/trpc'
 import { useAuth } from '@/providers/auth-provider'
+import { AnimatedBackground } from '@chad-chat/ui/components/chat/animated-background'
 import { Chat } from '@chad-chat/ui/components/chat/chat'
 import type { Message } from '@chad-chat/ui/components/chat/definitions/types'
 import {
@@ -9,7 +9,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@chad-chat/ui/components/shadcn/sidebar'
-import { useSubscription } from '@trpc/tanstack-react-query'
 import { useState } from 'react'
 
 export const Route = createFileRoute({
@@ -18,18 +17,6 @@ export const Route = createFileRoute({
 
 function Index() {
   const { user } = useAuth()
-  const sub = useSubscription(
-    trpcWs.threads.onThreadUpdate.subscriptionOptions(
-      {
-        threadId: '1',
-      },
-      {
-        onData: (data) => {
-          console.log('new thread update', data)
-        },
-      },
-    ),
-  )
 
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -60,10 +47,13 @@ function Index() {
   }
 
   return (
-    <div className="flex h-screen w-screen">
+    <div className="relative flex h-screen w-screen">
+      {/* Floating decorative background */}
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="flex flex-1">
+          <AnimatedBackground />
+
           <header className="flex h-16 shrink-0 items-center justify-between px-4">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
@@ -90,17 +80,6 @@ function Index() {
                 'Write a Python script to analyze CSV data',
                 'Help me brainstorm ideas for a weekend project',
                 'Create a workout plan for someone who works from home',
-                'What are the pros and cons of TypeScript vs JavaScript?',
-                'Write a haiku about debugging code at 3 AM',
-                'Explain the latest trends in web development',
-                'Help me draft a professional email to a client',
-                'Create a recipe using only ingredients I have at home',
-                "What's the difference between REST and GraphQL?",
-                'Generate creative names for my new startup',
-                'Explain blockchain technology in simple terms',
-                'Help me optimize this SQL query for better performance',
-                'Write a short story about a cat who learns to code',
-                'What are some good practices for React component design?',
               ]}
             />
           </div>
