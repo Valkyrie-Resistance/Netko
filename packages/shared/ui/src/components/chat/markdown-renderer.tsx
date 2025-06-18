@@ -4,10 +4,11 @@ import remarkGfm from "remark-gfm"
 
 import { cn } from "@chad-chat/ui/lib/utils"
 import { CopyButton } from "@chad-chat/ui/components/chat/copy-button.js"
-
-interface MarkdownRendererProps {
-  children: string
-}
+import {
+  type MarkdownRendererProps,
+  type HighlightedPre,
+  type CodeBlockProps,
+} from "@chad-chat/ui/components/chat/definitions/types"
 
 export function MarkdownRenderer({ children }: MarkdownRendererProps) {
   return (
@@ -39,11 +40,6 @@ export function MarkdownRenderer({ children }: MarkdownRendererProps) {
       </Markdown>
     </div>
   )
-}
-
-interface HighlightedPre extends React.HTMLAttributes<HTMLPreElement> {
-  children: string
-  language: string
 }
 
 const HighlightedPre = React.memo(
@@ -95,12 +91,6 @@ const HighlightedPre = React.memo(
   }
 )
 HighlightedPre.displayName = "HighlightedCode"
-
-interface CodeBlockProps extends React.HTMLAttributes<HTMLPreElement> {
-  children: React.ReactNode
-  className?: string
-  language: string
-}
 
 const CodeBlock = ({
   children,

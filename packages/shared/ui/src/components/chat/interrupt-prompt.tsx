@@ -1,12 +1,6 @@
-"use client"
-
 import { AnimatePresence, motion } from "framer-motion"
 import { X } from "lucide-react"
-
-interface InterruptPromptProps {
-  isOpen: boolean
-  close: () => void
-}
+import { type InterruptPromptProps } from "@chad-chat/ui/components/chat/definitions/types"
 
 export function InterruptPrompt({ isOpen, close }: InterruptPromptProps) {
   return (

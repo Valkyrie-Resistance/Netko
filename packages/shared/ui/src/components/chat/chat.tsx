@@ -1,55 +1,26 @@
-"use client"
-
 import {
   forwardRef,
   useCallback,
   useRef,
   useState,
-  type ReactElement,
 } from "react"
 import { ArrowDown, ThumbsDown, ThumbsUp } from "lucide-react"
 
 import { cn } from "@chad-chat/ui/lib/utils"
 import { useAutoScroll } from "@chad-chat/ui/hooks/use-auto-scroll"
 import { Button } from "@chad-chat/ui/components/shadcn/button"
-import { type Message } from "@chad-chat/ui/components/chat/chat-message.js"
+import {
+  type Message,
+  type ChatProps,
+  type ChatFormProps,
+} from "@chad-chat/ui/components/chat/definitions/types"
 import { CopyButton } from "@chad-chat/ui/components/chat/copy-button.js"
 import { MessageInput } from "@chad-chat/ui/components/chat/message-input.js"
 import { MessageList } from "@chad-chat/ui/components/chat/message-list.js"
 import { PromptSuggestions } from "@chad-chat/ui/components/chat/prompt-suggestions.js"
 
-interface ChatPropsBase {
-  handleSubmit: (
-    event?: { preventDefault?: () => void },
-    options?: { experimental_attachments?: FileList }
-  ) => void
-  messages: Array<Message>
-  input: string
-  className?: string
-  handleInputChange: React.ChangeEventHandler<HTMLTextAreaElement>
-  isGenerating: boolean
-  stop?: () => void
-  onRateResponse?: (
-    messageId: string,
-    rating: "thumbs-up" | "thumbs-down"
-  ) => void
-  setMessages?: (messages: any[]) => void
-  transcribeAudio?: (blob: Blob) => Promise<string>
-}
-
-interface ChatPropsWithoutSuggestions extends ChatPropsBase {
-  append?: never
-  suggestions?: never
-}
-
-interface ChatPropsWithSuggestions extends ChatPropsBase {
-  append: (message: { role: "user"; content: string }) => void
-  suggestions: string[]
-}
-
-type ChatProps = ChatPropsWithoutSuggestions | ChatPropsWithSuggestions
-
 export function Chat({
+  userName,
   messages,
   handleSubmit,
   input,
@@ -61,7 +32,6 @@ export function Chat({
   className,
   onRateResponse,
   setMessages,
-  transcribeAudio,
 }: ChatProps) {
   const lastMessage = messages.at(-1)
   const isEmpty = messages.length === 0
@@ -193,14 +163,6 @@ export function Chat({
 
   return (
     <ChatContainer className={className}>
-      {isEmpty && append && suggestions ? (
-        <PromptSuggestions
-          label="Try these prompts"
-          append={append}
-          suggestions={suggestions}
-        />
-      ) : null}
-
       {messages.length > 0 ? (
         <ChatMessages messages={messages}>
           <MessageList
@@ -211,24 +173,34 @@ export function Chat({
         </ChatMessages>
       ) : null}
 
-      <ChatForm
-        className="mt-auto"
-        isPending={isGenerating || isTyping}
-        handleSubmit={handleSubmit}
-      >
-        {({ files, setFiles }) => (
-          <MessageInput
-            value={input}
-            onChange={handleInputChange}
-            allowAttachments
-            files={files}
-            setFiles={setFiles}
-            stop={handleStop}
-            isGenerating={isGenerating}
-            transcribeAudio={transcribeAudio}
+      {isEmpty && append && suggestions ? (
+        <div className="flex-1 flex items-center justify-center">
+          <PromptSuggestions
+            userName={userName}
+            append={append}
+            suggestions={suggestions}
           />
-        )}
-      </ChatForm>
+        </div>
+      ) : null}
+      
+      <div className="flex-shrink-0">
+        <ChatForm
+          isPending={isGenerating || isTyping}
+          handleSubmit={handleSubmit}
+        >
+          {({ files, setFiles }) => (
+            <MessageInput
+              value={input}
+              onChange={handleInputChange}
+              allowAttachments
+              files={files}
+              setFiles={setFiles}
+              stop={handleStop}
+              isGenerating={isGenerating}
+            />
+          )}
+        </ChatForm>
+      </div>
     </ChatContainer>
   )
 }
@@ -250,29 +222,27 @@ export function ChatMessages({
 
   return (
     <div
-      className="grid grid-cols-1 overflow-y-auto pb-4"
+      className="flex-1 overflow-y-auto pb-4 min-h-0"
       ref={containerRef}
       onScroll={handleScroll}
       onTouchStart={handleTouchStart}
     >
-      <div className="max-w-full [grid-column:1/1] [grid-row:1/1]">
+      <div className="relative">
         {children}
-      </div>
-
-      {!shouldAutoScroll && (
-        <div className="pointer-events-none flex flex-1 items-end justify-end [grid-column:1/1] [grid-row:1/1]">
-          <div className="sticky bottom-0 left-0 flex w-full justify-end">
+        
+        {!shouldAutoScroll && (
+          <div className="absolute bottom-0 right-0 flex justify-end">
             <Button
               onClick={scrollToBottom}
-              className="pointer-events-auto h-8 w-8 rounded-full ease-in-out animate-in fade-in-0 slide-in-from-bottom-1"
+              className="h-8 w-8 rounded-full ease-in-out animate-in fade-in-0 slide-in-from-bottom-1"
               size="icon"
               variant="ghost"
             >
               <ArrowDown className="h-4 w-4" />
             </Button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
@@ -284,25 +254,12 @@ export const ChatContainer = forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("grid max-h-full w-full grid-rows-[1fr_auto]", className)}
+      className={cn("flex flex-col h-full w-full", className)}
       {...props}
     />
   )
 })
 ChatContainer.displayName = "ChatContainer"
-
-interface ChatFormProps {
-  className?: string
-  isPending: boolean
-  handleSubmit: (
-    event?: { preventDefault?: () => void },
-    options?: { experimental_attachments?: FileList }
-  ) => void
-  children: (props: {
-    files: File[] | null
-    setFiles: React.Dispatch<React.SetStateAction<File[] | null>>
-  }) => ReactElement
-}
 
 export const ChatForm = forwardRef<HTMLFormElement, ChatFormProps>(
   ({ children, handleSubmit, isPending, className }, ref) => {

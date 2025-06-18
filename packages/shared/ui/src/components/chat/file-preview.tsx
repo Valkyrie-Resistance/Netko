@@ -1,13 +1,7 @@
-"use client"
-
 import React, { useEffect } from "react"
 import { motion } from "framer-motion"
 import { FileIcon, X } from "lucide-react"
-
-interface FilePreviewProps {
-  file: File
-  onRemove?: () => void
-}
+import { type FilePreviewProps } from "@chad-chat/ui/components/chat/definitions/types"
 
 export const FilePreview = React.forwardRef<HTMLDivElement, FilePreviewProps>(
   (props, ref) => {

@@ -1,20 +1,8 @@
-import {
-  ChatMessage,
-  type ChatMessageProps,
-  type Message,
-} from "@chad-chat/ui/components/chat/chat-message.js"
+import { ChatMessage } from "@chad-chat/ui/components/chat/chat-message.js"
 import { TypingIndicator } from "@chad-chat/ui/components/chat/typing-indicator.js"
-
-type AdditionalMessageOptions = Omit<ChatMessageProps, keyof Message>
-
-interface MessageListProps {
-  messages: Message[]
-  showTimeStamps?: boolean
-  isTyping?: boolean
-  messageOptions?:
-    | AdditionalMessageOptions
-    | ((message: Message) => AdditionalMessageOptions)
-}
+import {
+  type MessageListProps,
+} from "@chad-chat/ui/components/chat/definitions/types"
 
 export function MessageList({
   messages,

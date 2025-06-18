@@ -1,15 +1,8 @@
-"use client"
-
 import { Check, Copy } from "lucide-react"
-
 import { cn } from "@chad-chat/ui/lib/utils"
 import { useCopyToClipboard } from "@chad-chat/ui/hooks/use-copy-to-clipboard"
 import { Button } from "@chad-chat/ui/components/shadcn/button"
-
-type CopyButtonProps = {
-  content: string
-  copyMessage?: string
-}
+import { type CopyButtonProps } from "@chad-chat/ui/components/chat/definitions/types"
 
 export function CopyButton({ content, copyMessage }: CopyButtonProps) {
   const { isCopied, handleCopy } = useCopyToClipboard({

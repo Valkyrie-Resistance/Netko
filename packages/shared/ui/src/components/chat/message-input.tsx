@@ -1,41 +1,39 @@
-"use client"
-
 import React, { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowUp, Info, Loader2, Mic, Paperclip, Square, X } from "lucide-react"
+import { 
+  ArrowUp, 
+  Info, 
+  Loader2, 
+  Mic, 
+  Paperclip, 
+  Square, 
+  X,
+  Search,
+  Sparkles,
+  ChevronDown
+} from "lucide-react"
 import { omit } from "remeda"
 
 import { cn } from "@chad-chat/ui/lib/utils"
-import { useAudioRecording } from "@chad-chat/ui/hooks/use-audio-recording"
 import { useAutosizeTextArea } from "@chad-chat/ui/hooks/use-autosize-textarea"
-import { AudioVisualizer } from "@chad-chat/ui/components/chat/audio-visualizer.js"
 import { Button } from "@chad-chat/ui/components/shadcn/button"
 import { FilePreview } from "@chad-chat/ui/components/chat/file-preview.js"
 import { InterruptPrompt } from "@chad-chat/ui/components/chat/interrupt-prompt.js"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@chad-chat/ui/components/shadcn/popover"
+import {
+  type MessageInputProps,
+  type FileUploadOverlayProps,
+} from "@chad-chat/ui/components/chat/definitions/types"
 
-interface MessageInputBaseProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  value: string
-  submitOnEnter?: boolean
-  stop?: () => void
-  isGenerating: boolean
-  enableInterrupt?: boolean
-  transcribeAudio?: (blob: Blob) => Promise<string>
-}
-
-interface MessageInputWithoutAttachmentProps extends MessageInputBaseProps {
-  allowAttachments?: false
-}
-
-interface MessageInputWithAttachmentsProps extends MessageInputBaseProps {
-  allowAttachments: true
-  files: File[] | null
-  setFiles: React.Dispatch<React.SetStateAction<File[] | null>>
-}
-
-type MessageInputProps =
-  | MessageInputWithoutAttachmentProps
-  | MessageInputWithAttachmentsProps
+const modelOptions = [
+  { id: "gpt-4", name: "GPT-4", icon: "✨" },
+  { id: "gpt-3.5-turbo", name: "GPT-3.5", icon: "🚀" },
+  { id: "claude-3", name: "Claude 3", icon: "🧠" },
+]
 
 export function MessageInput({
   placeholder = "Ask AI...",
@@ -46,25 +44,17 @@ export function MessageInput({
   isGenerating,
   enableInterrupt = true,
   transcribeAudio,
+  enableWebSearch = false,
+  onWebSearchToggle,
+  selectedModel = "gpt-4",
+  onModelChange,
   ...props
 }: MessageInputProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [showInterruptPrompt, setShowInterruptPrompt] = useState(false)
-
-  const {
-    isListening,
-    isSpeechSupported,
-    isRecording,
-    isTranscribing,
-    audioStream,
-    toggleListening,
-    stopRecording,
-  } = useAudioRecording({
-    transcribeAudio,
-    onTranscriptionComplete: (text) => {
-      props.onChange?.({ target: { value: text } } as any)
-    },
-  })
+  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(enableWebSearch)
+  const [selectedModelId, setSelectedModelId] = useState(selectedModel)
+  const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false)
 
   useEffect(() => {
     if (!isGenerating) {
@@ -178,9 +168,19 @@ export function MessageInput({
     dependencies: [props.value, showFileList],
   })
 
+  const handleWebSearchToggle = () => {
+    setIsWebSearchEnabled(!isWebSearchEnabled)
+    onWebSearchToggle?.(!isWebSearchEnabled)
+  }
+
+  const handleModelChange = (modelId: string) => {
+    setSelectedModelId(modelId)
+    onModelChange?.(modelId)
+  }
+
   return (
     <div
-      className="relative flex w-full"
+      className="relative flex w-full flex-col gap-2"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
@@ -192,127 +192,318 @@ export function MessageInput({
         />
       )}
 
-      <RecordingPrompt
-        isVisible={isRecording}
-        onStopRecording={stopRecording}
-      />
+      <div className="relative flex w-full items-end space-x-2">
+        <motion.div 
+          className="relative flex-1"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="relative">
+            <div 
+              className={cn(
+                "absolute inset-0 rounded-xl opacity-50",
+                "bg-gradient-to-br from-primary/20 via-transparent to-primary/20",
+                "dark:from-primary/10 dark:via-transparent dark:to-primary/10",
+                "before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-tr before:from-blue-500/20 before:via-transparent before:to-purple-500/20 before:opacity-50",
+                "dark:before:from-blue-500/10 dark:before:to-purple-500/10",
+                "after:absolute after:inset-0 after:rounded-xl after:bg-gradient-to-bl after:from-rose-500/20 after:via-transparent after:to-amber-500/20 after:opacity-30",
+                "dark:after:from-rose-500/10 dark:after:to-amber-500/10"
+              )}
+            />
 
-      <div className="relative flex w-full items-center space-x-2">
-        <div className="relative flex-1">
-          <textarea
-            aria-label="Write your prompt here"
-            placeholder={placeholder}
-            ref={textAreaRef}
-            onPaste={onPaste}
-            onKeyDown={onKeyDown}
-            className={cn(
-              "z-10 w-full grow resize-none rounded-xl border border-input bg-background p-3 pr-24 text-sm ring-offset-background transition-[border] placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-              showFileList && "pb-16",
-              className
-            )}
-            {...(props.allowAttachments
-              ? omit(props, ["allowAttachments", "files", "setFiles"])
-              : omit(props, ["allowAttachments"]))}
-          />
-
-          {props.allowAttachments && (
-            <div className="absolute inset-x-3 bottom-0 z-20 overflow-x-scroll py-3">
-              <div className="flex space-x-3">
-                <AnimatePresence mode="popLayout">
-                  {props.files?.map((file) => {
-                    return (
-                      <FilePreview
-                        key={file.name + String(file.lastModified)}
-                        file={file}
-                        onRemove={() => {
-                          props.setFiles((files) => {
-                            if (!files) return null
-
-                            const filtered = Array.from(files).filter(
-                              (f) => f !== file
-                            )
-                            if (filtered.length === 0) return null
-                            return filtered
-                          })
+            <div className="absolute left-0 right-0 top-0 z-10 flex items-center gap-2 px-3 py-2">
+              <Popover onOpenChange={setIsModelSelectorOpen}>
+                <PopoverTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "gap-1.5 text-xs font-medium relative overflow-hidden",
+                        "bg-muted/90 hover:bg-muted",
+                        "dark:bg-muted/40 dark:hover:bg-muted/60",
+                        "backdrop-blur-sm transition-all duration-200",
+                        "border border-border/10 dark:border-border/10",
+                        "after:absolute after:inset-0 after:rounded-md",
+                        "after:bg-gradient-to-r after:from-primary/0 after:via-primary/10 after:to-primary/0",
+                        "after:translate-x-[-100%] hover:after:translate-x-[100%]",
+                        "after:transition-transform after:duration-500",
+                        "text-foreground/90 dark:text-foreground/80"
+                      )}
+                    >
+                      <motion.div
+                        initial={{ rotate: 0 }}
+                        animate={{ rotate: [0, 15, -15, 0] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                          ease: "easeInOut"
                         }}
-                      />
-                    )
-                  })}
-                </AnimatePresence>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+                      >
+                        <Sparkles className="h-3 w-3 text-primary" />
+                      </motion.div>
+                      {modelOptions.find(m => m.id === selectedModelId)?.name || "Select Model"}
+                      <motion.div
+                        initial={false}
+                        animate={{ 
+                          rotate: isModelSelectorOpen ? 180 : 0,
+                          scale: isModelSelectorOpen ? 1.1 : 1
+                        }}
+                        transition={{ 
+                          duration: 0.2,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        <ChevronDown className="h-3 w-3 text-foreground/70" />
+                      </motion.div>
+                    </Button>
+                  </motion.div>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-48 p-1"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <div className="space-y-1">
+                    {modelOptions.map((model) => (
+                      <motion.button
+                        key={model.id}
+                        whileHover={{ scale: 1.02, x: 2 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          handleModelChange(model.id)
+                          setIsModelSelectorOpen(false)
+                        }}
+                        className={cn(
+                          "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-all duration-200",
+                          selectedModelId === model.id
+                            ? "bg-primary/15 text-primary dark:bg-primary/25 dark:text-primary font-medium"
+                            : "hover:bg-muted dark:hover:bg-muted/50 text-foreground/90"
+                        )}
+                      >
+                        <motion.span
+                          initial={{ scale: 1 }}
+                          animate={{ scale: selectedModelId === model.id ? [1, 1.2, 1] : 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {model.icon}
+                        </motion.span>
+                        {model.name}
+                      </motion.button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-      <div className="absolute right-3 top-3 z-20 flex gap-2">
-        {props.allowAttachments && (
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            className="h-8 w-8"
-            aria-label="Attach a file"
-            onClick={async () => {
-              const files = await showFileUploadDialog()
-              addFiles(files)
-            }}
-          >
-            <Paperclip className="h-4 w-4" />
-          </Button>
-        )}
-        {isSpeechSupported && (
-          <Button
-            type="button"
-            variant="outline"
-            className={cn("h-8 w-8", isListening && "text-primary")}
-            aria-label="Voice input"
-            size="icon"
-            onClick={toggleListening}
-          >
-            <Mic className="h-4 w-4" />
-          </Button>
-        )}
-        {isGenerating && stop ? (
-          <Button
-            type="button"
-            size="icon"
-            className="h-8 w-8"
-            aria-label="Stop generating"
-            onClick={stop}
-          >
-            <Square className="h-3 w-3 animate-pulse" fill="currentColor" />
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            size="icon"
-            className="h-8 w-8 transition-opacity"
-            aria-label="Send message"
-            disabled={props.value === "" || isGenerating}
-          >
-            <ArrowUp className="h-5 w-5" />
-          </Button>
-        )}
+              <div className="h-4 w-px bg-border/50 dark:bg-border/30" />
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "gap-1.5 text-xs font-medium relative overflow-hidden",
+                    "bg-muted/90 hover:bg-muted",
+                    "dark:bg-muted/40 dark:hover:bg-muted/60",
+                    "backdrop-blur-sm transition-all duration-200",
+                    "border border-border/10 dark:border-border/10",
+                    "after:absolute after:inset-0 after:rounded-md",
+                    "after:bg-gradient-to-r after:from-primary/0 after:via-primary/10 after:to-primary/0",
+                    "after:translate-x-[-100%] hover:after:translate-x-[100%]",
+                    "after:transition-transform after:duration-500",
+                    "text-foreground/90 dark:text-foreground/80",
+                    isWebSearchEnabled && "text-primary dark:text-primary bg-primary/10 dark:bg-primary/20 border-primary/20"
+                  )}
+                  onClick={handleWebSearchToggle}
+                >
+                  <motion.div
+                    animate={isWebSearchEnabled ? {
+                      rotate: [0, 360],
+                      scale: [1, 1.2, 1]
+                    } : {}}
+                    transition={{
+                      duration: 0.5,
+                      ease: "easeInOut"
+                    }}
+                    whileHover={{
+                      rotate: [-10, 10],
+                      transition: {
+                        duration: 0.3,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                      }
+                    }}
+                  >
+                    <Search className={cn(
+                      "h-3 w-3",
+                      isWebSearchEnabled ? "text-primary" : "text-foreground/70"
+                    )} />
+                  </motion.div>
+                  Web
+                </Button>
+              </motion.div>
+            </div>
+
+            <textarea
+              aria-label="Write your prompt here"
+              placeholder={placeholder}
+              ref={textAreaRef}
+              onPaste={onPaste}
+              onKeyDown={onKeyDown}
+              className={cn(
+                "w-full resize-none rounded-xl pt-12 pb-3 pl-3 pr-24 text-sm",
+                "border border-border/10",
+                "bg-background/30 dark:bg-background/20",
+                "backdrop-blur-xl",
+                "placeholder:text-muted-foreground/50",
+                "focus:border-primary/30 focus:bg-background/40 dark:focus:bg-background/30",
+                "focus:outline-none focus:ring-2 focus:ring-primary/20",
+                "disabled:cursor-not-allowed disabled:opacity-50",
+                showFileList && "pb-16",
+                className
+              )}
+              style={{
+                WebkitBackdropFilter: "blur(16px)",
+                backdropFilter: "blur(16px)",
+              }}
+              {...(props.allowAttachments
+                ? omit(props, ["allowAttachments", "files", "setFiles"])
+                : omit(props, ["allowAttachments"]))}
+            />
+
+            <div className="absolute right-3 bottom-3 z-20 flex gap-2">
+              {props.allowAttachments && (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    className={cn(
+                      "h-8 w-8 rounded-lg relative overflow-hidden",
+                      "bg-background/60 hover:bg-background/90",
+                      "dark:bg-muted/40 dark:hover:bg-muted/60",
+                      "backdrop-blur-sm transition-all duration-200",
+                      "after:absolute after:inset-0",
+                      "after:bg-gradient-to-r after:from-primary/0 after:via-primary/10 after:to-primary/0",
+                      "after:translate-x-[-100%] hover:after:translate-x-[100%]",
+                      "after:transition-transform after:duration-500"
+                    )}
+                    aria-label="Attach a file"
+                    onClick={async () => {
+                      const files = await showFileUploadDialog()
+                      addFiles(files)
+                    }}
+                  >
+                    <Paperclip className="h-4 w-4 text-foreground/70" />
+                  </Button>
+                </motion.div>
+              )}
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isGenerating && stop ? (
+                  <Button
+                    type="button"
+                    size="icon"
+                    className={cn(
+                      "h-8 w-8 rounded-lg relative overflow-hidden",
+                      "bg-primary/30 hover:bg-primary/40",
+                      "dark:bg-primary/40 dark:hover:bg-primary/50",
+                      "backdrop-blur-sm transition-all duration-200",
+                      "border border-primary/20 dark:border-primary/30",
+                      "after:absolute after:inset-0",
+                      "after:bg-gradient-to-r after:from-white/0 after:via-white/10 after:to-white/0",
+                      "after:translate-x-[-100%] hover:after:translate-x-[100%]",
+                      "after:transition-transform after:duration-500"
+                    )}
+                    aria-label="Stop generating"
+                    onClick={stop}
+                  >
+                    <Square className="h-3 w-3 animate-pulse" fill="currentColor" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    size="icon"
+                    className={cn(
+                      "h-8 w-8 rounded-lg relative overflow-hidden group",
+                      "bg-primary hover:bg-primary/90",
+                      "dark:bg-primary dark:hover:bg-primary/90",
+                      "backdrop-blur-sm transition-all duration-200",
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
+                      "disabled:hover:bg-primary disabled:dark:hover:bg-primary",
+                      "after:absolute after:inset-0",
+                      "after:bg-gradient-to-r after:from-white/0 after:via-white/20 after:to-white/0",
+                      "after:translate-x-[-100%] group-hover:after:translate-x-[100%]",
+                      "after:transition-transform after:duration-500"
+                    )}
+                    aria-label="Send message"
+                    disabled={props.value === "" || isGenerating}
+                  >
+                    <motion.div
+                      initial={false}
+                      animate={props.value ? { scale: [1, 1.2, 1] } : {}}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ArrowUp className="h-5 w-5 text-background dark:text-background" />
+                    </motion.div>
+                  </Button>
+                )}
+              </motion.div>
+            </div>
+
+            {props.allowAttachments && (
+              <div className="absolute inset-x-3 bottom-0 z-20 overflow-x-scroll py-3">
+                <div className="flex space-x-3">
+                  <AnimatePresence mode="popLayout">
+                    {props.files?.map((file) => (
+                      <motion.div
+                        key={file.name + String(file.lastModified)}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <FilePreview
+                          file={file}
+                          onRemove={() => {
+                            props.setFiles((files) => {
+                              if (!files) return null
+                              const filtered = Array.from(files).filter(
+                                (f) => f !== file
+                              )
+                              if (filtered.length === 0) return null
+                              return filtered
+                            })
+                          }}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
       </div>
 
       {props.allowAttachments && <FileUploadOverlay isDragging={isDragging} />}
-
-      <RecordingControls
-        isRecording={isRecording}
-        isTranscribing={isTranscribing}
-        audioStream={audioStream}
-        textAreaHeight={textAreaHeight}
-        onStopRecording={stopRecording}
-      />
     </div>
   )
 }
 MessageInput.displayName = "MessageInput"
-
-interface FileUploadOverlayProps {
-  isDragging: boolean
-}
 
 function FileUploadOverlay({ isDragging }: FileUploadOverlayProps) {
   return (
@@ -354,111 +545,4 @@ function showFileUploadDialog() {
       resolve(null)
     }
   })
-}
-
-function TranscribingOverlay() {
-  return (
-    <motion.div
-      className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-background/80 backdrop-blur-sm"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="relative">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <motion.div
-          className="absolute inset-0 h-8 w-8 animate-pulse rounded-full bg-primary/20"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1.2, opacity: 1 }}
-          transition={{
-            duration: 1,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut",
-          }}
-        />
-      </div>
-      <p className="mt-4 text-sm font-medium text-muted-foreground">
-        Transcribing audio...
-      </p>
-    </motion.div>
-  )
-}
-
-interface RecordingPromptProps {
-  isVisible: boolean
-  onStopRecording: () => void
-}
-
-function RecordingPrompt({ isVisible, onStopRecording }: RecordingPromptProps) {
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ top: 0, filter: "blur(5px)" }}
-          animate={{
-            top: -40,
-            filter: "blur(0px)",
-            transition: {
-              type: "spring",
-              filter: { type: "tween" },
-            },
-          }}
-          exit={{ top: 0, filter: "blur(5px)" }}
-          className="absolute left-1/2 flex -translate-x-1/2 cursor-pointer overflow-hidden whitespace-nowrap rounded-full border bg-background py-1 text-center text-sm text-muted-foreground"
-          onClick={onStopRecording}
-        >
-          <span className="mx-2.5 flex items-center">
-            <Info className="mr-2 h-3 w-3" />
-            Click to finish recording
-          </span>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
-}
-
-interface RecordingControlsProps {
-  isRecording: boolean
-  isTranscribing: boolean
-  audioStream: MediaStream | null
-  textAreaHeight: number
-  onStopRecording: () => void
-}
-
-function RecordingControls({
-  isRecording,
-  isTranscribing,
-  audioStream,
-  textAreaHeight,
-  onStopRecording,
-}: RecordingControlsProps) {
-  if (isRecording) {
-    return (
-      <div
-        className="absolute inset-[1px] z-50 overflow-hidden rounded-xl"
-        style={{ height: textAreaHeight - 2 }}
-      >
-        <AudioVisualizer
-          stream={audioStream}
-          isRecording={isRecording}
-          onClick={onStopRecording}
-        />
-      </div>
-    )
-  }
-
-  if (isTranscribing) {
-    return (
-      <div
-        className="absolute inset-[1px] z-50 overflow-hidden rounded-xl"
-        style={{ height: textAreaHeight - 2 }}
-      >
-        <TranscribingOverlay />
-      </div>
-    )
-  }
-
-  return null
 }
