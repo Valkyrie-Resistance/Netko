@@ -16,8 +16,13 @@ export const seed = async () => {
     )
     const marvinPrompt = await Bun.file(marvinPromptPath).text()
 
-    const marvin = await prisma.assistant.create({
-      data: {
+    const marvin = await prisma.assistant.upsert({
+      where: {
+        id: 'y3javtpp7g9j9c6xxlg7g8qn',
+      },
+      update: {},
+      create: {
+        id: 'y3javtpp7g9j9c6xxlg7g8qn',
         name: 'Marvin',
         description:
           'A deeply depressed hyper-intelligent AI companion assistant with a cynical and sarcastic personality.',

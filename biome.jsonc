@@ -94,7 +94,8 @@
       // Ignore UI package since is shadcn/ui generated
       "packages/shared/ui/**/**",
       // Ignore routeTree.gen.ts since is a generated file
-      "routeTree.gen.ts"
+      "routeTree.gen.ts",
+      "public/**/**"
     ]
   }
 }
