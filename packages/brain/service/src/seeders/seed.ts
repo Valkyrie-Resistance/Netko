@@ -4,10 +4,12 @@ const prisma = new PrismaClient()
 
 export const seed = async () => {
   try {
-    const marvinPromptPath = new URL(
-      '../../../domain/src/values/prompts/marvin.md',
-      import.meta.url,
-    )
+    // Use a more reliable path resolution for Docker containers
+    const marvinPromptPath =
+      process.env.NODE_ENV === 'production'
+        ? '/app/packages/brain/domain/src/values/prompts/marvin.md'
+        : new URL('../../../domain/src/values/prompts/marvin.md', import.meta.url).pathname
+
     const marvinPrompt = await Bun.file(marvinPromptPath).text()
 
     await prisma.assistant.upsert({
