@@ -10,7 +10,6 @@ import {
   type LucideIcon,
   MessageSquare,
   Share,
-  Sparkles,
   Trash2,
 } from 'lucide-react'
 
@@ -98,11 +97,6 @@ export function NavConversations({
                           >
                             {/* Hover indicator line */}
                             <div className="absolute left-0 top-0 h-full w-0.5 bg-primary opacity-0 transition-opacity duration-200 group-hover/item:opacity-100" />
-
-                            {/* New conversation indicator for today's items */}
-                            {group.label === 'Today' && index === 0 && (
-                              <Sparkles className="mr-2 size-3 text-primary animate-pulse" />
-                            )}
 
                             <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                               <span className="truncate text-sm text-sidebar-foreground/90 group-hover/item:text-sidebar-foreground">
