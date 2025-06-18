@@ -108,10 +108,7 @@ export async function getMessagesUpToId(
     include: {
       thread: true,
     },
-    orderBy: [
-      { createdAt: 'asc' },
-      { id: 'asc' },
-    ],
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
   })) as MessageWithRelations[]
 
   return messages.map((message) => MessageSchema.parse(message))

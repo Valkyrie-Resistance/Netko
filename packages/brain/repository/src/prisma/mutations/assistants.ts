@@ -64,7 +64,7 @@ export async function updateAssistant(
   const validatedData = AssistantUpdateInputSchema.parse(data)
 
   const assistant = (await prisma.assistant.update({
-        where: {
+    where: {
       id: validatedId,
     },
     data: {

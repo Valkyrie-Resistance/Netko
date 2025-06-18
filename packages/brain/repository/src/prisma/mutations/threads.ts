@@ -82,7 +82,7 @@ export async function createThread(
   const { userId, assistantId, ...rest } = data
   const validatedData = ThreadCreateInputSchema.parse(rest)
   const validatedUserId = UserIdSchema.parse(userId)
-  const validatedAssistantId = AssistantIdSchema.parse( assistantId)
+  const validatedAssistantId = AssistantIdSchema.parse(assistantId)
 
   const thread = (await prisma.thread.create({
     data: {
