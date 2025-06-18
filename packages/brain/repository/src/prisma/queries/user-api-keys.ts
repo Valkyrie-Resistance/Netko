@@ -22,14 +22,18 @@ export async function getUserApiKeyByProvider(
     return null
   }
 
-  await prisma.userApiKey.update({
-    where: {
-      id: apiKey.id,
-    },
-    data: {
-      lastUsedAt: new Date(),
-    },
-  })
+  const oneHour = 60 * 60 * 1000
+  const now = new Date()
+  if (!apiKey.lastUsedAt || now.getTime() - apiKey.lastUsedAt.getTime() > oneHour) {
+    await prisma.userApiKey.update({
+      where: {
+        id: apiKey.id,
+      },
+      data: {
+        lastUsedAt: now,
+      },
+    })
+  }
 
   return apiKey.encryptedKey
 }

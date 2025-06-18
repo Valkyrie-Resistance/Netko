@@ -3,7 +3,7 @@ import { AssistantQueries, getUserApiKeyByProvider } from '@chad-chat/brain-repo
 import { prisma } from '@chad-chat/brain-repository'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import type { Message } from 'ai'
-import { streamText } from 'ai'
+import { type StreamTextResult, streamText } from 'ai'
 import { ModelSyncService } from './model-sync'
 
 interface OpenRouterError {
@@ -30,7 +30,7 @@ export class LLMService {
     threadId: string,
     userId: string,
     messages: Message[],
-  ): Promise<ReadableStream> {
+  ): Promise<StreamTextResult<never, never>> {
     const validatedAssistantId = AssistantIdSchema.parse(assistantId)
     const assistant = await AssistantQueries.getAssistantById(validatedAssistantId, userId)
     if (!assistant) {
@@ -75,7 +75,6 @@ export class LLMService {
         maxTokens: assistant.maxTokens ?? undefined,
       })
 
-      // Check if a system message already exists for this thread
       const existingSystemMessage = await prisma.message.findFirst({
         where: {
           threadId,
@@ -99,7 +98,7 @@ export class LLMService {
         })
       }
 
-      return stream as unknown as ReadableStream
+      return stream
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw error
