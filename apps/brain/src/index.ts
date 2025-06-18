@@ -1,4 +1,4 @@
-import { auth, brainEnvConfig } from '@chad-chat/brain-service'
+import { auth, brainEnvConfig, seed } from '@chad-chat/brain-service'
 import { sentry } from '@hono/sentry'
 import { trpcServer } from '@hono/trpc-server'
 import { createBunHonoWSHandler } from '@valkyrie-resistance/trpc-ws-hono-bun-adapter'
@@ -62,6 +62,11 @@ if (brainEnvConfig.app.sentryDsn) {
 if (!brainEnvConfig.app.dev) {
   app.use('*', serveStatic({ root: './public' }))
   app.use('*', serveStatic({ root: './public', path: 'index.html' }))
+}
+
+// Seed Marvin if in development
+if (brainEnvConfig.app.dev) {
+  seed().catch(console.error)
 }
 
 // Export the app

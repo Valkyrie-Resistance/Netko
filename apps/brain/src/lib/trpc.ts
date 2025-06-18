@@ -53,7 +53,7 @@ export const createWsContext = async (
 export const publicProcedure = t.procedure
 export const protectedProcedure = t.procedure.use(async ({ next, ctx }) => {
   const { user, session } = ctx
-  if (!session) {
+  if (!session || !user) {
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
   return next({ ctx: { user, session } })

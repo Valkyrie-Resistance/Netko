@@ -6,12 +6,7 @@ import {
   MessageSchema,
 } from '@chad-chat/brain-domain'
 import { ThreadIdSchema } from '@chad-chat/brain-domain'
-import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
-
-type MessageWithRelations = Prisma.MessageGetPayload<{
-  include: { thread: true }
-}>
 
 export async function getAllMessages(
   threadId: string,
@@ -23,7 +18,7 @@ export async function getAllMessages(
   const { limit, cursor } = MessageListInputSchema.parse(input)
   const validatedThreadId = ThreadIdSchema.parse(threadId)
 
-  const messages = (await prisma.message.findMany({
+  const messages = await prisma.message.findMany({
     where: {
       threadId: validatedThreadId,
     },
@@ -39,7 +34,7 @@ export async function getAllMessages(
           id: cursor.id,
         }
       : undefined,
-  })) as MessageWithRelations[]
+  })
 
   const nextCursor =
     messages.length > limit
@@ -59,7 +54,7 @@ export async function getMessageById(messageId: string, threadId: string): Promi
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedThreadId = ThreadIdSchema.parse(threadId)
 
-  const message = (await prisma.message.findUnique({
+  const message = await prisma.message.findUnique({
     where: {
       messageCompoundId: {
         id: validatedMessageId,
@@ -69,7 +64,7 @@ export async function getMessageById(messageId: string, threadId: string): Promi
     include: {
       thread: true,
     },
-  })) as MessageWithRelations | null
+  })
 
   return message ? MessageSchema.parse(message) : null
 }
@@ -98,7 +93,7 @@ export async function getMessagesUpToId(
     return []
   }
 
-  const messages = (await prisma.message.findMany({
+  const messages = await prisma.message.findMany({
     where: {
       threadId: validatedThreadId,
       createdAt: {
@@ -109,7 +104,7 @@ export async function getMessagesUpToId(
       thread: true,
     },
     orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-  })) as MessageWithRelations[]
+  })
 
   return messages.map((message) => MessageSchema.parse(message))
 }
