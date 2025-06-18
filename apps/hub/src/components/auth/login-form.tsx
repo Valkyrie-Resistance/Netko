@@ -60,7 +60,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md space-y-8">
+    <div className="w-full max-w-md space-y-8 z-50">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
