@@ -2,7 +2,7 @@ import type {
   FileUploadOverlayProps,
   MessageInputProps,
 } from '@chad-chat/ui/components/chat/definitions/types'
-import { FilePreview } from '@chad-chat/ui/components/chat/file-preview.js'
+import type { LLMModel } from '@chad-chat/brain-domain'
 import { InterruptPrompt } from '@chad-chat/ui/components/chat/interrupt-prompt.js'
 import { Button } from '@chad-chat/ui/components/shadcn/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@chad-chat/ui/components/shadcn/popover'
@@ -13,9 +13,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowUp,
   ChevronDown,
-  Info,
-  Loader2,
-  Mic,
   Paperclip,
   Search,
   Sparkles,
@@ -24,13 +21,24 @@ import {
 } from 'lucide-react'
 import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { omit } from 'remeda'
 
-const modelOptions = [
-  { id: 'gpt-4', name: 'GPT-4', icon: '✨' },
-  { id: 'gpt-3.5-turbo', name: 'GPT-3.5', icon: '🚀' },
-  { id: 'claude-3', name: 'Claude 3', icon: '🧠' },
-]
+// Helper function to get icon for model provider
+const getModelIcon = (provider: string) => {
+  switch (provider.toLowerCase()) {
+    case 'openai':
+      return '✨'
+    case 'anthropic':
+      return '🧠'
+    case 'google':
+      return '🔍'
+    case 'meta':
+      return '🦙'
+    case 'mistral':
+      return '🌊'
+    default:
+      return '🤖'
+  }
+}
 
 export function MessageInput({
   placeholder = 'Ask AI...',
@@ -40,20 +48,23 @@ export function MessageInput({
   stop,
   isGenerating,
   enableInterrupt = true,
-  transcribeAudio,
-  enableWebSearch = false,
-  onWebSearchToggle,
-  selectedModel = 'gpt-4',
+  selectedModel,
   onModelChange,
+  llmModels,
+  handleLLMModelChange,
+  isWebSearchEnabled,
+  onWebSearchToggle,
   ...props
 }: MessageInputProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [showInterruptPrompt, setShowInterruptPrompt] = useState(false)
-  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(enableWebSearch)
   const [selectedModelId, setSelectedModelId] = useState(selectedModel)
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false)
   const [animateModelIcon, setAnimateModelIcon] = useState(true)
   const prefersReducedMotion = usePrefersReducedMotion()
+
+  // Filter only active models for selection
+  const activeModels = llmModels.filter(model => model.isActive)
 
   useEffect(() => {
     if (!isGenerating) {
@@ -67,42 +78,19 @@ export function MessageInput({
     return () => clearTimeout(timeout)
   }, [])
 
-  const addFiles = (files: File[] | null) => {
-    if (props.allowAttachments) {
-      props.setFiles((currentFiles) => {
-        if (currentFiles === null) {
-          return files
-        }
-
-        if (files === null) {
-          return currentFiles
-        }
-
-        return [...currentFiles, ...files]
-      })
-    }
-  }
-
   const onDragOver = (event: React.DragEvent) => {
-    if (props.allowAttachments !== true) return
     event.preventDefault()
     setIsDragging(true)
   }
 
   const onDragLeave = (event: React.DragEvent) => {
-    if (props.allowAttachments !== true) return
     event.preventDefault()
     setIsDragging(false)
   }
 
   const onDrop = (event: React.DragEvent) => {
     setIsDragging(false)
-    if (props.allowAttachments !== true) return
     event.preventDefault()
-    const dataTransfer = event.dataTransfer
-    if (dataTransfer.files.length) {
-      addFiles(Array.from(dataTransfer.files))
-    }
   }
 
   const onPaste = (event: React.ClipboardEvent) => {
@@ -110,14 +98,13 @@ export function MessageInput({
     if (!items) return
 
     const text = event.clipboardData.getData('text')
-    if (text && text.length > 500 && props.allowAttachments) {
+    if (text && text.length > 500) {
       event.preventDefault()
       const blob = new Blob([text], { type: 'text/plain' })
       const file = new File([blob], 'Pasted text', {
         type: 'text/plain',
         lastModified: Date.now(),
       })
-      addFiles([file])
       return
     }
 
@@ -125,9 +112,6 @@ export function MessageInput({
       .map((item) => item.getAsFile())
       .filter((file) => file !== null)
 
-    if (props.allowAttachments && files.length > 0) {
-      addFiles(files)
-    }
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -139,7 +123,7 @@ export function MessageInput({
           stop()
           setShowInterruptPrompt(false)
           event.currentTarget.form?.requestSubmit()
-        } else if (props.value || (props.allowAttachments && props.files?.length)) {
+          } else if (props.value) {
           setShowInterruptPrompt(true)
           return
         }
@@ -160,7 +144,7 @@ export function MessageInput({
     }
   }, [props.value])
 
-  const showFileList = props.allowAttachments && props.files && props.files.length > 0
+  const showFileList = false
 
   useAutosizeTextArea({
     ref: textAreaRef as React.RefObject<HTMLTextAreaElement>,
@@ -169,15 +153,14 @@ export function MessageInput({
     dependencies: [props.value, showFileList],
   })
 
-  const handleWebSearchToggle = () => {
-    setIsWebSearchEnabled(!isWebSearchEnabled)
-    onWebSearchToggle?.(!isWebSearchEnabled)
+  const handleModelChange = (model: LLMModel) => {
+    setSelectedModelId(model.id)
+    handleLLMModelChange(model)
+    onModelChange?.(model.id)
   }
 
-  const handleModelChange = (modelId: string) => {
-    setSelectedModelId(modelId)
-    onModelChange?.(modelId)
-  }
+  // Find the currently selected model
+  const currentModel = activeModels.find(model => model.id === selectedModelId) || activeModels[0]
 
   return (
     <div
@@ -250,7 +233,7 @@ export function MessageInput({
                       >
                         <Sparkles className="h-3 w-3 text-primary" />
                       </motion.div>
-                      {modelOptions.find((m) => m.id === selectedModelId)?.name || 'Select Model'}
+                      {currentModel?.displayName || 'Select Model'}
                       <motion.div
                         initial={false}
                         animate={{
@@ -269,13 +252,14 @@ export function MessageInput({
                 </PopoverTrigger>
                 <PopoverContent className="w-48 p-1" onOpenAutoFocus={(e) => e.preventDefault()}>
                   <div className="space-y-1">
-                    {modelOptions.map((model) => (
+                    {activeModels.map((model) => (
                       <motion.button
                         key={model.id}
                         whileHover={{ scale: 1.02, x: 2 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          handleModelChange(model.id)
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleModelChange(model)
                           setIsModelSelectorOpen(false)
                         }}
                         className={cn(
@@ -290,9 +274,12 @@ export function MessageInput({
                           animate={{ scale: selectedModelId === model.id ? [1, 1.2, 1] : 1 }}
                           transition={{ duration: 0.3 }}
                         >
-                          {model.icon}
+                          {getModelIcon(model.provider)}
                         </motion.span>
-                        {model.name}
+                        <div className="flex flex-col items-start">
+                          <span>{model.displayName}</span>
+                          <span className="text-xs text-muted-foreground">{model.provider}</span>
+                        </div>
                       </motion.button>
                     ))}
                   </div>
@@ -319,7 +306,7 @@ export function MessageInput({
                     isWebSearchEnabled &&
                       'text-primary dark:text-primary bg-primary/10 dark:bg-primary/20 border-primary/20',
                   )}
-                  onClick={handleWebSearchToggle}
+                  onClick={() => onWebSearchToggle(!isWebSearchEnabled)}
                 >
                   <motion.div
                     animate={
@@ -384,13 +371,9 @@ export function MessageInput({
                 WebkitBackdropFilter: 'blur(16px)',
                 backdropFilter: 'blur(16px)',
               }}
-              {...(props.allowAttachments
-                ? omit(props, ['allowAttachments', 'files', 'setFiles'])
-                : omit(props, ['allowAttachments']))}
             />
 
             <div className="absolute right-3 bottom-3 z-20 flex gap-2">
-              {props.allowAttachments && (
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     type="button"
@@ -407,15 +390,11 @@ export function MessageInput({
                       'after:transition-transform after:duration-500',
                     )}
                     aria-label="Attach a file"
-                    onClick={async () => {
-                      const files = await showFileUploadDialog()
-                      addFiles(files)
-                    }}
+                    onClick={async () => {}}
                   >
                     <Paperclip className="h-4 w-4 text-foreground/70" />
                   </Button>
                 </motion.div>
-              )}
 
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 {isGenerating && stop ? (
@@ -469,40 +448,17 @@ export function MessageInput({
               </motion.div>
             </div>
 
-            {props.allowAttachments && (
               <div className="absolute inset-x-3 bottom-0 z-20 overflow-x-scroll py-3">
                 <div className="flex space-x-3">
                   <AnimatePresence mode="popLayout">
-                    {props.files?.map((file) => (
-                      <motion.div
-                        key={file.name + String(file.lastModified)}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <FilePreview
-                          file={file}
-                          onRemove={() => {
-                            props.setFiles((files) => {
-                              if (!files) return null
-                              const filtered = Array.from(files).filter((f) => f !== file)
-                              if (filtered.length === 0) return null
-                              return filtered
-                            })
-                          }}
-                        />
-                      </motion.div>
-                    ))}
                   </AnimatePresence>
                 </div>
               </div>
-            )}
           </div>
         </motion.div>
       </div>
 
-      {props.allowAttachments && <FileUploadOverlay isDragging={isDragging} />}
+      <FileUploadOverlay isDragging={isDragging} />
     </div>
   )
 }

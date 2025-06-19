@@ -1,12 +1,24 @@
-import { sleep } from 'bun'
+import { callLLM } from '@chad-chat/brain-service'
 import { z } from 'zod'
-import { publicProcedure, router } from '../../lib/trpc'
+import { protectedProcedure, router } from '../../lib/trpc'
 
 export const threadsSubscriptions = router({
-  onThreadUpdate: publicProcedure
-    .input(z.object({ threadId: z.string() }))
-    .subscription(async function* ({ input: _ }) {
-      await sleep(1000)
-      yield Math.random()
+  callLLM: protectedProcedure
+    .input(
+      z.object({
+        threadId: z.string(),
+        userMessage: z.string(),
+        assistantId: z.string(),
+        modelId: z.string(),
+      }),
+    )
+    .subscription(async function* ({ input }) {
+      const { threadId, userMessage, assistantId, modelId } = input
+
+      const stream = await callLLM(threadId, userMessage, assistantId, modelId)
+
+      for await (const chunk of stream as any) {
+        yield chunk
+      }
     }),
 })

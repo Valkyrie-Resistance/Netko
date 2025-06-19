@@ -1,9 +1,7 @@
 import type {
   ChatMessageProps,
   ReasoningPart,
-  ToolCall,
 } from '@chad-chat/ui/components/chat/definitions/types'
-import { FilePreview } from '@chad-chat/ui/components/chat/file-preview.js'
 import { MarkdownRenderer } from '@chad-chat/ui/components/chat/markdown-renderer.js'
 import {
   Collapsible,
@@ -65,19 +63,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   showTimeStamp = false,
   animation = 'scale',
   actions,
-  experimental_attachments,
-  toolInvocations,
-  parts,
 }) => {
-  const files = useMemo(() => {
-    return experimental_attachments?.map((attachment) => {
-      const dataArray = dataUrlToUint8Array(attachment.url)
-      const file = new File([dataArray], attachment.name ?? 'Unknown')
-      return file
-    })
-  }, [experimental_attachments])
 
-  const isUser = role === 'user'
+  const isUser = role === 'USER'
 
   const formattedTime = createdAt?.toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -87,13 +75,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   if (isUser) {
     return (
       <div className={cn('flex flex-col', isUser ? 'items-end' : 'items-start')}>
-        {files ? (
-          <div className="mb-1 flex flex-wrap gap-2">
-            {files.map((file, index) => {
-              return <FilePreview file={file} key={index} />
-            })}
-          </div>
-        ) : null}
+
 
         <div className={cn(chatBubbleVariants({ isUser, animation }))}>
           <MarkdownRenderer>{content}</MarkdownRenderer>
@@ -112,51 +94,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         ) : null}
       </div>
     )
-  }
-
-  if (parts && parts.length > 0) {
-    return parts.map((part, index) => {
-      if (part.type === 'text') {
-        return (
-          <div
-            className={cn('flex flex-col', isUser ? 'items-end' : 'items-start')}
-            key={`text-${index}`}
-          >
-            <div className={cn(chatBubbleVariants({ isUser, animation }))}>
-              <MarkdownRenderer>{part.text}</MarkdownRenderer>
-              {actions ? (
-                <div className="absolute -bottom-4 right-2 flex space-x-1 rounded-lg border bg-background p-1 text-foreground opacity-0 transition-opacity group-hover/message:opacity-100">
-                  {actions}
-                </div>
-              ) : null}
-            </div>
-
-            {showTimeStamp && createdAt ? (
-              <time
-                dateTime={createdAt.toISOString()}
-                className={cn(
-                  'mt-1 block px-1 text-xs opacity-50',
-                  animation !== 'none' && 'duration-500 animate-in fade-in-0',
-                )}
-              >
-                {formattedTime}
-              </time>
-            ) : null}
-          </div>
-        )
-      }
-      if (part.type === 'reasoning') {
-        return <ReasoningBlock key={`reasoning-${index}`} part={part} />
-      }
-      if (part.type === 'tool-invocation') {
-        return <ToolCall key={`tool-${index}`} toolInvocations={[part.toolInvocation]} />
-      }
-      return null
-    })
-  }
-
-  if (toolInvocations && toolInvocations.length > 0) {
-    return <ToolCall toolInvocations={toolInvocations} />
   }
 
   return (
@@ -226,84 +163,6 @@ const ReasoningBlock = ({ part }: { part: ReasoningPart }) => {
           </motion.div>
         </CollapsibleContent>
       </Collapsible>
-    </div>
-  )
-}
-
-function ToolCall({ toolInvocations }: Pick<ChatMessageProps, 'toolInvocations'>) {
-  if (!toolInvocations?.length) return null
-
-  return (
-    <div className="flex flex-col items-start gap-2">
-      {toolInvocations.map((invocation, index) => {
-        const isCancelled = invocation.state === 'result' && invocation.result.__cancelled === true
-
-        if (isCancelled) {
-          return (
-            <div
-              key={index}
-              className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-sm text-muted-foreground"
-            >
-              <Ban className="h-4 w-4" />
-              <span>
-                Cancelled{' '}
-                <span className="font-mono">
-                  {'`'}
-                  {invocation.toolName}
-                  {'`'}
-                </span>
-              </span>
-            </div>
-          )
-        }
-
-        switch (invocation.state) {
-          case 'partial-call':
-          case 'call':
-            return (
-              <div
-                key={index}
-                className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-sm text-muted-foreground"
-              >
-                <Terminal className="h-4 w-4" />
-                <span>
-                  Calling{' '}
-                  <span className="font-mono">
-                    {'`'}
-                    {invocation.toolName}
-                    {'`'}
-                  </span>
-                  ...
-                </span>
-                <Loader2 className="h-3 w-3 animate-spin" />
-              </div>
-            )
-          case 'result':
-            return (
-              <div
-                key={index}
-                className="flex flex-col gap-1.5 rounded-lg border bg-muted/50 px-3 py-2 text-sm"
-              >
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Code2 className="h-4 w-4" />
-                  <span>
-                    Result from{' '}
-                    <span className="font-mono">
-                      {'`'}
-                      {invocation.toolName}
-                      {'`'}
-                    </span>
-                  </span>
-                </div>
-                <pre className="overflow-x-auto whitespace-pre-wrap text-foreground">
-                  {JSON.stringify(invocation.result, null, 2)}
-                </pre>
-              </div>
-            )
-          default:
-            return null
-        }
-      })}
     </div>
   )
 }

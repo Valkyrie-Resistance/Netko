@@ -136,29 +136,6 @@ export async function createMessage(
   return MessageSchema.parse(message)
 }
 
-export async function updateMessage(
-  messageId: string,
-  threadId: string,
-  data: MessageUpdateInput,
-): Promise<Message> {
-  const validatedMessageId = MessageIdSchema.parse(messageId)
-  const validatedThreadId = ThreadIdSchema.parse(threadId)
-  const validatedData = MessageUpdateInputSchema.parse(data)
-
-  const message = (await prisma.message.update({
-    where: {
-      id: validatedMessageId,
-      threadId: validatedThreadId,
-    },
-    data: validatedData,
-    include: {
-      thread: true,
-    },
-  })) as MessageWithRelations
-
-  return MessageSchema.parse(message)
-}
-
 export async function deleteMessage(messageId: string, threadId: string): Promise<Message> {
   const validatedMessageId = MessageIdSchema.parse(messageId)
   const validatedThreadId = ThreadIdSchema.parse(threadId)
@@ -168,6 +145,62 @@ export async function deleteMessage(messageId: string, threadId: string): Promis
       id: validatedMessageId,
       threadId: validatedThreadId,
     },
+    include: {
+      thread: true,
+    },
+  })) as MessageWithRelations
+
+  return MessageSchema.parse(message)
+}
+
+export async function getMessagesByThreadId(threadId: string): Promise<Message[]> {
+  const validatedThreadId = ThreadIdSchema.parse(threadId)
+
+  const messages = await prisma.message.findMany({
+    where: {
+      threadId: validatedThreadId,
+    },
+    include: {
+      thread: true,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  })
+
+  return messages.map((message) => MessageSchema.parse(message))
+}
+
+export async function updateMessage(messageId: string, data: MessageUpdateInput): Promise<Message>
+export async function updateMessage(
+  messageId: string,
+  threadId: string,
+  data: MessageUpdateInput,
+): Promise<Message>
+export async function updateMessage(
+  messageId: string,
+  dataOrThreadId: MessageUpdateInput | string,
+  maybeData?: MessageUpdateInput,
+): Promise<Message> {
+  const validatedMessageId = MessageIdSchema.parse(messageId)
+
+  let data: MessageUpdateInput
+  let whereClause: { id: string; threadId?: string }
+
+  if (typeof dataOrThreadId === 'string') {
+    // Second signature: messageId, threadId, data
+    const validatedThreadId = ThreadIdSchema.parse(dataOrThreadId)
+    data = MessageUpdateInputSchema.parse(maybeData!)
+    whereClause = { id: validatedMessageId, threadId: validatedThreadId }
+  } else {
+    // First signature: messageId, data
+    data = MessageUpdateInputSchema.parse(dataOrThreadId)
+    whereClause = { id: validatedMessageId }
+  }
+
+  const message = (await prisma.message.update({
+    where: whereClause,
+    data,
     include: {
       thread: true,
     },

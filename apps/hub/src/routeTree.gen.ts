@@ -56,7 +56,6 @@ const ProtectedChatThreadIdRoute = ProtectedChatThreadIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof ProtectedRouteWithChildren
   '/chat': typeof ProtectedChatRouteWithChildren
   '/auth': typeof AuthIndexRoute
   '/chat/$threadId': typeof ProtectedChatThreadIdRoute
@@ -65,7 +64,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof ProtectedRouteWithChildren
   '/auth': typeof AuthIndexRoute
   '/chat/$threadId': typeof ProtectedChatThreadIdRoute
   '/chat': typeof ProtectedChatIndexRoute
@@ -83,16 +81,9 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | ''
-    | '/chat'
-    | '/auth'
-    | '/chat/$threadId'
-    | '/chat/'
-    | '/profile'
+  fullPaths: '/' | '/chat' | '/auth' | '/chat/$threadId' | '/chat/' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/auth' | '/chat/$threadId' | '/chat' | '/profile'
+  to: '/' | '/auth' | '/chat/$threadId' | '/chat' | '/profile'
   id:
     | '__root__'
     | '/'

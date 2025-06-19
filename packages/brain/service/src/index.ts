@@ -1,5 +1,6 @@
 export * from './assistants/queries'
 export * from './config/auth'
 export * from './config/env'
+export * from './llm-calls/llm-calling'
 export * from './seeders'
 export * from './threads/queries'

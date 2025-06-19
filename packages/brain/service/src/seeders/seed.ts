@@ -28,6 +28,34 @@ export const seed = async () => {
         updatedAt: new Date(),
       },
     })
+
+    await prisma.lLMModel.upsert({
+      where: {
+        id: 'cmc23woxs000208l78rlo42qv',
+      },
+      update: {},
+      create: {
+        id: 'cmc23woxs000208l78rlo42qv',
+        name: 'gpt-4o-mini',
+        description: 'GPT-4o-mini',
+        provider: 'OPENROUTER',
+        displayName: 'GPT-4o-mini',
+      },
+    })
+
+    await prisma.lLMModel.upsert({
+      where: {
+        id: 'cmc23we9s000008l853hf6mi5',
+      },
+      update: {},
+      create: {
+        id: 'cmc23we9s000008l853hf6mi5',
+        name: 'google/gemini-2.5-flash-lite-preview-06-17',
+        description: 'Gemini 2.5 Flash Lite',
+        provider: 'OPENROUTER',
+        displayName: 'Gemini 2.5 Flash Lite',
+      },
+    })
   } catch (error) {
     console.error('Error creating assistant:', error)
     throw error
