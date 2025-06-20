@@ -1,4 +1,4 @@
-import { prisma } from '@chad-chat/brain-repository'
+import { prisma } from '@netko/brain-repository'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { openAPI } from 'better-auth/plugins'

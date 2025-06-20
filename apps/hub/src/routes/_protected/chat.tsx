@@ -1,4 +1,4 @@
-import { SidebarInset, SidebarProvider } from '@chad-chat/ui/components/shadcn/sidebar'
+import { SidebarInset, SidebarProvider } from '@netko/ui/components/shadcn/sidebar'
 import { Outlet } from '@tanstack/react-router'
 import { AppSidebar } from '@/components/core/nav/app-sidebar'
 

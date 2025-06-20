@@ -1,4 +1,4 @@
-import { cn } from '@chad-chat/ui/lib/utils'
+import { cn } from '@netko/ui/lib/utils'
 import type * as React from 'react'
 
 function Card({ className, ...props }: React.ComponentProps<'div'>) {

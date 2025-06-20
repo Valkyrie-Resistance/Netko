@@ -1,4 +1,4 @@
-import { type LLMModel, LLMModelIdSchema, LLMModelSchema } from '@chad-chat/brain-domain'
+import { type LLMModel, LLMModelIdSchema, LLMModelSchema } from '@netko/brain-domain'
 import { prisma } from '../client'
 
 export async function getModelById(modelId: string): Promise<LLMModel | null> {

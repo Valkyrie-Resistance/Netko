@@ -1,6 +1,6 @@
-import { AssistantSchema, LLMModelSchema, ThreadSearchSchemaInput } from '@chad-chat/brain-domain'
-import { MessageMutations, prisma, ThreadQueries } from '@chad-chat/brain-repository'
-import { assistantService, threadService } from '@chad-chat/brain-service'
+import { AssistantSchema, LLMModelSchema, ThreadSearchSchemaInput } from '@netko/brain-domain'
+import { MessageMutations, prisma, ThreadQueries } from '@netko/brain-repository'
+import { assistantService, threadService } from '@netko/brain-service'
 import z from 'zod'
 import { protectedProcedure, router } from '../../lib/trpc'
 
@@ -17,7 +17,7 @@ export const threadsQueries = router({
     return assistantService.getAssistants(ctx.user.id)
   }),
 
-  getLLMModels: protectedProcedure.output(z.array(LLMModelSchema)).query(async ({ ctx }) => {
+  getLLMModels: protectedProcedure.output(z.array(LLMModelSchema)).query(async ({ ctx: _ }) => {
     return prisma.lLMModel.findMany({
       where: {
         isActive: true,

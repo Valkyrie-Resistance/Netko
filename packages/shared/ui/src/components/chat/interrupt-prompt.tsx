@@ -1,4 +1,4 @@
-import type { InterruptPromptProps } from '@chad-chat/ui/components/chat/definitions/types'
+import type { InterruptPromptProps } from '@netko/ui/components/chat/definitions/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 

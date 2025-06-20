@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@chad-chat/ui/lib/utils'
+import { cn } from '@netko/ui/lib/utils'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import type * as React from 'react'
 

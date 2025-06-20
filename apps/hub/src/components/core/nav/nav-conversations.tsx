@@ -1,12 +1,12 @@
 'use client'
 
-import type { Thread } from '@chad-chat/brain-domain'
+import type { Thread } from '@netko/brain-domain'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@chad-chat/ui/components/shadcn/dropdown-menu'
+} from '@netko/ui/components/shadcn/dropdown-menu'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -15,7 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@chad-chat/ui/components/shadcn/sidebar'
+} from '@netko/ui/components/shadcn/sidebar'
 import { useRouter } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import {

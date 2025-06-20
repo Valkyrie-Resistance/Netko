@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@chad-chat/ui/*": ["../../packages/shared/ui/src/*"]
+      "@netko/ui/*": ["../../packages/shared/ui/src/*"]
     }
   },
   "include": ["vite.config.ts"]

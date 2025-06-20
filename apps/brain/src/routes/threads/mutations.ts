@@ -1,6 +1,4 @@
-import {
-  ThreadMutations,
-} from '@chad-chat/brain-repository'
+import { ThreadMutations } from '@netko/brain-repository'
 import z from 'zod'
 import { protectedProcedure, router } from '../../lib/trpc'
 

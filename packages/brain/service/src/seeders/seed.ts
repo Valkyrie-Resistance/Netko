@@ -1,4 +1,4 @@
-import { PrismaClient } from '@chad-chat/brain-repository'
+import { PrismaClient } from '@netko/brain-repository'
 import { brainEnvConfig } from '../config/env'
 
 const prisma = new PrismaClient()

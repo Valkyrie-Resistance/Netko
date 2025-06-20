@@ -1,4 +1,4 @@
-import { brainEnvConfig } from '@chad-chat/brain-service'
+import { brainEnvConfig } from '@netko/brain-service'
 import { protectedProcedure, publicProcedure, router } from '../../lib/trpc'
 
 export const authQueries = router({

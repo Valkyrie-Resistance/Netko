@@ -1,8 +1,8 @@
-import type { LLMModel, Message } from '@chad-chat/brain-domain'
-import { MessageInput } from '@chad-chat/ui/components/chat/message-input'
-import { MessageList } from '@chad-chat/ui/components/chat/message-list'
-import { PromptSuggestions } from '@chad-chat/ui/components/chat/prompt-suggestions'
-import { SidebarTrigger } from '@chad-chat/ui/components/shadcn/sidebar'
+import type { LLMModel, Message } from '@netko/brain-domain'
+import { MessageInput } from '@netko/ui/components/chat/message-input'
+import { MessageList } from '@netko/ui/components/chat/message-list'
+import { PromptSuggestions } from '@netko/ui/components/chat/prompt-suggestions'
+import { SidebarTrigger } from '@netko/ui/components/shadcn/sidebar'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { ThemeToggle } from '@/components/core/theme/theme-switcher'
@@ -15,7 +15,7 @@ export const Route = createFileRoute({
 
 function RouteComponent() {
   const { user } = useAuth()
-  const { data: llmModels, isLoading: isLoadingLLMModels } = useQuery(
+  const { data: llmModels, isLoading: _isLoadingLLMModels } = useQuery(
     trpcHttp.threads.getLLMModels.queryOptions(),
   )
   const [currentLLMModel, setCurrentLLMModel] = useState<LLMModel | null>(null)

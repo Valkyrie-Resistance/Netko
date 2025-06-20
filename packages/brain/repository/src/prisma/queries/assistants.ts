@@ -7,7 +7,7 @@ import {
   type AssistantSearchInput,
   AssistantSearchInputSchema,
   UserIdSchema,
-} from '@chad-chat/brain-domain'
+} from '@netko/brain-domain'
 import { prisma } from '../client'
 
 export async function getAllAssistants(input: AssistantListInput): Promise<{

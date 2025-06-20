@@ -8,7 +8,7 @@ cmds = ['bun install']
 
 [phases.build]
 cmds = ['turbo db:generate', 
-        'turbo build --filter @chad-chat/brain']
+        'turbo build --filter @netko/brain']
 
 [start]
 cmd = 'bun --filter "./apps/brain" prod:release'

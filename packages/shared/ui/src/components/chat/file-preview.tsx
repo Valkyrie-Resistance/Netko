@@ -1,4 +1,4 @@
-import type { FilePreviewProps } from '@chad-chat/ui/components/chat/definitions/types'
+import type { FilePreviewProps } from '@netko/ui/components/chat/definitions/types'
 import { motion } from 'framer-motion'
 import { FileIcon, X } from 'lucide-react'
 import React, { useEffect } from 'react'

@@ -1,8 +1,8 @@
-# chad-chat
+# Netko
 
-Welcome to **chad-chat** — your digital laboratory for AI banter and multi-LLM mischief! 🧪💬
+Welcome to **Netko** — your digital laboratory for AI banter and multi-LLM mischief! 🧪💬
 
-Ever wanted to wrangle a squad of language models, sync your wildest conversations, and experiment with the bleeding edge of AI—all in one stylish playground? You're in the right timeline. Built for the T3 Chat Cloneathon, chad-chat is where ideas spark, personalities (AI and human) collide, and inspiration is just one message away.
+Ever wanted to wrangle a squad of language models, sync your wildest conversations, and experiment with the bleeding edge of AI—all in one stylish playground? You're in the right timeline. Built for the T3 Chat Cloneathon, Netko is where ideas spark, personalities (AI and human) collide, and inspiration is just one message away.
 
 > ⚡️ Side effects may include spontaneous brainstorming, worldline shifts, and the urge to build something cool.
 
@@ -44,7 +44,7 @@ Ever wanted to wrangle a squad of language models, sync your wildest conversatio
 ## 🏗️ Project Structure
 
 ```
-chad-chat/
+Netko/
   apps/
     hub/        # Frontend (React, TanStack Router, shadcn/ui)
     brain/      # Backend entrypoint
@@ -102,10 +102,10 @@ Ready to fire up your own lab? 🧑‍🔬
 
 ## 🏡 Self-Hosting (WIP)
 
-Dreaming of running chad-chat from your own secret lab? 🏰
+Dreaming of running Netko from your own secret lab? 🏰
 
 Self-hosting support is coming soon! 🛠️  
-Stay tuned for updates on how to deploy chad-chat on your own infrastructure. (No microwave time machine required — just a bit of patience as we stabilize the worldline.)
+Stay tuned for updates on how to deploy Netko on your own infrastructure. (No microwave time machine required — just a bit of patience as we stabilize the worldline.)
 
 ---
 

@@ -1,5 +1,5 @@
 {
-  "extends": "@chad-chat/typescript-config/react-library.json",
+  "extends": "@netko/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist"
   },

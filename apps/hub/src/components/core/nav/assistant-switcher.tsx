@@ -1,4 +1,4 @@
-import type { Assistant } from '@chad-chat/brain-domain'
+import type { Assistant } from '@netko/brain-domain'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,14 +7,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@chad-chat/ui/components/shadcn/dropdown-menu'
+} from '@netko/ui/components/shadcn/dropdown-menu'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@chad-chat/ui/components/shadcn/sidebar'
-import { cn } from '@chad-chat/ui/lib/utils'
+} from '@netko/ui/components/shadcn/sidebar'
+import { cn } from '@netko/ui/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bot, ChevronsUpDown, Plus, Sparkles } from 'lucide-react'
 import * as React from 'react'

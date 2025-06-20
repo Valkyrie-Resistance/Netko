@@ -1,4 +1,4 @@
-import { AssistantQueries } from '@chad-chat/brain-repository'
+import { AssistantQueries } from '@netko/brain-repository'
 
 export const assistantService = {
   getAssistants: async (userId: string) => {

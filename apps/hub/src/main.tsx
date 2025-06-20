@@ -1,4 +1,4 @@
-import '@chad-chat/ui/styles/globals.css'
+import '@netko/ui/styles/globals.css'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import reactDom from 'react-dom/client'

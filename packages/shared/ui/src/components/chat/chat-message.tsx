@@ -1,15 +1,15 @@
 import type {
   ChatMessageProps,
   ReasoningPart,
-} from '@chad-chat/ui/components/chat/definitions/types'
-import { MarkdownRenderer } from '@chad-chat/ui/components/chat/markdown-renderer.js'
+} from '@netko/ui/components/chat/definitions/types'
+import { MarkdownRenderer } from '@netko/ui/components/chat/markdown-renderer.js'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@chad-chat/ui/components/shadcn/collapsible'
+} from '@netko/ui/components/shadcn/collapsible'
 
-import { cn } from '@chad-chat/ui/lib/utils'
+import { cn } from '@netko/ui/lib/utils'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { motion } from 'framer-motion'
 import { Ban, ChevronRight, Code2, Loader2, Terminal } from 'lucide-react'

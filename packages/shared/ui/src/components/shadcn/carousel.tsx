@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@chad-chat/ui/components/shadcn/button'
-import { cn } from '@chad-chat/ui/lib/utils'
+import { Button } from '@netko/ui/components/shadcn/button'
+import { cn } from '@netko/ui/lib/utils'
 import useEmblaCarousel, { type UseEmblaCarouselType } from 'embla-carousel-react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import * as React from 'react'

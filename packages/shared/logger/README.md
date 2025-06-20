@@ -1,6 +1,6 @@
-# @chad-chat/logger 🚀
+# @netko/logger 🚀
 
-A sassy, Node.js-only logger for Chad Chat, powered by pino and chalk. 
+A sassy, Node.js-only logger for Netko, powered by pino and chalk. 
 
 ## Features
 
@@ -13,7 +13,7 @@ A sassy, Node.js-only logger for Chad Chat, powered by pino and chalk.
 ## Usage
 
 ```ts
-import { logger } from '@chad-chat/logger'
+import { logger } from '@netko/logger'
 
 logger.info('Hello, world!', { requestId: 'abc123' })
 logger.error('Oops!', { userId: 42 })

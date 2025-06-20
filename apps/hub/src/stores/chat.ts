@@ -1,4 +1,4 @@
-import type { Assistant, LLMModel } from '@chad-chat/brain-domain'
+import type { Assistant, LLMModel } from '@netko/brain-domain'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -63,7 +63,7 @@ export const useChatStore = create<ChatState>()(
       },
     }),
     {
-      name: 'chad-chat-store', // localStorage key - keeping it branded! 😎
+      name: 'netko-store', // localStorage key - keeping it branded! 😎
       partialize: (state) => ({
         // Only persist the essentials - no need to bloat localStorage
         currentAssistant: state.currentAssistant,

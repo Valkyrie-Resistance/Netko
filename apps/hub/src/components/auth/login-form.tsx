@@ -1,11 +1,11 @@
-import { Button } from '@chad-chat/ui/components/shadcn/button'
+import { Button } from '@netko/ui/components/shadcn/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@chad-chat/ui/components/shadcn/card'
+} from '@netko/ui/components/shadcn/card'
 import { Separator } from '@radix-ui/react-separator'
 import { useQuery } from '@tanstack/react-query'
 import { MessageCircle } from 'lucide-react'
@@ -68,7 +68,7 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Chad Chat</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Netko</h1>
           <p className="text-muted-foreground text-balance">
             Your overly confident AI conversation buddy
           </p>
@@ -142,7 +142,7 @@ export function LoginForm() {
                 <p className="text-sm text-muted-foreground">
                   Want to run your own lab?{' '}
                   <a
-                    href="https://github.com/Valkyrie-Resistance/chad-chat"
+                    href="https://github.com/Valkyrie-Resistance/netko"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-primary underline underline-offset-4 hover:text-primary/80"

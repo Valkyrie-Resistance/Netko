@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@chad-chat/ui/lib/utils'
+import { cn } from '@netko/ui/lib/utils'
 import { GripVerticalIcon } from 'lucide-react'
 import type * as React from 'react'
 import * as ResizablePrimitive from 'react-resizable-panels'

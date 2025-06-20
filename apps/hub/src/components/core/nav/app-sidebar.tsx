@@ -1,5 +1,5 @@
-import { AssistantSchema, ThreadSchema } from '@chad-chat/brain-domain'
-import { Button } from '@chad-chat/ui/components/shadcn/button'
+import { AssistantSchema, ThreadSchema } from '@netko/brain-domain'
+import { Button } from '@netko/ui/components/shadcn/button'
 import {
   CommandDialog,
   CommandEmpty,
@@ -7,13 +7,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@chad-chat/ui/components/shadcn/command'
+} from '@netko/ui/components/shadcn/command'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-} from '@chad-chat/ui/components/shadcn/sidebar'
+} from '@netko/ui/components/shadcn/sidebar'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -45,7 +45,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     trpcHttp.threads.getSidebarThreads.queryOptions(),
   )
 
-  // Chad Chat Store integration - because we're keeping track of the good stuff! 🎯
+  // Netko Store integration - because we're keeping track of the good stuff! 🎯
   const { currentAssistant, setCurrentAssistant } = useChatStore()
 
   const [conversationGroups, setConversationGroups] = useState<ConversationGroup[]>([])

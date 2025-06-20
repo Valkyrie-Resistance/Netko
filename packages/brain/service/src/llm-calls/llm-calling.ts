@@ -1,8 +1,13 @@
-import { prisma } from "@chad-chat/brain-repository";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText } from 'ai';
+import { prisma } from '@netko/brain-repository'
+import { createOpenRouter } from '@openrouter/ai-sdk-provider'
+import { streamText } from 'ai'
 
-export async  function callLLM(userId: string, assistantId: string, modelId: string, userMessage: string) {
+export async function callLLM(
+  userId: string,
+  assistantId: string,
+  modelId: string,
+  userMessage: string,
+) {
   const model = await prisma.lLMModel.findUnique({
     where: {
       id: modelId,
@@ -15,24 +20,24 @@ export async  function callLLM(userId: string, assistantId: string, modelId: str
     },
   })
 
-  if (!model || !assistant)  {
-    throw new Error("Model or assistant not found")
+  if (!model || !assistant) {
+    throw new Error('Model or assistant not found')
   }
 
   const userKey = await prisma.userApiKey.findFirst({
     where: {
       userId: userId,
-      provider: "OPENROUTER",
+      provider: 'OPENROUTER',
     },
   })
 
   if (!userKey) {
-    throw new Error("User key not found")
+    throw new Error('User key not found')
   }
 
   const openrouter = createOpenRouter({
     apiKey: userKey.encryptedKey,
-  });
+  })
 
   const stream = streamText({
     model: openrouter.chat(model.name),
@@ -41,5 +46,4 @@ export async  function callLLM(userId: string, assistantId: string, modelId: str
   })
 
   return stream
-
 }

@@ -1,6 +1,6 @@
-# @chad-chat/brain-repository
+# @netko/brain-repository
 
-This package contains the repository layer for the Chad Chat Brain service. It provides data access, caching, and persistence logic for the domain and service layers, primarily using Prisma as the ORM.
+This package contains the repository layer for the Netko Brain service. It provides data access, caching, and persistence logic for the domain and service layers, primarily using Prisma as the ORM.
 
 ## Structure
 
@@ -11,7 +11,7 @@ This package contains the repository layer for the Chad Chat Brain service. It p
 
 ## Usage
 
-This package is intended to be used as part of the Chad Chat monorepo. It is not meant to be consumed directly, but rather imported by the Brain service and other internal packages.
+This package is intended to be used as part of the Netko monorepo. It is not meant to be consumed directly, but rather imported by the Brain service and other internal packages.
 
 ### Generating the Prisma Schema
 

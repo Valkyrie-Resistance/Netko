@@ -1,5 +1,5 @@
 {
-  "name": "@chad-chat/hub",
+  "name": "@netko/hub",
   "version": "0.1.0",
   "type": "module",
   "private": true,
@@ -9,9 +9,9 @@
     "start": "vite preview"
   },
   "dependencies": {
-    "@chad-chat/brain": "workspace:*",
-    "@chad-chat/brain-domain": "workspace:*",
-    "@chad-chat/ui": "workspace:*",
+    "@netko/brain": "workspace:*",
+    "@netko/brain-domain": "workspace:*",
+    "@netko/ui": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -44,7 +44,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@chad-chat/typescript-config": "workspace:*",
+    "@netko/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@tanstack/router-plugin": "^1.121.4",
     "@types/react": "^19.1.2",

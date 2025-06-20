@@ -1,5 +1,5 @@
 {
-  "name": "@chad-chat",
+  "name": "@netko",
   "private": true,
   "scripts": {
     "build": "turbo run build",

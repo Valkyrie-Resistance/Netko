@@ -1,4 +1,4 @@
-import { Toaster } from '@chad-chat/ui/components/shadcn/sonner'
+import { Toaster } from '@netko/ui/components/shadcn/sonner'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import type { AuthRouterContext } from '@/components/auth/definitions/types'
 import { ThemeProvider } from '@/components/core/theme/theme-provider'

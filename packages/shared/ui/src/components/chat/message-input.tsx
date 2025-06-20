@@ -1,14 +1,14 @@
 import type {
   FileUploadOverlayProps,
   MessageInputProps,
-} from '@chad-chat/ui/components/chat/definitions/types'
-import type { LLMModel } from '@chad-chat/brain-domain'
-import { InterruptPrompt } from '@chad-chat/ui/components/chat/interrupt-prompt.js'
-import { Button } from '@chad-chat/ui/components/shadcn/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@chad-chat/ui/components/shadcn/popover'
-import { useAutosizeTextArea } from '@chad-chat/ui/hooks/use-autosize-textarea'
-import { usePrefersReducedMotion } from '@chad-chat/ui/hooks/use-prefers-reduced-motion'
-import { cn } from '@chad-chat/ui/lib/utils'
+} from '@netko/ui/components/chat/definitions/types'
+import type { LLMModel } from '@netko/brain-domain'
+import { InterruptPrompt } from '@netko/ui/components/chat/interrupt-prompt.js'
+import { Button } from '@netko/ui/components/shadcn/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@netko/ui/components/shadcn/popover'
+import { useAutosizeTextArea } from '@netko/ui/hooks/use-autosize-textarea'
+import { usePrefersReducedMotion } from '@netko/ui/hooks/use-prefers-reduced-motion'
+import { cn } from '@netko/ui/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowUp,

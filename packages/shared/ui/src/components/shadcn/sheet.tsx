@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@chad-chat/ui/lib/utils'
+import { cn } from '@netko/ui/lib/utils'
 import * as SheetPrimitive from '@radix-ui/react-dialog'
 import { XIcon } from 'lucide-react'
 import type * as React from 'react'

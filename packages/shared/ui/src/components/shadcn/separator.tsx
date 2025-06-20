@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@chad-chat/ui/lib/utils'
+import { cn } from '@netko/ui/lib/utils'
 import * as SeparatorPrimitive from '@radix-ui/react-separator'
 import type * as React from 'react'
 

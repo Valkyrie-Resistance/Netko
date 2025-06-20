@@ -1,5 +1,5 @@
-import type { ThreadSearchSchemaInput } from '@chad-chat/brain-domain'
-import { ThreadQueries } from '@chad-chat/brain-repository'
+import type { ThreadSearchSchemaInput } from '@netko/brain-domain'
+import { ThreadQueries } from '@netko/brain-repository'
 import type { z } from 'zod'
 
 const defaultLimit = 20

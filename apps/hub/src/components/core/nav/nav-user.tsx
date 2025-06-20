@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@chad-chat/ui/components/shadcn/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@netko/ui/components/shadcn/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,13 +9,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@chad-chat/ui/components/shadcn/dropdown-menu'
+} from '@netko/ui/components/shadcn/dropdown-menu'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@chad-chat/ui/components/shadcn/sidebar'
+} from '@netko/ui/components/shadcn/sidebar'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   BadgeCheck,
@@ -197,7 +197,7 @@ export function NavUser({ user }: { user: AuthUser | null }) {
                 <DropdownMenuItem
                   className="group relative cursor-pointer gap-2 rounded-md p-2 text-sm"
                   onClick={() => {
-                    window.open('https://github.com/Valkyrie-Resistance/chad-chat', '_blank')
+                    window.open('https://github.com/Valkyrie-Resistance/netko', '_blank')
                   }}
                 >
                   <HelpCircle className="size-4 transition-transform duration-300 group-hover:scale-110" />

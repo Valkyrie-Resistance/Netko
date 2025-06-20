@@ -7,4 +7,4 @@ cmds = ['bun install']
 
 [phases.build]
 cmds = ['turbo db:generate', 
-        'turbo build --filter @chad-chat/hub']
+        'turbo build --filter @netko/hub']

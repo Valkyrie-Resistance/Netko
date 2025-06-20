@@ -1,5 +1,5 @@
-import { usePrefersReducedMotion } from '@chad-chat/ui/hooks/use-prefers-reduced-motion'
-import { cn } from '@chad-chat/ui/lib/utils'
+import { usePrefersReducedMotion } from '@netko/ui/hooks/use-prefers-reduced-motion'
+import { cn } from '@netko/ui/lib/utils'
 import * as React from 'react'
 
 export function AnimatedBackground({

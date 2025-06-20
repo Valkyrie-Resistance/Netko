@@ -1,4 +1,4 @@
-import type { PromptSuggestionsProps } from '@chad-chat/ui/components/chat/definitions/types'
+import type { PromptSuggestionsProps } from '@netko/ui/components/chat/definitions/types'
 import { useEffect, useState } from 'react'
 
 export function PromptSuggestions({ userName, append, suggestions }: PromptSuggestionsProps) {

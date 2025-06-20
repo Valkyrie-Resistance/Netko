@@ -1,5 +1,5 @@
 {
-  "extends": "@chad-chat/typescript-config/react-library.json",
+  "extends": "@netko/typescript-config/react-library.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "target": "ESNext",
@@ -8,7 +8,7 @@
     "lib": ["ESNext", "DOM"],
     "baseUrl": ".",
     "paths": {
-      "@chad-chat/ui/*": ["./src/*"],
+      "@netko/ui/*": ["./src/*"],
       "@/hooks": ["./src/hooks/*"],
       "@/lib": ["./src/lib/*"],
       "@/components": ["./src/components/*"]

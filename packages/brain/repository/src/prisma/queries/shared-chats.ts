@@ -7,7 +7,7 @@ import {
   SharedChatListInputSchema,
   SharedChatSchema,
   UserIdSchema,
-} from '@chad-chat/brain-domain'
+} from '@netko/brain-domain'
 import { prisma } from '../client'
 
 export async function getAllSharedChats(input: SharedChatListInput): Promise<{

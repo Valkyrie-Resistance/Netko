@@ -1,5 +1,5 @@
 {
-  "name": "@chad-chat/brain",
+  "name": "@netko/brain",
   "module": "src/index.ts",
   "type": "module",
   "private": true,
@@ -16,18 +16,18 @@
     "prod:release": "bun run prod:setup && bun run start",
     "prod:setup": "bun run db:generate && bun run db:deploy",
     "dev:setup": "bun run db:generate && bun run db:migrate",
-    "db:generate": "bun run --filter @chad-chat/brain-repository db:generate",
-    "db:migrate": "bun run --env-file=.env --filter @chad-chat/brain-repository db:migrate",
-    "db:deploy": "bun run --filter @chad-chat/brain-repository db:deploy"
+    "db:generate": "bun run --filter @netko/brain-repository db:generate",
+    "db:migrate": "bun run --env-file=.env --filter @netko/brain-repository db:migrate",
+    "db:deploy": "bun run --filter @netko/brain-repository db:deploy"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5",
-    "@chad-chat/typescript-config": "workspace:*"
+    "@netko/typescript-config": "workspace:*"
   },
   "dependencies": {
-    "@chad-chat/brain-service": "workspace:*",
-    "@chad-chat/logger": "workspace:*",
+    "@netko/brain-service": "workspace:*",
+    "@netko/logger": "workspace:*",
     "@hono/sentry": "^1.2.2",
     "@hono/trpc-server": "0.3.4",
     "@trpc/client": "^11.4.1",

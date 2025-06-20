@@ -36,7 +36,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@chad-chat/ui': path.resolve(__dirname, '../../packages/shared/ui/src'),
+      '@netko/ui': path.resolve(__dirname, '../../packages/shared/ui/src'),
       '@': path.resolve(__dirname, './src'),
     },
   },

@@ -1,4 +1,4 @@
-import type { AppRouter } from '@chad-chat/brain'
+import type { AppRouter } from '@netko/brain'
 import { QueryClient } from '@tanstack/react-query'
 import {
   createTRPCClient,

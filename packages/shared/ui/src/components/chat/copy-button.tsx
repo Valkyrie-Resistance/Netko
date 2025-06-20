@@ -1,7 +1,7 @@
-import type { CopyButtonProps } from '@chad-chat/ui/components/chat/definitions/types'
-import { Button } from '@chad-chat/ui/components/shadcn/button'
-import { useCopyToClipboard } from '@chad-chat/ui/hooks/use-copy-to-clipboard'
-import { cn } from '@chad-chat/ui/lib/utils'
+import type { CopyButtonProps } from '@netko/ui/components/chat/definitions/types'
+import { Button } from '@netko/ui/components/shadcn/button'
+import { useCopyToClipboard } from '@netko/ui/hooks/use-copy-to-clipboard'
+import { cn } from '@netko/ui/lib/utils'
 import { Check, Copy } from 'lucide-react'
 
 export function CopyButton({ content, copyMessage }: CopyButtonProps) {

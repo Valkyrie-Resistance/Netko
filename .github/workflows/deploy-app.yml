@@ -1,4 +1,4 @@
-name: Deploy Chad Chat
+name: Deploy Netko
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
         run: bun run fmt-lint
       - name: Build Docker Image
         run: |
-          docker build -t chad-chat:latest .
+          docker build -t netko:latest .
       - name: Cache Turborepo
         uses: actions/cache@v3
         with:
@@ -42,6 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy Chad Chat
+      - name: Deploy Netko
         run: |
           bash -c "${{ secrets.DEPLOY_HUB_CURL }}" 

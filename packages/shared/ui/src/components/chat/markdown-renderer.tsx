@@ -1,10 +1,10 @@
-import { CopyButton } from '@chad-chat/ui/components/chat/copy-button.js'
+import { CopyButton } from '@netko/ui/components/chat/copy-button.js'
 import type {
   CodeBlockProps,
   HighlightedPre,
   MarkdownRendererProps,
-} from '@chad-chat/ui/components/chat/definitions/types'
-import { cn } from '@chad-chat/ui/lib/utils'
+} from '@netko/ui/components/chat/definitions/types'
+import { cn } from '@netko/ui/lib/utils'
 import React, { type JSX, Suspense } from 'react'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'

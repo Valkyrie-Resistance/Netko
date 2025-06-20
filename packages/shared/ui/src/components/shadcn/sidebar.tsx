@@ -1,24 +1,24 @@
 'use client'
 
-import { Button } from '@chad-chat/ui/components/shadcn/button'
-import { Input } from '@chad-chat/ui/components/shadcn/input'
-import { Separator } from '@chad-chat/ui/components/shadcn/separator'
+import { Button } from '@netko/ui/components/shadcn/button'
+import { Input } from '@netko/ui/components/shadcn/input'
+import { Separator } from '@netko/ui/components/shadcn/separator'
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@chad-chat/ui/components/shadcn/sheet'
-import { Skeleton } from '@chad-chat/ui/components/shadcn/skeleton'
+} from '@netko/ui/components/shadcn/sheet'
+import { Skeleton } from '@netko/ui/components/shadcn/skeleton'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@chad-chat/ui/components/shadcn/tooltip'
-import { useIsMobile } from '@chad-chat/ui/hooks/use-mobile'
-import { cn } from '@chad-chat/ui/lib/utils'
+} from '@netko/ui/components/shadcn/tooltip'
+import { useIsMobile } from '@netko/ui/hooks/use-mobile'
+import { cn } from '@netko/ui/lib/utils'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { PanelLeftIcon } from 'lucide-react'

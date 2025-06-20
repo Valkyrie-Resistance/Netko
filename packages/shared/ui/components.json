@@ -11,10 +11,10 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@chad-chat/ui/components",
-    "utils": "@chad-chat/ui/lib/utils",
-    "hooks": "@chad-chat/ui/hooks",
-    "lib": "@chad-chat/ui/lib",
-    "ui": "@chad-chat/ui/components"
+    "components": "@netko/ui/components",
+    "utils": "@netko/ui/lib/utils",
+    "hooks": "@netko/ui/hooks",
+    "lib": "@netko/ui/lib",
+    "ui": "@netko/ui/components"
   }
 }

@@ -6,8 +6,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@chad-chat/ui/components/shadcn/dialog'
-import { cn } from '@chad-chat/ui/lib/utils'
+} from '@netko/ui/components/shadcn/dialog'
+import { cn } from '@netko/ui/lib/utils'
 import { Command as CommandPrimitive } from 'cmdk'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SearchIcon } from 'lucide-react'

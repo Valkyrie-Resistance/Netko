@@ -8,7 +8,7 @@ import {
   type ThreadUpdateInput,
   ThreadUpdateInputSchema,
   UserIdSchema,
-} from '@chad-chat/brain-domain'
+} from '@netko/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 

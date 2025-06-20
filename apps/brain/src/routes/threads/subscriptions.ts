@@ -1,4 +1,4 @@
-import { callLLM } from '@chad-chat/brain-service'
+import { callLLM } from '@netko/brain-service'
 import { z } from 'zod'
 import { protectedProcedure, router } from '../../lib/trpc'
 
@@ -17,6 +17,7 @@ export const threadsSubscriptions = router({
 
       const stream = await callLLM(threadId, userMessage, assistantId, modelId)
 
+      // biome-ignore lint/suspicious/noExplicitAny: stream is a stream of chunks
       for await (const chunk of stream as any) {
         yield chunk
       }

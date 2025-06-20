@@ -1,5 +1,5 @@
 {
-  "name": "@chad-chat/brain-repository",
+  "name": "@netko/brain-repository",
   "module": "src/index.ts",
   "type": "module",
   "private": true,
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
-    "@chad-chat/brain-domain": "workspace:*",
+    "@netko/brain-domain": "workspace:*",
     "prisma": "^6.9.0"
   }
 }

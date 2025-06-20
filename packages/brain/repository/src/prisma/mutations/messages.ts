@@ -10,7 +10,7 @@ import {
   MessageUpdateInputSchema,
   ThreadIdSchema,
   UserIdSchema,
-} from '@chad-chat/brain-domain'
+} from '@netko/brain-domain'
 import type { Prisma } from '../../../generated/prisma'
 import { prisma } from '../client'
 
@@ -190,7 +190,7 @@ export async function updateMessage(
   if (typeof dataOrThreadId === 'string') {
     // Second signature: messageId, threadId, data
     const validatedThreadId = ThreadIdSchema.parse(dataOrThreadId)
-    data = MessageUpdateInputSchema.parse(maybeData!)
+    data = MessageUpdateInputSchema.parse(maybeData)
     whereClause = { id: validatedMessageId, threadId: validatedThreadId }
   } else {
     // First signature: messageId, data

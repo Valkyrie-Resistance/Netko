@@ -1,10 +1,10 @@
-import { Button } from '@chad-chat/ui/components/shadcn/button'
+import { Button } from '@netko/ui/components/shadcn/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@chad-chat/ui/components/shadcn/dropdown-menu'
+} from '@netko/ui/components/shadcn/dropdown-menu'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { ThemeEnum } from './definitions/types'
 import { useTheme } from './theme-provider'

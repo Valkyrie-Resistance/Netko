@@ -1,5 +1,5 @@
 {
-  "name": "@chad-chat/brain-service",
+  "name": "@netko/brain-service",
   "module": "src/index.ts",
   "type": "module",
   "private": true,
@@ -12,8 +12,8 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@chad-chat/brain-domain": "workspace:*",
-    "@chad-chat/brain-repository": "workspace:*",
+    "@netko/brain-domain": "workspace:*",
+    "@netko/brain-repository": "workspace:*",
     "@openrouter/ai-sdk-provider": "^0.7.2",
     "better-auth": "^1.2.9"
   }

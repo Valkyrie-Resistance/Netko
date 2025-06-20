@@ -1,6 +1,6 @@
-import { ChatMessage } from '@chad-chat/ui/components/chat/chat-message.js'
-import type { MessageListProps } from '@chad-chat/ui/components/chat/definitions/types'
-import { TypingIndicator } from '@chad-chat/ui/components/chat/typing-indicator.js'
+import { ChatMessage } from '@netko/ui/components/chat/chat-message.js'
+import type { MessageListProps } from '@netko/ui/components/chat/definitions/types'
+import { TypingIndicator } from '@netko/ui/components/chat/typing-indicator.js'
 
 export function MessageList({
   messages,

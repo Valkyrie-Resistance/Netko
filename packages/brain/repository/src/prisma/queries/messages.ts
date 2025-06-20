@@ -5,7 +5,7 @@ import {
   MessageListInputSchema,
   MessageSchema,
   ThreadIdSchema,
-} from '@chad-chat/brain-domain'
+} from '@netko/brain-domain'
 import { prisma } from '../client'
 
 export async function getAllMessages(

@@ -1,5 +1,5 @@
 {
-  "name": "@chad-chat/brain-domain",
+  "name": "@netko/brain-domain",
   "module": "src/index.ts",
   "type": "module",
   "private": true,

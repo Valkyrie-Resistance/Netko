@@ -1,5 +1,5 @@
-import type { Context } from '@chad-chat/brain-domain'
-import { auth } from '@chad-chat/brain-service'
+import type { Context } from '@netko/brain-domain'
+import { auth } from '@netko/brain-service'
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { CreateBunHonoWSSContextFnOptions } from '@valkyrie-resistance/trpc-ws-hono-bun-adapter'

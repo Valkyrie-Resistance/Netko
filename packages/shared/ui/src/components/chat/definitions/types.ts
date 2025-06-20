@@ -1,6 +1,6 @@
 import type { VariantProps } from 'class-variance-authority'
 import type React from 'react'
-import type { LLMModel, Message } from '@chad-chat/brain-domain'
+import type { LLMModel, Message } from '@netko/brain-domain'
 
 // =============================================================================
 // ANIMATION & UI STATE TYPES

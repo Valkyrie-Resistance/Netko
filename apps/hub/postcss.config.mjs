@@ -1,1 +1,1 @@
-export { default } from '@chad-chat/ui/postcss.config'
+export { default } from '@netko/ui/postcss.config'
