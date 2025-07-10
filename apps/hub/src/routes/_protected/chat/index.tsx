@@ -1,4 +1,3 @@
-import type { LLMModel } from '@netko/brain-domain'
 import { AnimatedBackground } from '@netko/ui/components/chat/animated-background'
 import { ChatInput } from '@netko/ui/components/chat/chat-input'
 import { PromptSuggestions } from '@netko/ui/components/chat/prompt-suggestions'
@@ -19,7 +18,6 @@ function Index() {
     trpcHttp.threads.getLLMModels.queryOptions(),
   )
   const [chatInputValue, setChatInputValue] = useState('')
-  const [currentLLMModel, setCurrentLLMModel] = useState<LLMModel | null>(null)
 
   return (
     <>

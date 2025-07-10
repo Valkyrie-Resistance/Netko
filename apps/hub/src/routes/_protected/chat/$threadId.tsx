@@ -1,8 +1,8 @@
-import type { LLMModel, Message } from '@netko/brain-domain'
+import type { Message } from '@netko/brain-domain'
 import { PromptSuggestions } from '@netko/ui/components/chat/prompt-suggestions'
 import { SidebarTrigger } from '@netko/ui/components/shadcn/sidebar'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ThemeToggle } from '@/components/core/theme/theme-switcher'
 import { trpcHttp } from '@/lib/trpc'
 import { useAuth } from '@/providers/auth-provider'
@@ -13,12 +13,8 @@ export const Route = createFileRoute({
 
 function RouteComponent() {
   const { user } = useAuth()
-  const { data: llmModels, isLoading: _isLoadingLLMModels } = useQuery(
-    trpcHttp.threads.getLLMModels.queryOptions(),
-  )
-  const [currentLLMModel, setCurrentLLMModel] = useState<LLMModel | null>(null)
-  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  const { isLoading: _isLoadingLLMModels } = useQuery(trpcHttp.threads.getLLMModels.queryOptions())
+  const [messages] = useState<Message[]>([])
 
   return (
     <>
