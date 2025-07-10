@@ -6,6 +6,7 @@ export function PromptSuggestions({ userName, append, suggestions }: PromptSugge
   const [typewriterText, setTypewriterText] = useState('')
   const [showSubtext, setShowSubtext] = useState(false)
   const [isTyping, setIsTyping] = useState(true)
+  const [showGlowingLine, setShowGlowingLine] = useState(true)
 
   const getGreeting = () => {
     const hour = new Date().getHours()
@@ -35,6 +36,15 @@ export function PromptSuggestions({ userName, append, suggestions }: PromptSugge
 
     return () => clearInterval(typewriterInterval)
   }, [fullGreeting])
+
+  // Stop the glowing line animation after 5 seconds to save GPU
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowGlowingLine(false)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <div className="flex flex-col h-full pt-16 pb-8 overflow-hidden relative">
@@ -94,8 +104,8 @@ export function PromptSuggestions({ userName, append, suggestions }: PromptSugge
                 <span className="text-primary">💫</span>
               </span>
             </h2>
-            {/* Enhanced decorative underline */}
-            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent dark:via-primary/40 motion-safe:animate-pulse" />
+            {/* Enhanced decorative underline - stops animating after 5 seconds */}
+            <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent dark:via-primary/40 ${showGlowingLine ? 'motion-safe:animate-pulse' : ''}`} />
           </div>
         </div>
 

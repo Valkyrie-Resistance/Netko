@@ -1,6 +1,4 @@
 import type { LLMModel, Message } from '@netko/brain-domain'
-import { MessageInput } from '@netko/ui/components/chat/message-input'
-import { MessageList } from '@netko/ui/components/chat/message-list'
 import { PromptSuggestions } from '@netko/ui/components/chat/prompt-suggestions'
 import { SidebarTrigger } from '@netko/ui/components/shadcn/sidebar'
 import { useQuery } from '@tanstack/react-query'
@@ -21,33 +19,6 @@ function RouteComponent() {
   const [currentLLMModel, setCurrentLLMModel] = useState<LLMModel | null>(null)
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
-
-  useEffect(() => {
-    setMessages([
-      {
-        id: '1',
-        role: 'USER',
-        content: 'Hello, how are you?',
-        createdAt: new Date(),
-        thread: {
-          id: '1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-      {
-        id: '2',
-        role: 'ASSISTANT',
-        content: 'I am good, thank you!',
-        createdAt: new Date(),
-        thread: {
-          id: '1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-    ])
-  }, [])
 
   return (
     <>
@@ -72,21 +43,8 @@ function RouteComponent() {
             ]}
           />
         ) : (
-          <div className="flex flex-col w-full h-full min-h-0 mx-auto max-w-4xl p-4">
-            <MessageList messages={messages} />
-          </div>
+          <div className="flex flex-col w-full h-full min-h-0 mx-auto max-w-4xl p-4">hi</div>
         )}
-        <MessageInput
-          value={''}
-          onChange={() => {}}
-          stop={() => {}}
-          isGenerating={false}
-          llmModels={llmModels ?? []}
-          handleLLMModelChange={(model) => setCurrentLLMModel(model)}
-          selectedModel={currentLLMModel?.id ?? ''}
-          isWebSearchEnabled={isWebSearchEnabled}
-          onWebSearchToggle={setIsWebSearchEnabled}
-        />
       </div>
     </>
   )

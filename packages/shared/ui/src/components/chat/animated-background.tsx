@@ -1,4 +1,3 @@
-import { usePrefersReducedMotion } from '@netko/ui/hooks/use-prefers-reduced-motion'
 import { cn } from '@netko/ui/lib/utils'
 import * as React from 'react'
 
@@ -11,16 +10,9 @@ export function AnimatedBackground({
   durationMs?: number
   fadeOutMs?: number
 }) {
-  const prefersReducedMotion = usePrefersReducedMotion()
-
-  const [isAnimating, setIsAnimating] = React.useState(!prefersReducedMotion)
+  const [isAnimating, setIsAnimating] = React.useState(true)
 
   React.useEffect(() => {
-    if (prefersReducedMotion) {
-      setIsAnimating(false)
-      return
-    }
-
     const stopTimer = window.setTimeout(() => {
       setIsAnimating(false)
     }, durationMs)
@@ -28,7 +20,7 @@ export function AnimatedBackground({
     return () => {
       window.clearTimeout(stopTimer)
     }
-  }, [durationMs, prefersReducedMotion])
+  }, [durationMs])
 
   const particles = React.useMemo(
     () =>
