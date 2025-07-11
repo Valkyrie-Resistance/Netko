@@ -2,12 +2,7 @@ import { Button } from '@netko/ui/components/shadcn/button'
 import { Paperclip } from 'lucide-react'
 import { motion } from 'framer-motion'
 import * as React from 'react'
-
-export interface AttachmentsButtonProps {
-  onFilesSelected: (files: FileList) => void
-  disabled?: boolean
-  className?: string
-}
+import type { AttachmentsButtonProps } from './definitions/types'
 
 export function AttachmentsButton({
   onFilesSelected,

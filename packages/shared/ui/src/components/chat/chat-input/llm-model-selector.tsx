@@ -9,14 +9,7 @@ import { cn } from '@netko/ui/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Sparkles } from 'lucide-react'
 import * as React from 'react'
-import type { LLMModel } from '@netko/brain-domain'
-
-export interface LLMModelSelectorProps {
-  models: LLMModel[]
-  selectedModel: LLMModel | null
-  onChange: (model: LLMModel) => void
-  className?: string
-}
+import type { LLMModelSelectorProps } from './definitions/types'
 
 /**
  * Fancy drop-down selector for choosing the active LLM model.

@@ -2,12 +2,7 @@ import { Button } from '@netko/ui/components/shadcn/button'
 import { motion } from 'framer-motion'
 import { Globe } from 'lucide-react'
 import { cn } from '@netko/ui/lib/utils'
-
-export interface WebSearchToggleProps {
-  enabled: boolean
-  onToggle: (enabled: boolean) => void
-  className?: string
-}
+import type { WebSearchToggleProps } from './definitions/types'
 
 export function WebSearchToggle({ enabled, onToggle, className }: WebSearchToggleProps) {
   return (
