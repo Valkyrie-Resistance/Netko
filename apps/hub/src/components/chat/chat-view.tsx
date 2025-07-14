@@ -1,17 +1,15 @@
-import type { LLMModel } from '@netko/brain-domain'
+import type { Assistant, LLMModel } from '@netko/brain-domain'
 import { ChatInput } from '@netko/ui/components/chat/chat-input'
 import { MessagesList } from '@netko/ui/components/chat/messages-list'
 import type { UIMessage } from '@netko/ui/components/chat/messages-list/definitions/types'
 import { NewChatView } from '@netko/ui/components/chat/new-chat-view'
 import { AnimatedBackground } from '@netko/ui/components/core/animated-background'
-import { SidebarTrigger } from '@netko/ui/components/shadcn/sidebar'
-import { Skeleton } from '@netko/ui/components/shadcn/skeleton'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useSubscription } from '@trpc/tanstack-react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { ThemeToggle } from '@/components/core/theme/theme-switcher'
+import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
 import { trpcHttp, trpcWs } from '@/lib/trpc'
 import { useAuth } from '@/providers/auth-provider'
 import type { ChatViewProps } from './definitions/types'
@@ -26,7 +24,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
   const [chatInputValue, setChatInputValue] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedModelId, setSelectedModelId] = useState<string>('')
-  const [selectedAssistant, setSelectedAssistant] = useState<any>(null)
+  const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false)
   const [lastEventId, setLastEventId] = useState<string | null>(null)
 
@@ -73,7 +71,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
             if (event.data.messageId && event.data.content !== undefined) {
               setRealtimeMessages((prev) =>
                 prev.map((msg) =>
-                  msg.id === event.data.messageId ? { ...msg, content: event.data.content! } : msg,
+                  msg.id === event.data.messageId ? { ...msg, content: event.data.content } : msg,
                 ),
               )
             }
@@ -143,7 +141,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
   // Mutations
   const createThreadMutation = useMutation(
     trpcHttp.threads.createThread.mutationOptions({
-      onSuccess: (data: any) => {
+      onSuccess: (data: { thread: { id: string } }) => {
         navigate({
           to: '/chat/$threadId',
           params: { threadId: data.thread.id },
@@ -153,7 +151,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
         queryClient.invalidateQueries({ queryKey: [['threads', 'getSidebarThreads']] })
         setIsGenerating(false)
       },
-      onError: (error) => {
+      onError: () => {
         toast.error('Failed to start conversation 😿')
         setIsGenerating(false)
       },
@@ -165,7 +163,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
       onSuccess: () => {
         // Real-time subscription handles updates automatically
       },
-      onError: (error) => {
+      onError: () => {
         toast.error('Failed to send message 😿')
         setIsGenerating(false)
       },
@@ -258,21 +256,9 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
   // Loading states
   if (llmModels.length === 0 || assistants.length === 0) {
     return (
-      <>
-        <header className="flex items-center justify-between p-4 border-b">
-          <div className="flex items-center gap-4">
-            <SidebarTrigger />
-            <h1 className="text-lg font-semibold">{thread?.title || 'Chat'}</h1>
-          </div>
-          <ThemeToggle />
-        </header>
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center space-y-2">
-            <Skeleton className="h-4 w-48 mx-auto" />
-            <Skeleton className="h-4 w-32 mx-auto" />
-          </div>
-        </div>
-      </>
+      <div className="flex items-center justify-center h-full">
+        <BarsSpinner size={48} />
+      </div>
     )
   }
 
@@ -318,17 +304,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
   return (
     <>
       <div className="relative flex flex-col w-full h-full min-h-0 p-4 pb-32">
-        {displayMessages.length === 0 && !isGenerating ? (
-          <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-            <div className="text-4xl">💬</div>
-            <h2 className="text-xl font-semibold">Start the conversation</h2>
-            <p className="text-muted-foreground">
-              Send a message to begin chatting with your AI assistant.
-            </p>
-          </div>
-        ) : (
-          <MessagesList messages={displayMessages} userAvatar={user?.image || ''} />
-        )}
+        <MessagesList messages={displayMessages} userAvatar={user?.image || ''} />
         <div ref={messagesEndRef} />
       </div>
       <div className="pointer-events-none absolute left-0 right-0 bottom-0 flex justify-center w-full z-20 p-4">

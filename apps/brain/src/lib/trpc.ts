@@ -1,5 +1,7 @@
+import { brainEnvConfig } from '@netko/brain-config'
 import { type Context, UserAuthSchema } from '@netko/brain-domain'
 import { auth, validateToken } from '@netko/brain-service'
+import * as Sentry from '@sentry/bun'
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { CreateBunHonoWSSContextFnOptions } from '@valkyrie-resistance/trpc-ws-hono-bun-adapter'
@@ -9,6 +11,14 @@ import type { AppRouter } from '../routes'
 export const t = initTRPC.context<Context>().create({
   transformer: superjson,
 })
+
+const sentryMiddleware = brainEnvConfig.app.sentryDsn
+  ? t.middleware(
+      Sentry.trpcMiddleware({
+        attachRpcInput: true,
+      }),
+    )
+  : t.middleware(({ next, ctx }) => next({ ctx }))
 
 //* Router
 export const router = t.router
@@ -81,11 +91,13 @@ export const createWsContext = async (
 }
 
 //* Procedures
-export const publicProcedure = t.procedure
-export const protectedProcedure = t.procedure.use(async ({ next, ctx }) => {
-  const { user, session } = ctx
-  if (!session || !user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-  return next({ ctx: { user, session } })
-})
+export const publicProcedure = t.procedure.use(sentryMiddleware)
+export const protectedProcedure = t.procedure
+  .use(async ({ next, ctx }) => {
+    const { user, session } = ctx
+    if (!session || !user) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+    }
+    return next({ ctx: { user, session } })
+  })
+  .use(sentryMiddleware)

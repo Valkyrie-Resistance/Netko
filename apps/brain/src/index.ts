@@ -2,6 +2,7 @@ import { sentry } from '@hono/sentry'
 import { trpcServer } from '@hono/trpc-server'
 import { brainEnvConfig } from '@netko/brain-config'
 import { auth, seed } from '@netko/brain-service'
+import * as Sentry from '@sentry/bun'
 import { createBunHonoWSHandler } from '@valkyrie-resistance/trpc-ws-hono-bun-adapter'
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/bun'
@@ -25,7 +26,9 @@ app.get('/up', async (c) => {
 const { websocket, wsRouter } = createBunHonoWSHandler({
   router: appRouter,
   createContext: createWsContext,
-  onError: console.error,
+  onError: (err) => {
+    Sentry.captureException(err)
+  },
 })
 
 app.route('/ws', wsRouter)
@@ -52,11 +55,23 @@ app.use(
     router: appRouter,
     endpoint: '/api/trpc',
     createContext,
+    onError: (err) => {
+      Sentry.captureException(err)
+    },
   }),
 )
 
 // Sentry middleware
 if (brainEnvConfig.app.sentryDsn) {
+  console.log('Sentry DSN', brainEnvConfig.app.sentryDsn)
+  Sentry.init({
+    dsn: brainEnvConfig.app.sentryDsn,
+    sendDefaultPii: true,
+    environment: brainEnvConfig.app.dev ? 'development' : 'production',
+    integrations: [Sentry.consoleLoggingIntegration({ levels: ['log', 'error', 'warn'] })],
+    // biome-ignore lint/style/useNamingConvention: Sentry
+    _experiments: { enableLogs: true },
+  })
   app.use('*', sentry({ dsn: brainEnvConfig.app.sentryDsn }))
 }
 
@@ -65,6 +80,11 @@ if (!brainEnvConfig.app.dev) {
   app.use('*', serveStatic({ root: './public' }))
   app.use('*', serveStatic({ root: './public', path: 'index.html' }))
 }
+
+app.onError((err, c) => {
+  Sentry.captureException(err)
+  return c.json({ error: 'Internal server error' }, 500)
+})
 
 // Seed Marvin
 seed().catch(console.error)

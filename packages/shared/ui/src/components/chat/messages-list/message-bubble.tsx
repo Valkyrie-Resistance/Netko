@@ -9,7 +9,7 @@ import type { MessageBubbleProps } from './definitions/types'
 import { MessageRoleEnum } from '@netko/brain-domain'
 import { MarkdownContent } from './markdown-content'
 
-export const MessageBubble = ({
+const MessageBubbleComponent = ({
   message,
   isLast = false,
   onRetry,
@@ -23,8 +23,8 @@ export const MessageBubble = ({
 }: MessageBubbleProps) => {
   const [isHovered, setIsHovered] = React.useState(false)
   const messageReactions = reactions?.[message.id] || []
-    const actualUserAvatar = userAvatar || ''
- 
+  const actualUserAvatar = userAvatar || ''
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -85,7 +85,6 @@ export const MessageBubble = ({
           )}>
             {message.role === MessageRoleEnum.USER ? 'You' : message.role === MessageRoleEnum.ASSISTANT ? 'Assistant' : 'System'}
           </span>
-          
           {/* Model info next to Assistant */}
           {(message.role === MessageRoleEnum.ASSISTANT || message.role === MessageRoleEnum.SYSTEM) && message.metadata?.model && (
             <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
@@ -167,5 +166,20 @@ export const MessageBubble = ({
     </motion.div>
   )
 }
+
+function areEqual(prev: MessageBubbleProps, next: MessageBubbleProps) {
+  return (
+    prev.message.id === next.message.id &&
+    prev.message.content === next.message.content &&
+    prev.message.isGenerating === next.message.isGenerating &&
+    prev.message.reasoning === next.message.reasoning &&
+    prev.isLast === next.isLast &&
+    prev.userAvatar === next.userAvatar &&
+    prev.className === next.className
+    // You can add more fields if needed
+  )
+}
+
+export const MessageBubble = React.memo(MessageBubbleComponent, areEqual)
 
 MessageBubble.displayName = 'MessageBubble' 

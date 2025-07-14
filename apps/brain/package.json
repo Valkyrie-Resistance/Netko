@@ -30,6 +30,7 @@
     "@hono/trpc-server": "0.3.4",
     "@netko/brain-config": "workspace:*",
     "@netko/brain-service": "workspace:*",
+    "@sentry/bun": "^9.38.0",
     "@trpc/client": "^11.4.1",
     "@trpc/server": "^11.4.1",
     "@types/ws": "^8.18.1",
