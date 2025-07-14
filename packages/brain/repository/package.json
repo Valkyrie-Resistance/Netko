@@ -16,8 +16,10 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@netko/brain-config": "workspace:*",
     "@prisma/client": "^6.9.0",
-    "@netko/brain-domain": "workspace:*",
-    "prisma": "^6.9.0"
+    "ioredis": "^5.6.1",
+    "prisma": "^6.9.0",
+    "zod": "^3.24.2"
   }
 }

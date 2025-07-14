@@ -14,7 +14,10 @@
   "dependencies": {
     "@netko/brain-domain": "workspace:*",
     "@netko/brain-repository": "workspace:*",
+    "@netko/brain-config": "workspace:*",
     "@openrouter/ai-sdk-provider": "^0.7.2",
-    "better-auth": "^1.2.9"
+    "ai": "^4.3.16",
+    "better-auth": "^1.2.9",
+    "jose": "^6.0.11"
   }
 }

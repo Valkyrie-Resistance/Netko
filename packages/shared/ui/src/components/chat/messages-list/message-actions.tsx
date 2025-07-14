@@ -21,8 +21,9 @@ export function MessageActions({
 }: MessageActionsProps) {
   const [showEmojiPicker, setShowEmojiPicker] = React.useState(false)
   const [isHovered, setIsHovered] = React.useState(false)
-  const isUser = message.role === 'user'
-  const isAssistant = message.role === 'assistant'
+  const isUser = message.role === 'USER'
+  const isAssistant = message.role === 'ASSISTANT'
+  const isSystem = message.role === 'SYSTEM'
 
   const handleEmojiSelect = (emoji: string) => {
     onEmojiReact?.(message.id, emoji)
@@ -39,11 +40,11 @@ export function MessageActions({
     })
   }
 
-  const timestampElement = (
+  const timestampElement = message.createdAt ? (
     <span className="text-xs text-muted-foreground">
-      {formatDateTime(message.timestamp)}
+      {formatDateTime(message.createdAt)}
     </span>
-  )
+  ) : null
 
   return (
     <motion.div
@@ -138,7 +139,7 @@ export function MessageActions({
       </div>
 
       {/* For assistant and system messages: timestamp after buttons */}
-      {(isAssistant || message.role === 'system') && timestampElement}
+      {(isAssistant || isSystem) && timestampElement}
     </motion.div>
   )
 } 

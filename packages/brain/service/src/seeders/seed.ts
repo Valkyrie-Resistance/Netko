@@ -1,5 +1,5 @@
+import { brainEnvConfig } from '@netko/brain-config'
 import { PrismaClient } from '@netko/brain-repository'
-import { brainEnvConfig } from '../config/env'
 
 const prisma = new PrismaClient()
 

@@ -1,4 +1,4 @@
-import { brainEnvConfig } from '@netko/brain-service'
+import { brainEnvConfig } from '@netko/brain-config'
 import { protectedProcedure, publicProcedure, router } from '../../lib/trpc'
 
 export const authQueries = router({

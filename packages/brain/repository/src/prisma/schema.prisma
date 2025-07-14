@@ -32,9 +32,9 @@ model User {
   sessions      Session[]
   accounts      Account[]
   threads       Thread[]
-  Assistant     Assistant[]
-  Message       Message[]
-  SharedChat    SharedChat[]
+  assistant     Assistant[]
+  message       Message[]
+  sharedChat    SharedChat[]
   apiKeys       UserApiKey[]
 
   @@unique([email])
@@ -44,7 +44,6 @@ model User {
 model UserApiKey {
   id           String        @id @default(cuid(2))
   provider     ModelProvider
-  keyName      String // User-friendly name like "My OpenAI Key"
   encryptedKey String // Encrypted API key
   isActive     Boolean       @default(true)
 
@@ -56,7 +55,7 @@ model UserApiKey {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, provider, keyName])
+  @@unique([userId, provider])
   @@index([userId, provider])
   @@map("user_api_key")
 }
@@ -222,4 +221,13 @@ model SharedChat {
 
   @@index([shareId])
   @@map("shared_chat")
+}
+
+model jwks {
+  id         String   @id @default(uuid())
+  publicKey  String
+  privateKey String
+  createdAt  DateTime @default(now())
+
+  @@map("jwks")
 }

@@ -1,5 +1,5 @@
 import { RiAppleFill, RiDiscordFill, RiGithubFill, RiGoogleFill } from '@remixicon/react'
-import { signIn } from '@/lib/auth'
+import { authClient } from '@/lib/auth'
 
 export const SocialProviderEnum = {
   GOOGLE: 'google',
@@ -16,27 +16,27 @@ export const socialProviders = [
     provider: SocialProviderEnum.GOOGLE,
     icon: RiGoogleFill,
     description: 'Sign in with Google',
-    action: async () => await signIn.social({ provider: SocialProviderEnum.GOOGLE }),
+    action: async () => await authClient.signIn.social({ provider: SocialProviderEnum.GOOGLE }),
   },
   {
     name: 'GitHub',
     provider: SocialProviderEnum.GITHUB,
     icon: RiGithubFill,
     description: 'Sign in with GitHub',
-    action: async () => await signIn.social({ provider: SocialProviderEnum.GITHUB }),
+    action: async () => await authClient.signIn.social({ provider: SocialProviderEnum.GITHUB }),
   },
   {
     name: 'Discord',
     provider: SocialProviderEnum.DISCORD,
     icon: RiDiscordFill,
     description: 'Sign in with Discord',
-    action: async () => await signIn.social({ provider: SocialProviderEnum.DISCORD }),
+    action: async () => await authClient.signIn.social({ provider: SocialProviderEnum.DISCORD }),
   },
   {
     name: 'Apple',
     provider: SocialProviderEnum.APPLE,
     icon: RiAppleFill,
     description: 'Sign in with Apple',
-    action: async () => await signIn.social({ provider: SocialProviderEnum.APPLE }),
+    action: async () => await authClient.signIn.social({ provider: SocialProviderEnum.APPLE }),
   },
 ]

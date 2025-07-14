@@ -1,52 +1,39 @@
 import type { AppRouter } from '@netko/brain'
 import { QueryClient } from '@tanstack/react-query'
-import {
-  createTRPCClient,
-  createWSClient,
-  httpBatchLink,
-  httpSubscriptionLink,
-  splitLink,
-  wsLink,
-} from '@trpc/client'
+import { createTRPCClient, createWSClient, httpBatchLink, wsLink } from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
+import superjson from 'superjson'
 
 export const queryClient = new QueryClient()
 
+//* TRPC HTTP Client
 const trpcHttpClient = createTRPCClient<AppRouter>({
-  /**
-   * @see https://trpc.io/docs/v11/client/links
-   */
-  links: [
-    splitLink({
-      condition: (op) => op.type === 'subscription',
-      true: httpSubscriptionLink({
-        url: '/api/trpc',
-        eventSourceOptions() {
-          return {
-            withCredentials: true,
-          }
-        },
-      }),
-      false: httpBatchLink({
-        url: '/api/trpc',
-      }),
-    }),
-  ],
+  links: [httpBatchLink({ url: '/api/trpc', transformer: superjson })],
 })
 
+//* WS Client
+export const wsClient = createWSClient({
+  url: '/ws',
+  connectionParams: async () => {
+    const token = localStorage.getItem('ws-auth-jwt')
+    return {
+      token: token ?? '',
+    }
+  },
+})
+
+//* TRPC WS Client
+export const trpcWsClient = createTRPCClient<AppRouter>({
+  links: [wsLink({ client: wsClient, transformer: superjson })],
+})
+
+//* TRPC HTTP Client
 export const trpcHttp = createTRPCOptionsProxy<AppRouter>({
   client: trpcHttpClient,
   queryClient,
 })
 
-export const wsClient = createWSClient({
-  url: '/ws',
-})
-
-export const trpcWsClient = createTRPCClient<AppRouter>({
-  links: [wsLink({ client: wsClient })],
-})
-
+//* TRPC WS Client
 export const trpcWs = createTRPCOptionsProxy<AppRouter>({
   client: trpcWsClient,
   queryClient,

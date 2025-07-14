@@ -41,7 +41,7 @@ import { useChatStore } from '@/stores/chat'
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
   const { data: assistants, isLoading } = useQuery(trpcHttp.threads.getAssistants.queryOptions())
-  const { data: conversations, isLoading: isConversationsLoading } = useQuery(
+  const { data: threads, isLoading: isThreadsLoading } = useQuery(
     trpcHttp.threads.getSidebarThreads.queryOptions(),
   )
 
@@ -55,14 +55,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isNewChatHovered, setIsNewChatHovered] = useState(false)
 
   useEffect(() => {
-    if (conversations && !isConversationsLoading) {
-      setConversationGroups(
-        groupConversationsByTime(conversations.threads.map((c) => ThreadSchema.parse(c))),
-      )
+    if (threads && !isThreadsLoading) {
+      setConversationGroups(groupConversationsByTime(threads.map((c) => ThreadSchema.parse(c))))
     }
-  }, [conversations, isConversationsLoading])
+  }, [threads, isThreadsLoading])
 
-  // Auto-select first assistant if none is selected and assistants are loaded 🤖
   useEffect(() => {
     if (assistants && assistants.length > 0 && !currentAssistant) {
       const firstAssistant = AssistantSchema.parse(assistants[0])
@@ -71,7 +68,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [assistants, currentAssistant, setCurrentAssistant])
 
   const handleCreateChat = () => {
-    // tanstack router navigate to /chat
     router.navigate({
       to: '/chat',
     })
@@ -254,17 +250,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </CommandGroup>
 
           <CommandGroup heading="Recent Conversations">
-            {conversations?.threads.map((conversation) => (
+            {threads?.map((thread) => (
               <CommandItem
-                key={conversation.id}
+                key={thread.id}
                 onSelect={() => {
-                  console.log('Navigating to conversation:', conversation.title)
+                  console.log('Navigating to conversation:', thread.title)
                   setIsCommandOpen(false)
                 }}
                 className="group relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none transition-colors duration-300 aria-selected:bg-primary/10 hover:bg-accent"
               >
                 <MessageSquare className="h-4 w-4" />
-                <span className="flex-1 truncate">{conversation.title}</span>
+                <span className="flex-1 truncate">{thread.title}</span>
                 <motion.div
                   className="absolute right-2 opacity-0 transition-opacity group-hover:opacity-100"
                   initial={false}

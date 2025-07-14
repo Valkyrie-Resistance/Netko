@@ -1,5 +1,5 @@
 import { cn } from '@netko/ui/lib/utils'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import * as React from 'react'
 import { useAutosizeTextArea } from '@netko/ui/hooks/use-autosize-textarea'
 
@@ -13,7 +13,7 @@ import type { ChatInputProps } from './definitions/types'
 /**
  * ChatInput – sparkly, animated, transparent chat box ✨
  */
-export const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
+export const ChatInput = React.memo(React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
   (
     {
       value,
@@ -32,6 +32,7 @@ export const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
     },
     _ref,
   ) => {
+    const shouldReduceMotion = useReducedMotion()
     const internalRef = React.useRef<HTMLTextAreaElement>(null)
     const fileInputRef = React.useRef<HTMLInputElement>(null)
     const isMobile = useIsMobile()
@@ -63,11 +64,12 @@ export const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
 
     return (
       <motion.div
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.25 }}
+        initial={shouldReduceMotion ? false : { y: 30, opacity: 0 }}
+        animate={shouldReduceMotion ? false : { y: 0, opacity: 1 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
+        style={{ willChange: 'transform, opacity' }}
         className={cn(
-          'relative w-full overflow-hidden rounded-3xl border border-white/20 bg-white/30 dark:bg-zinc-900/40 backdrop-blur-xl shadow-2xl flex-shrink-0',
+          'relative w-full overflow-hidden rounded-3xl border border-white/20 bg-white/30 dark:bg-zinc-900/40 backdrop-blur-xl flex-shrink-0',
           containerClassName,
         )}
       >
@@ -171,18 +173,10 @@ export const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
             onClick={() => onSend?.()}
           />
         </div>
-
-        {/* Subtle animated background */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-purple-500/5 to-transparent"
-          initial={{ opacity: 0.4 }}
-          animate={{ opacity: 0.6 }}
-          transition={{ duration: 5, repeat: Infinity, repeatType: 'reverse' }}
-        />
       </motion.div>
     )
   },
-)
+))
 ChatInput.displayName = 'ChatInput'
 
 export default ChatInput

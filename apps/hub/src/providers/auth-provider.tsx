@@ -1,11 +1,11 @@
 import React, { createContext, useContext } from 'react'
 import type { AuthContextValue } from '@/components/auth/definitions/types'
-import { useSession } from '@/lib/auth'
+import { authClient } from '@/lib/auth'
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { data, refetch, error, isPending } = useSession()
+  const { data, refetch, error, isPending } = authClient.useSession()
 
   const user = data?.user ?? null
   const session = data?.session ?? null

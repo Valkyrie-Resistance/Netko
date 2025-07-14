@@ -11,7 +11,6 @@ const rootLayout = () => {
     </ThemeProvider>
   )
 }
-
 export const Route = createRootRouteWithContext<AuthRouterContext>()({
   component: rootLayout,
 })

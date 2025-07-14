@@ -17,7 +17,7 @@
     "prod:setup": "bun run db:generate && bun run db:deploy",
     "dev:setup": "bun run db:generate && bun run db:migrate",
     "db:generate": "bun run --filter @netko/brain-repository db:generate",
-    "db:migrate": "bun run --env-file=.env --filter @netko/brain-repository db:migrate",
+    "db:migrate": "bun run --env-file=../../../apps/brain/.env --cwd ../../packages/brain/repository db:migrate",
     "db:deploy": "bun run --filter @netko/brain-repository db:deploy"
   },
   "devDependencies": {
@@ -26,15 +26,16 @@
     "@netko/typescript-config": "workspace:*"
   },
   "dependencies": {
-    "@netko/brain-service": "workspace:*",
-    "@netko/logger": "workspace:*",
     "@hono/sentry": "^1.2.2",
     "@hono/trpc-server": "0.3.4",
+    "@netko/brain-config": "workspace:*",
+    "@netko/brain-service": "workspace:*",
     "@trpc/client": "^11.4.1",
     "@trpc/server": "^11.4.1",
     "@types/ws": "^8.18.1",
-    "@valkyrie-resistance/trpc-ws-hono-bun-adapter": "^0.1.1",
+    "@valkyrie-resistance/trpc-ws-hono-bun-adapter": "^0.2.1",
     "hono": "4.7.11",
+    "superjson": "^2.2.2",
     "trpc-bun-adapter": "^1.3.0",
     "ws": "^8.18.2",
     "zod": "^3.25.62"

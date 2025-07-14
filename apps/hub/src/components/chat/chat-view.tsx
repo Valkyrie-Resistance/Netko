@@ -1,0 +1,352 @@
+import type { LLMModel } from '@netko/brain-domain'
+import { ChatInput } from '@netko/ui/components/chat/chat-input'
+import { MessagesList } from '@netko/ui/components/chat/messages-list'
+import type { UIMessage } from '@netko/ui/components/chat/messages-list/definitions/types'
+import { NewChatView } from '@netko/ui/components/chat/new-chat-view'
+import { AnimatedBackground } from '@netko/ui/components/core/animated-background'
+import { SidebarTrigger } from '@netko/ui/components/shadcn/sidebar'
+import { Skeleton } from '@netko/ui/components/shadcn/skeleton'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { useSubscription } from '@trpc/tanstack-react-query'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { ThemeToggle } from '@/components/core/theme/theme-switcher'
+import { trpcHttp, trpcWs } from '@/lib/trpc'
+import { useAuth } from '@/providers/auth-provider'
+import type { ChatViewProps } from './definitions/types'
+
+export function ChatView({ threadId, thread }: ChatViewProps) {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // State management
+  const [chatInputValue, setChatInputValue] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [selectedModelId, setSelectedModelId] = useState<string>('')
+  const [selectedAssistant, setSelectedAssistant] = useState<any>(null)
+  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false)
+  const [lastEventId, setLastEventId] = useState<string | null>(null)
+
+  // Message state for real-time updates
+  const [realtimeMessages, setRealtimeMessages] = useState<UIMessage[]>([])
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null)
+
+  // Real-time subscription using TRPC with useSubscription hook
+  useSubscription({
+    ...trpcWs.threads.onThreadMessage.subscriptionOptions({
+      threadId: threadId ?? '',
+      lastEventId: lastEventId || undefined,
+    }),
+    enabled: !!threadId,
+    onData: (event) => {
+      try {
+        switch (event.data.type) {
+          case 'message_created': {
+            // Add new message to realtime state
+            if (event.data.message) {
+              const newMessage: UIMessage = {
+                ...event.data.message,
+                isGenerating: false,
+              }
+
+              setRealtimeMessages((prev) => {
+                // Check if message already exists to avoid duplicates
+                const exists = prev.find((m) => m.id === newMessage.id)
+                if (exists) return prev
+                return [...prev, newMessage]
+              })
+
+              // If it's an assistant message, mark as streaming
+              if (newMessage.role === 'ASSISTANT') {
+                setStreamingMessageId(newMessage.id)
+                setIsGenerating(true)
+              }
+            }
+            break
+          }
+
+          case 'message_streaming': {
+            // Update streaming message content
+            if (event.data.messageId && event.data.content !== undefined) {
+              setRealtimeMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === event.data.messageId ? { ...msg, content: event.data.content! } : msg,
+                ),
+              )
+            }
+            break
+          }
+
+          case 'message_completed': {
+            // Update final message and stop generation
+            if (event.data.message) {
+              const completedMessage: UIMessage = {
+                ...event.data.message,
+                isGenerating: false,
+              }
+
+              setRealtimeMessages((prev) =>
+                prev.map((msg) => (msg.id === completedMessage.id ? completedMessage : msg)),
+              )
+            }
+
+            setStreamingMessageId(null)
+            setIsGenerating(false)
+            break
+          }
+
+          default:
+        }
+
+        // Update last event ID for reconnection
+        if (event.data.timestamp) {
+          setLastEventId(event.data.timestamp.toString())
+        }
+      } catch (error) {
+        console.error('❌ Error processing subscription event:', error)
+      }
+    },
+    onError: (error) => {
+      console.error('❌ Error processing subscription event:', error)
+      toast.error('Connection lost - attempting to reconnect... 🔄')
+    },
+  })
+
+  // Messages come from thread prop and are updated via subscription
+
+  const { data: llmModels = [] } = useQuery(trpcHttp.threads.getLLMModels.queryOptions())
+  const { data: assistants = [] } = useQuery(trpcHttp.threads.getAssistants.queryOptions())
+
+  // Initialize realtime messages from thread messages
+  useEffect(() => {
+    const messagesToProcess = thread?.messages || []
+
+    if (Array.isArray(messagesToProcess) && messagesToProcess.length > 0) {
+      const initialMessages: UIMessage[] = messagesToProcess.map((msg) => ({
+        ...msg,
+        isGenerating: false,
+      }))
+      setRealtimeMessages(initialMessages)
+    }
+  }, [thread?.messages])
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (realtimeMessages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [realtimeMessages.length])
+
+  // Mutations
+  const createThreadMutation = useMutation(
+    trpcHttp.threads.createThread.mutationOptions({
+      onSuccess: (data: any) => {
+        navigate({
+          to: '/chat/$threadId',
+          params: { threadId: data.thread.id },
+          replace: true,
+        })
+        // Invalidate sidebar threads to show the new thread
+        queryClient.invalidateQueries({ queryKey: [['threads', 'getSidebarThreads']] })
+        setIsGenerating(false)
+      },
+      onError: (error) => {
+        toast.error('Failed to start conversation 😿')
+        setIsGenerating(false)
+      },
+    }),
+  )
+
+  const sendMessageMutation = useMutation(
+    trpcHttp.threads.sendMessage.mutationOptions({
+      onSuccess: () => {
+        // Real-time subscription handles updates automatically
+      },
+      onError: (error) => {
+        toast.error('Failed to send message 😿')
+        setIsGenerating(false)
+      },
+    }),
+  )
+
+  // Initialize selected model and assistant - optimize by using thread data
+  useEffect(() => {
+    if (llmModels.length > 0 && !selectedModelId) {
+      // Use first available model as default
+      const defaultModelId = llmModels[0]?.id || ''
+      setSelectedModelId(defaultModelId)
+    }
+  }, [llmModels, selectedModelId])
+
+  useEffect(() => {
+    if (assistants.length > 0 && !selectedAssistant) {
+      // Use thread's assistant if available, otherwise use first public assistant
+      const threadAssistant = thread?.assistant
+      const defaultAssistant =
+        threadAssistant || assistants.find((a) => a.isPublic) || assistants[0]
+      setSelectedAssistant(defaultAssistant || null)
+    }
+  }, [assistants, selectedAssistant, thread?.assistant])
+
+  // Handle message submission
+  const handleSendMessage = useCallback(
+    (message: string) => {
+      if (!message.trim() || isGenerating) return
+
+      if (!threadId) {
+        // Create new thread with this message
+        setIsGenerating(true)
+        createThreadMutation.mutate({
+          title: message.slice(0, 50),
+          description: message,
+          assistantId: selectedAssistant?.id || '',
+          content: message,
+          llmModel: selectedModelId,
+        })
+      } else {
+        // Send message to existing thread
+        setIsGenerating(true)
+        sendMessageMutation.mutate({
+          threadId,
+          content: message,
+          assistantId: selectedAssistant?.id || '',
+          llmModel: selectedModelId,
+        })
+      }
+
+      setChatInputValue('')
+    },
+    [
+      threadId,
+      isGenerating,
+      selectedAssistant,
+      selectedModelId,
+      createThreadMutation,
+      sendMessageMutation,
+    ],
+  )
+
+  // Handle LLM model change
+  const handleLLMModelChange = useCallback((model: LLMModel) => {
+    setSelectedModelId(model.id)
+  }, [])
+
+  // Handle file attachments (placeholder for now)
+  const handleFilesSelected = useCallback((files: FileList) => {
+    toast.info(`Selected ${files.length} file(s) - attachments coming soon! 📎`)
+  }, [])
+
+  // Handle web search toggle
+  const handleWebSearchToggle = useCallback((enabled: boolean) => {
+    setIsWebSearchEnabled(enabled)
+  }, [])
+
+  // Handle suggestion clicks for new chat
+  const handleSuggestionClick = useCallback((message: { role: 'user'; content: string }) => {
+    setChatInputValue(message.content)
+  }, [])
+
+  // Update messages with generation state
+  const displayMessages = realtimeMessages.map((msg) => ({
+    ...msg,
+    isGenerating: isGenerating && msg.id === streamingMessageId,
+  }))
+
+  // Loading states
+  if (llmModels.length === 0 || assistants.length === 0) {
+    return (
+      <>
+        <header className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <h1 className="text-lg font-semibold">{thread?.title || 'Chat'}</h1>
+          </div>
+          <ThemeToggle />
+        </header>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center space-y-2">
+            <Skeleton className="h-4 w-48 mx-auto" />
+            <Skeleton className="h-4 w-32 mx-auto" />
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // Show new chat view if no thread is selected
+  if (!threadId) {
+    return (
+      <>
+        <div className="relative flex flex-col w-full h-full min-h-0">
+          <AnimatedBackground />
+          <div className="relative flex flex-col w-full h-full min-h-0 mx-auto max-w-4xl p-4 pb-32">
+            <NewChatView
+              userName={user?.name || 'there'}
+              suggestions={[
+                "Explain quantum computing like I'm 5 years old 🧠",
+                'Write a Python script to analyze CSV data',
+                'Help me brainstorm ideas for a weekend project',
+                'Create a workout plan for someone who works from home',
+              ]}
+              append={handleSuggestionClick}
+            />
+          </div>
+          <div className="pointer-events-none absolute left-0 right-0 bottom-0 flex justify-center w-full z-20 p-4">
+            <div className="pointer-events-auto w-full max-w-4xl mx-auto">
+              <ChatInput
+                value={chatInputValue}
+                onChange={(e) => setChatInputValue(e.target.value)}
+                onSend={() => handleSendMessage(chatInputValue)}
+                isGenerating={isGenerating}
+                llmModels={llmModels}
+                selectedModel={selectedModelId}
+                handleLLMModelChange={handleLLMModelChange}
+                isWebSearchEnabled={isWebSearchEnabled}
+                onWebSearchToggle={handleWebSearchToggle}
+                onFilesSelected={handleFilesSelected}
+              />
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <div className="relative flex flex-col w-full h-full min-h-0 p-4 pb-32">
+        {displayMessages.length === 0 && !isGenerating ? (
+          <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+            <div className="text-4xl">💬</div>
+            <h2 className="text-xl font-semibold">Start the conversation</h2>
+            <p className="text-muted-foreground">
+              Send a message to begin chatting with your AI assistant.
+            </p>
+          </div>
+        ) : (
+          <MessagesList messages={displayMessages} userAvatar={user?.image || ''} />
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="pointer-events-none absolute left-0 right-0 bottom-0 flex justify-center w-full z-20 p-4">
+        <div className="pointer-events-auto w-full max-w-4xl mx-auto">
+          <ChatInput
+            value={chatInputValue}
+            onChange={(e) => setChatInputValue(e.target.value)}
+            onSend={() => handleSendMessage(chatInputValue)}
+            isGenerating={isGenerating}
+            llmModels={llmModels}
+            selectedModel={selectedModelId}
+            handleLLMModelChange={handleLLMModelChange}
+            isWebSearchEnabled={isWebSearchEnabled}
+            onWebSearchToggle={handleWebSearchToggle}
+            onFilesSelected={handleFilesSelected}
+          />
+        </div>
+      </div>
+    </>
+  )
+}

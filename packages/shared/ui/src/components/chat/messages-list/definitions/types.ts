@@ -1,16 +1,11 @@
 import type * as React from 'react'
+import type { Message } from '@netko/brain-domain'
 
-export interface Message {
-  id: string
-  content: string
-  role: 'user' | 'assistant' | 'system'
-  timestamp: Date
+// Use DomainMessage with minimal UI extensions
+export interface UIMessage extends Message {
+  // UI-specific properties
   isGenerating?: boolean
   reasoning?: string
-  codeBlocks?: CodeBlock[]
-  branches?: Message[]
-  parentId?: string
-  metadata?: MessageMetadata
 }
 
 export interface CodeBlock {
@@ -34,7 +29,7 @@ export interface EmojiReaction {
 }
 
 export interface MessageActionsProps {
-  message: Message
+  message: UIMessage
   onRetry?: (messageId: string) => void
   onBranch?: (messageId: string) => void
   onCopy?: (content: string) => void
@@ -45,7 +40,7 @@ export interface MessageActionsProps {
 }
 
 export interface MessageBubbleProps {
-  message: Message
+  message: UIMessage
   isLast?: boolean
   onRetry?: (messageId: string) => void
   onBranch?: (messageId: string) => void
@@ -71,7 +66,7 @@ export interface ReasoningBlockProps {
 }
 
 export interface MessagesListProps {
-  messages: Message[]
+  messages: UIMessage[]
   isGenerating?: boolean
   onRetry?: (messageId: string) => void
   onBranch?: (messageId: string) => void

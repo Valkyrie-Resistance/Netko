@@ -1,6 +1,7 @@
 import { sentry } from '@hono/sentry'
 import { trpcServer } from '@hono/trpc-server'
-import { auth, brainEnvConfig, seed } from '@netko/brain-service'
+import { brainEnvConfig } from '@netko/brain-config'
+import { auth, seed } from '@netko/brain-service'
 import { createBunHonoWSHandler } from '@valkyrie-resistance/trpc-ws-hono-bun-adapter'
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/bun'

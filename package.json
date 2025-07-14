@@ -11,7 +11,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.0.0",
     "turbo": "^2.5.4",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "@types/bun": "latest"
   },
   "engines": {
     "node": ">=18"
@@ -21,6 +22,7 @@
     "apps/*",
     "packages/shared/*",
     "packages/clients/*",
-    "packages/brain/*"
+    "packages/brain/*",
+    "packages/configs/*"
   ]
 }
