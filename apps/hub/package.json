@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@netko/typescript-config": "workspace:*",
+    "@sentry/vite-plugin": "^3.6.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/router-plugin": "^1.121.4",
     "@types/react": "^19.1.2",

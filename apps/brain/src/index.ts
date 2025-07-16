@@ -27,7 +27,9 @@ const { websocket, wsRouter } = createBunHonoWSHandler({
   router: appRouter,
   createContext: createWsContext,
   onError: (err) => {
-    Sentry.captureException(err)
+    if (brainEnvConfig.app.sentryDsn) {
+      Sentry.captureException(err)
+    }
   },
 })
 
@@ -56,14 +58,15 @@ app.use(
     endpoint: '/api/trpc',
     createContext,
     onError: (err) => {
-      Sentry.captureException(err)
+      if (brainEnvConfig.app.sentryDsn) {
+        Sentry.captureException(err)
+      }
     },
   }),
 )
 
 // Sentry middleware
 if (brainEnvConfig.app.sentryDsn) {
-  console.log('Sentry DSN', brainEnvConfig.app.sentryDsn)
   Sentry.init({
     dsn: brainEnvConfig.app.sentryDsn,
     sendDefaultPii: true,
@@ -81,8 +84,11 @@ if (!brainEnvConfig.app.dev) {
   app.use('*', serveStatic({ root: './public', path: 'index.html' }))
 }
 
+// Global error handler
 app.onError((err, c) => {
-  Sentry.captureException(err)
+  if (brainEnvConfig.app.sentryDsn) {
+    Sentry.captureException(err)
+  }
   return c.json({ error: 'Internal server error' }, 500)
 })
 
