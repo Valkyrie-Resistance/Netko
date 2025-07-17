@@ -4,9 +4,9 @@ ARG VITE_SENTRY_DSN
 
 WORKDIR /app
 
-# openssl
+# openssl and ca-certificates
 RUN apt-get update
-RUN apt-get install -y openssl
+RUN apt-get install -y openssl ca-certificates
 
 COPY . .
 
