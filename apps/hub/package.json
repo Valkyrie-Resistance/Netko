@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build --mode production",
+    "build": "vite build --mode production --outDir ../brain/public",
     "start": "vite preview"
   },
   "dependencies": {
