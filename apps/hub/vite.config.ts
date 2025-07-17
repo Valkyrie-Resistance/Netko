@@ -1,16 +1,7 @@
 import path from 'node:path'
-import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react-swc'
 import { defineConfig } from 'vite'
-
-const sentryPlugin = process.env.SENTRY_AUTH_TOKEN
-  ? sentryVitePlugin({
-      org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT,
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-    })
-  : undefined
 
 export default defineConfig({
   build: {
@@ -45,7 +36,6 @@ export default defineConfig({
       verboseFileRoutes: false,
     }),
     react(),
-    ...(sentryPlugin ? [sentryPlugin] : []),
   ],
   resolve: {
     alias: {

@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "bun run dev:setup && bun --watch src/index.ts",
-    "build": "bun build src/index.ts --target bun --outdir ./dist --sourcemap=linked",
+    "build": "bun build src/index.ts --target bun --outdir ./dist",
     "start": "bun dist/index.js",
     "test": "bun test",
     "prod:release": "bun run prod:setup && bun run start",
@@ -18,8 +18,7 @@
     "dev:setup": "bun run db:generate && bun run db:migrate",
     "db:generate": "bun run --filter @netko/brain-repository db:generate",
     "db:migrate": "bun run --env-file=../../../apps/brain/.env --cwd ../../packages/brain/repository db:migrate",
-    "db:deploy": "bun run --filter @netko/brain-repository db:deploy",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT ./dist && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT ./dist"
+    "db:deploy": "bun run --filter @netko/brain-repository db:deploy"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -32,7 +31,6 @@
     "@netko/brain-config": "workspace:*",
     "@netko/brain-service": "workspace:*",
     "@sentry/bun": "^9.38.0",
-    "@sentry/cli": "^2.47.1",
     "@trpc/client": "^11.4.1",
     "@trpc/server": "^11.4.1",
     "@types/ws": "^8.18.1",
