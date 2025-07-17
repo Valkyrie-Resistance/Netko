@@ -6,7 +6,7 @@ if (brainEnvConfig.app.sentryDsn) {
     dsn: brainEnvConfig.app.sentryDsn,
     sendDefaultPii: true,
     environment: brainEnvConfig.app.dev ? 'development' : 'production',
-    integrations: [Sentry.consoleLoggingIntegration({ levels: ['log', 'error', 'warn', 'info'] })],
+    integrations: [Sentry.consoleLoggingIntegration({ levels: ['log', 'error', 'warn'] })],
     // biome-ignore lint/style/useNamingConvention: Sentry
     _experiments: { enableLogs: true },
   })
