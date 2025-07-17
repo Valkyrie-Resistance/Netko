@@ -16,6 +16,6 @@ RUN bun install --frozen-lockfile
 RUN turbo db:generate
 RUN turbo build
 
-RUN mv apps/hub/dist/* apps/brain/public/
+RUN mv ./apps/hub/dist/* ./apps/brain/public/
 
 CMD ["bun", "run", "--filter", "./apps/brain", "prod:release"]
