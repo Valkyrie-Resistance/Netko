@@ -1,3 +1,4 @@
+import './instrument'
 import { sentry } from '@hono/sentry'
 import { trpcServer } from '@hono/trpc-server'
 import { brainEnvConfig } from '@netko/brain-config'
@@ -67,14 +68,6 @@ app.use(
 
 // Sentry middleware
 if (brainEnvConfig.app.sentryDsn) {
-  Sentry.init({
-    dsn: brainEnvConfig.app.sentryDsn,
-    sendDefaultPii: true,
-    environment: brainEnvConfig.app.dev ? 'development' : 'production',
-    integrations: [Sentry.consoleLoggingIntegration({ levels: ['log', 'error', 'warn'] })],
-    // biome-ignore lint/style/useNamingConvention: Sentry
-    _experiments: { enableLogs: true },
-  })
   app.use('*', sentry({ dsn: brainEnvConfig.app.sentryDsn }))
 }
 
