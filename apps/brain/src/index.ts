@@ -77,16 +77,143 @@ if (!brainEnvConfig.app.dev) {
   app.use('*', serveStatic({ root: './public', path: 'index.html' }))
 }
 
-// Global error handler
+// Enhanced global error handler with better error categorization
 app.onError((err, c) => {
-  if (brainEnvConfig.app.sentryDsn) {
-    Sentry.captureException(err)
+  const errorContext = {
+    url: c.req.url,
+    method: c.req.method,
+    userAgent: c.req.header('user-agent'),
+    timestamp: new Date().toISOString(),
   }
-  return c.json({ error: 'Internal server error' }, 500)
+
+  console.error('🔴 Server error:', err, errorContext)
+
+  if (brainEnvConfig.app.sentryDsn) {
+    Sentry.captureException(err, {
+      extra: errorContext,
+      tags: {
+        component: 'hono-server',
+      },
+    })
+  }
+
+  // Return appropriate error response based on error type
+  if (err.name === 'ValidationError') {
+    return c.json({ error: 'Invalid request data', details: err.message }, 400)
+  }
+
+  if (err.name === 'UnauthorizedError' || err.message?.includes('UNAUTHORIZED')) {
+    return c.json({ error: 'Authentication required' }, 401)
+  }
+
+  if (err.name === 'NotFoundError') {
+    return c.json({ error: 'Resource not found' }, 404)
+  }
+
+  // Generic server error for unknown errors
+  return c.json(
+    {
+      error: 'Internal server error',
+      ...(brainEnvConfig.app.dev && { details: err.message }),
+    },
+    500,
+  )
 })
 
-// Seed Marvin
-seed().catch(console.error)
+// Graceful shutdown handling
+const gracefulShutdown = async () => {
+  console.log('🛑 Initiating graceful shutdown...')
+
+  try {
+    // Import the RedisCacheClient for cleanup
+    const { RedisCacheClient } = await import('@netko/brain-repository')
+
+    // Close Redis connections
+    await RedisCacheClient.disconnect()
+    console.log('✅ Redis connections closed')
+
+    // Close database connections if needed
+    // await prisma.$disconnect()
+
+    console.log('✅ Graceful shutdown completed')
+    process.exit(0)
+  } catch (error) {
+    console.error('❌ Error during graceful shutdown:', error)
+    process.exit(1)
+  }
+}
+
+// Register shutdown handlers
+process.on('SIGTERM', gracefulShutdown)
+process.on('SIGINT', gracefulShutdown)
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('🔴 Uncaught Exception:', error)
+  if (brainEnvConfig.app.sentryDsn) {
+    Sentry.captureException(error, {
+      tags: { type: 'uncaughtException' },
+    })
+  }
+  gracefulShutdown()
+})
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🔴 Unhandled Rejection at:', promise, 'reason:', reason)
+  if (brainEnvConfig.app.sentryDsn) {
+    Sentry.captureException(new Error(`Unhandled Rejection: ${reason}`), {
+      tags: { type: 'unhandledRejection' },
+    })
+  }
+})
+
+// Seed Marvin with error handling
+seed().catch((error) => {
+  console.error('🔴 Seed error:', error)
+  if (brainEnvConfig.app.sentryDsn) {
+    Sentry.captureException(error, {
+      tags: { component: 'seed' },
+    })
+  }
+})
+
+// Health check endpoint with Redis status
+app.get('/health', async (c) => {
+  try {
+    // Import the health monitor and Redis client
+    const { healthMonitor } = await import('@netko/logger/src/health-monitor')
+    const { RedisCacheClient } = await import('@netko/brain-repository')
+
+    // Register Redis health check if not already registered
+    healthMonitor.registerRedisHealthCheck(async () => {
+      const healthStatus = RedisCacheClient.getHealthStatus()
+      return {
+        isHealthy: healthStatus.isHealthy,
+        errorCount: healthStatus.errorCount,
+        circuitBreakerState: healthStatus.circuitBreakerState,
+      }
+    })
+
+    // Perform comprehensive health check
+    const healthResult = await healthMonitor.performHealthCheck()
+
+    const statusCode =
+      healthResult.status === 'healthy' ? 200 : healthResult.status === 'degraded' ? 200 : 503
+
+    return c.json(healthResult, statusCode)
+  } catch (error) {
+    console.error('🔴 Health check error:', error)
+    return c.json(
+      {
+        status: 'unhealthy',
+        error: 'Health check failed',
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    )
+  }
+})
 
 // Export the app
 export default {

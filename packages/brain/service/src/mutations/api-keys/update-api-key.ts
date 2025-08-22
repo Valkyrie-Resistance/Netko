@@ -6,7 +6,7 @@ export const updateApiKey = async (
   userId: string,
   updates: { key?: string; isActive?: boolean },
 ) => {
-  const updateData: any = {}
+  const updateData: { encryptedKey?: string; isActive?: boolean } = {}
 
   if (updates.key) {
     updateData.encryptedKey = encrypt(updates.key)

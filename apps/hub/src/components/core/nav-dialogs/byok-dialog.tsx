@@ -39,7 +39,7 @@ export function ByokDialog({ open, onOpenChange }: ByokDialogProps) {
 
   const apiKeysByProvider = React.useMemo(() => {
     const map: Partial<Record<ModelProvider, ApiKey>> = {}
-    apiKeys.forEach((key: any) => {
+    apiKeys.forEach((key: ApiKey) => {
       map[key.provider as ModelProvider] = {
         ...key,
         lastUsedAt: key.lastUsedAt ? new Date(key.lastUsedAt) : null,
@@ -100,8 +100,9 @@ export function ByokDialog({ open, onOpenChange }: ByokDialogProps) {
         return newSet
       })
       await refetch()
-    } catch (error: any) {
-      toast.error(error.message || 'An unexpected error occurred.')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.'
+      toast.error(errorMessage)
     } finally {
       setLoadingStates((prev) => ({ ...prev, [provider]: false }))
     }

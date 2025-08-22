@@ -10,15 +10,33 @@ import { useSubscription } from '@trpc/tanstack-react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
+import { useErrorHandler } from '@/components/error-boundary'
 import { trpcHttp, trpcWs } from '@/lib/trpc'
 import { useAuth } from '@/providers/auth-provider'
 import type { ChatViewProps } from './definitions/types'
+
+// Configuration for subscription handling
+const _SUBSCRIPTION_CONFIG = {
+  RETRY_DELAY_MS: 2000,
+  MAX_RETRY_ATTEMPTS: 5,
+  RECONNECT_BACKOFF_MULTIPLIER: 1.5,
+  CONNECTION_TIMEOUT_MS: 10000,
+} as const
+
+// Enhanced subscription state
+interface SubscriptionState {
+  isConnected: boolean
+  retryCount: number
+  lastReconnectTime: number
+  consecutiveErrors: number
+}
 
 export function ChatView({ threadId, thread }: ChatViewProps) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { reportError } = useErrorHandler()
 
   // State management
   const [chatInputValue, setChatInputValue] = useState('')
@@ -28,19 +46,73 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false)
   const [lastEventId, setLastEventId] = useState<string | null>(null)
 
+  // Enhanced subscription state
+  const [subscriptionState, setSubscriptionState] = useState<SubscriptionState>({
+    isConnected: false,
+    retryCount: 0,
+    lastReconnectTime: 0,
+    consecutiveErrors: 0,
+  })
+
   // Message state for real-time updates
   const [realtimeMessages, setRealtimeMessages] = useState<UIMessage[]>([])
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null)
 
-  // Real-time subscription using TRPC with useSubscription hook
+  // Enhanced error handling for subscription
+  const handleSubscriptionError = useCallback(
+    (error: Error) => {
+      console.error('❌ Subscription error:', error)
+
+      setSubscriptionState((prev) => ({
+        ...prev,
+        isConnected: false,
+        consecutiveErrors: prev.consecutiveErrors + 1,
+      }))
+
+      // Report error with context
+      reportError(error, {
+        threadId,
+        userId: user?.id,
+        consecutiveErrors: subscriptionState.consecutiveErrors,
+        context: 'chat-subscription',
+      })
+
+      // Show user-friendly error message based on error type
+      if (error.message?.includes('UNAUTHORIZED')) {
+        toast.error('Authentication expired. Please refresh the page.')
+      } else if (error.message?.includes('timeout')) {
+        toast.error('Connection timeout. Attempting to reconnect...')
+      } else if (subscriptionState.consecutiveErrors >= 3) {
+        toast.error('Multiple connection failures. Please check your internet connection.')
+      } else {
+        toast.error('Connection lost - attempting to reconnect... 🔄')
+      }
+    },
+    [threadId, user?.id, subscriptionState.consecutiveErrors, reportError],
+  )
+
+  // Real-time subscription using TRPC with enhanced error handling
   useSubscription({
     ...trpcWs.threads.onThreadMessage.subscriptionOptions({
       threadId: threadId ?? '',
       lastEventId: lastEventId || undefined,
     }),
-    enabled: !!threadId,
+    enabled: !!threadId && !!user,
+    onStarted: () => {
+      setSubscriptionState((prev) => ({
+        ...prev,
+        isConnected: true,
+        consecutiveErrors: 0,
+      }))
+    },
     onData: (event) => {
       try {
+        // Reset error count on successful data
+        setSubscriptionState((prev) => ({
+          ...prev,
+          isConnected: true,
+          consecutiveErrors: 0,
+        }))
         switch (event.data.type) {
           case 'message_created': {
             // Add new message to realtime state
@@ -107,10 +179,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
         console.error('❌ Error processing subscription event:', error)
       }
     },
-    onError: (error) => {
-      console.error('❌ Error processing subscription event:', error)
-      toast.error('Connection lost - attempting to reconnect... 🔄')
-    },
+    onError: handleSubscriptionError,
   })
 
   // Messages come from thread prop and are updated via subscription
