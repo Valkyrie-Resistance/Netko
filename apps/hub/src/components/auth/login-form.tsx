@@ -1,3 +1,4 @@
+import { NetkoIcon } from '@netko/ui/components/core/netko-icon'
 import { Button } from '@netko/ui/components/shadcn/button'
 import {
   Card,
@@ -8,7 +9,6 @@ import {
 } from '@netko/ui/components/shadcn/card'
 import { Separator } from '@radix-ui/react-separator'
 import { useQuery } from '@tanstack/react-query'
-import { MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
 import { trpcHttp } from '@/lib/trpc'
@@ -63,10 +63,7 @@ export function LoginForm() {
     <div className="w-full max-w-md space-y-8 z-50">
       {/* Header */}
       <div className="text-center space-y-4">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-          <MessageCircle className="h-8 w-8 text-primary-foreground" />
-        </div>
-
+        <NetkoIcon className="mx-auto flex tems-center justify-center h-32 w-32 dark:invert-1 invert" />
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Netko</h1>
           <p className="text-muted-foreground text-balance">
