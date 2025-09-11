@@ -16,20 +16,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@netko/ui/components/shadcn/sidebar'
+import { useRouter } from '@tanstack/react-router'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  BadgeCheck,
-  ChevronsUpDown,
-  Database,
-  HelpCircle,
-  Key,
-  LogOut,
-  Settings,
-  Sparkles,
-} from 'lucide-react'
+import { ChevronsUpDown, Database, HelpCircle, LogOut, Settings, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import type { AuthUser } from '@/components/auth/definitions/types'
-import { ByokDialog } from '@/components/core/nav-dialogs/byok-dialog'
+// import { ByokDialog } from '@/components/core/nav-dialogs/byok-dialog'
 import { authClient } from '@/lib/auth'
 
 const menuItemVariants = {
@@ -47,9 +39,10 @@ const menuItemVariants = {
 
 export function NavUser({ user }: { user: AuthUser | null }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
   const [isHovered, setIsHovered] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const [isByokDialogOpen, setIsByokDialogOpen] = useState(false)
+  // const [isByokDialogOpen, setIsByokDialogOpen] = useState(false)
 
   if (!user) return null
 
@@ -154,27 +147,20 @@ export function NavUser({ user }: { user: AuthUser | null }) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="my-2 opacity-50" />
               <DropdownMenuGroup>
-                <motion.div
-                  variants={menuItemVariants}
-                  initial="hidden"
-                  animate="visible"
-                  custom={0}
-                >
-                  <DropdownMenuItem className="group relative cursor-pointer gap-2 rounded-md p-2 text-sm">
-                    <BadgeCheck className="size-4 transition-transform duration-300 group-hover:scale-110" />
-                    Account
-                    <span className="absolute right-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      →
-                    </span>
-                  </DropdownMenuItem>
-                </motion.div>
+                {/* Account removed - now accessible via Settings page */}
                 <motion.div
                   variants={menuItemVariants}
                   initial="hidden"
                   animate="visible"
                   custom={1}
                 >
-                  <DropdownMenuItem className="group relative cursor-pointer gap-2 rounded-md p-2 text-sm">
+                  <DropdownMenuItem
+                    className="group relative cursor-pointer gap-2 rounded-md p-2 text-sm"
+                    onClick={() => {
+                      setIsOpen(false)
+                      router.navigate({ to: '/settings' })
+                    }}
+                  >
                     <Settings className="size-4 transition-all duration-300 group-hover:rotate-90" />
                     Settings
                     <span className="absolute right-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -182,23 +168,7 @@ export function NavUser({ user }: { user: AuthUser | null }) {
                     </span>
                   </DropdownMenuItem>
                 </motion.div>
-                <motion.div
-                  variants={menuItemVariants}
-                  initial="hidden"
-                  animate="visible"
-                  custom={2}
-                >
-                  <DropdownMenuItem
-                    className="group relative cursor-pointer gap-2 rounded-md p-2 text-sm"
-                    onClick={() => setIsByokDialogOpen(true)}
-                  >
-                    <Key className="size-4 transition-transform duration-300 group-hover:scale-110" />
-                    BYOK (API Keys)
-                    <span className="absolute right-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      →
-                    </span>
-                  </DropdownMenuItem>
-                </motion.div>
+                {/* BYOK removed - now accessible via Settings page */}
               </DropdownMenuGroup>
               <DropdownMenuSeparator className="my-2 opacity-50" />
               <DropdownMenuGroup>
@@ -257,7 +227,7 @@ export function NavUser({ user }: { user: AuthUser | null }) {
           </DropdownMenu>
         </SidebarMenuItem>
       </SidebarMenu>
-      <ByokDialog open={isByokDialogOpen} onOpenChange={setIsByokDialogOpen} />
+      {/* <ByokDialog open={isByokDialogOpen} onOpenChange={setIsByokDialogOpen} /> */}
     </>
   )
 }

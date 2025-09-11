@@ -12,6 +12,7 @@ export async function genLLMMessage(
   message: string,
   model: string,
   assistantId: string,
+  webSearchEnabled = false,
 ): Promise<{ userMessage: Message; assistantMessage: Message }> {
   try {
     // 1. Create the user message first
@@ -126,8 +127,10 @@ export async function genLLMMessage(
           apiKey: decryptedApiKey,
         })
 
+        const modelNameForOpenRouter = webSearchEnabled ? `${llmModel.name}:online` : llmModel.name
+
         const result = await streamText({
-          model: openrouter(llmModel.name),
+          model: openrouter(modelNameForOpenRouter),
           system: assistant.systemPrompt,
           messages: conversationMessages,
           temperature: 0.7,

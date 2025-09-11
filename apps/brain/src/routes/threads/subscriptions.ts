@@ -25,8 +25,9 @@ export const threadsSubscriptions = router({
         )
 
         for (let i = 0; i < missedEvents.length; i += 2) {
-          const eventData = JSON.parse(missedEvents[i] ?? '')
+          const raw = JSON.parse(missedEvents[i] ?? '')
           const timestamp = missedEvents[i + 1] ?? ''
+          const eventData = normalizeEventPayload(raw)
           yield tracked(timestamp, eventData)
         }
       }
@@ -54,7 +55,11 @@ export const threadsSubscriptions = router({
         while (true) {
           let payload: { channel: string; message: string }
           if (messageQueue.length > 0) {
-            payload = messageQueue.shift()!
+            const shifted = messageQueue.shift()
+            if (!shifted) {
+              continue
+            }
+            payload = shifted
           } else {
             payload = await new Promise<{ channel: string; message: string }>((resolve) => {
               resolver = resolve
@@ -64,7 +69,8 @@ export const threadsSubscriptions = router({
           const { message } = payload
 
           try {
-            const eventData = JSON.parse(message)
+            const raw = JSON.parse(message)
+            const eventData = normalizeEventPayload(raw)
             yield tracked(eventData.timestamp.toString(), eventData)
           } catch (parseError) {
             yield tracked(Date.now().toString(), { type: 'error', parseError })
@@ -87,3 +93,31 @@ export const threadsSubscriptions = router({
     yield tracked('test', { user })
   }),
 })
+
+// Ensure all outgoing events have properly typed fields
+type EventPayload = {
+  type: 'message_created' | 'message_streaming' | 'message_completed' | 'message_error' | string
+  timestamp?: number | string
+  messageId?: string
+  content?: string
+  message?: { createdAt?: string | number | Date } & Record<string, unknown>
+  [key: string]: unknown
+}
+
+function normalizeEventPayload(event: EventPayload) {
+  const type = event?.type
+  const timestamp = Number(event?.timestamp ?? Date.now())
+  const normalized: EventPayload = { ...event, timestamp }
+
+  if (type === 'message_created' || type === 'message_completed') {
+    if (event?.message) {
+      normalized.message = {
+        ...event.message,
+        // createdAt can be ISO string or Date; normalize to Date for superjson
+        createdAt: new Date(event.message.createdAt),
+      }
+    }
+  }
+
+  return normalized
+}

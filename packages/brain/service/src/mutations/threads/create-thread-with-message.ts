@@ -8,6 +8,7 @@ export async function createThreadWithMessage(
   title: string,
   initialMessage: string,
   modelId: string,
+  webSearchEnabled = false,
 ): Promise<{
   thread: Thread
   userMessage: Message
@@ -17,7 +18,14 @@ export async function createThreadWithMessage(
   const thread = await createThread(userId, assistantId, title, modelId)
 
   // 2. Generate the initial message exchange
-  const messages = await genLLMMessage(thread.id, userId, initialMessage, modelId, assistantId)
+  const messages = await genLLMMessage(
+    thread.id,
+    userId,
+    initialMessage,
+    modelId,
+    assistantId,
+    webSearchEnabled,
+  )
 
   return {
     thread,

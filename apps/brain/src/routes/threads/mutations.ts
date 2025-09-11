@@ -11,6 +11,7 @@ export const threadsMutations = router({
         assistantId: z.string(),
         llmModel: z.string(),
         content: z.string(),
+        isWebSearchEnabled: z.boolean().default(false),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -28,6 +29,7 @@ export const threadsMutations = router({
         input.content,
         input.llmModel,
         input.assistantId,
+        input.isWebSearchEnabled,
       )
 
       return {
@@ -44,6 +46,7 @@ export const threadsMutations = router({
         content: z.string(),
         assistantId: z.string(),
         llmModel: z.string(),
+        isWebSearchEnabled: z.boolean().default(false),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -54,6 +57,7 @@ export const threadsMutations = router({
         input.content,
         input.llmModel,
         input.assistantId,
+        input.isWebSearchEnabled,
       )
 
       return {

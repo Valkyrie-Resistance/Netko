@@ -86,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         console.log('Searching conversations... 🔍')
         break
       case 'settings':
-        console.log('Opening settings... ⚙️')
+        router.navigate({ to: '/settings' })
         break
       default:
         break

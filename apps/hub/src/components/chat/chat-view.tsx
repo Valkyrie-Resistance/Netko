@@ -40,13 +40,34 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
     }),
     enabled: !!threadId,
     onData: (event) => {
+      type ThreadEventBase = {
+        type:
+          | 'message_created'
+          | 'message_streaming'
+          | 'message_completed'
+          | 'message_error'
+          | string
+        timestamp?: number | string
+      }
+      type ThreadEvent =
+        | (ThreadEventBase & {
+            messageId?: string
+            content?: string
+            message?: UIMessage | ({ createdAt?: string | number | Date } & Record<string, unknown>)
+          })
+        | { type: string; parseError: unknown }
+
       try {
-        switch (event.data.type) {
+        const data = event.data as ThreadEvent
+        switch (data.type) {
           case 'message_created': {
             // Add new message to realtime state
-            if (event.data.message) {
+            if ('message' in data && data.message) {
               const newMessage: UIMessage = {
-                ...event.data.message,
+                ...(data.message as UIMessage),
+                createdAt: new Date(
+                  (data.message as { createdAt?: string | number | Date })?.createdAt ?? Date.now(),
+                ),
                 isGenerating: false,
               }
 
@@ -68,10 +89,12 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
 
           case 'message_streaming': {
             // Update streaming message content
-            if (event.data.messageId && event.data.content !== undefined) {
+            if ('messageId' in data && data.messageId && 'content' in data) {
               setRealtimeMessages((prev) =>
                 prev.map((msg) =>
-                  msg.id === event.data.messageId ? { ...msg, content: event.data.content } : msg,
+                  msg.id === data.messageId
+                    ? { ...msg, content: (data as { content?: string }).content || '' }
+                    : msg,
                 ),
               )
             }
@@ -80,9 +103,12 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
 
           case 'message_completed': {
             // Update final message and stop generation
-            if (event.data.message) {
+            if ('message' in data && data.message) {
               const completedMessage: UIMessage = {
-                ...event.data.message,
+                ...(data.message as UIMessage),
+                createdAt: new Date(
+                  (data.message as { createdAt?: string | number | Date })?.createdAt ?? Date.now(),
+                ),
                 isGenerating: false,
               }
 
@@ -100,8 +126,8 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
         }
 
         // Update last event ID for reconnection
-        if (event.data.timestamp) {
-          setLastEventId(event.data.timestamp.toString())
+        if ('timestamp' in data && data.timestamp) {
+          setLastEventId(String(data.timestamp))
         }
       } catch (error) {
         console.error('❌ Error processing subscription event:', error)
@@ -125,6 +151,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
     if (Array.isArray(messagesToProcess) && messagesToProcess.length > 0) {
       const initialMessages: UIMessage[] = messagesToProcess.map((msg) => ({
         ...msg,
+        createdAt: new Date(msg.createdAt as unknown as string),
         isGenerating: false,
       }))
       setRealtimeMessages(initialMessages)
@@ -203,6 +230,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
           assistantId: selectedAssistant?.id || '',
           content: message,
           llmModel: selectedModelId,
+          isWebSearchEnabled,
         })
       } else {
         // Send message to existing thread
@@ -212,6 +240,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
           content: message,
           assistantId: selectedAssistant?.id || '',
           llmModel: selectedModelId,
+          isWebSearchEnabled,
         })
       }
 
@@ -222,6 +251,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
       isGenerating,
       selectedAssistant,
       selectedModelId,
+      isWebSearchEnabled,
       createThreadMutation,
       sendMessageMutation,
     ],
