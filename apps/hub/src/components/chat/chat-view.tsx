@@ -310,7 +310,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
               append={handleSuggestionClick}
             />
           </div>
-          <div className="pointer-events-none absolute left-0 right-0 bottom-0 flex justify-center w-full z-20 p-4">
+          <div className="pointer-events-none absolute left-0 right-0 bottom-0 flex justify-center w-full z-20 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
             <div className="pointer-events-auto w-full max-w-4xl mx-auto">
               <ChatInput
                 value={chatInputValue}
@@ -337,7 +337,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
         <MessagesList messages={displayMessages} userAvatar={user?.image || ''} />
         <div ref={messagesEndRef} />
       </div>
-      <div className="pointer-events-none absolute left-0 right-0 bottom-0 flex justify-center w-full z-20 p-4">
+      <div className="pointer-events-none absolute left-0 right-0 bottom-0 flex justify-center w-full z-20 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
         <div className="pointer-events-auto w-full max-w-4xl mx-auto">
           <ChatInput
             value={chatInputValue}
