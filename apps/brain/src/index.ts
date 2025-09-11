@@ -73,7 +73,7 @@ if (brainEnvConfig.app.sentryDsn) {
 
 // Serve static files
 if (!brainEnvConfig.app.dev) {
-  app.use('*', serveStatic({ root: './public' }))
+  app.use('*', serveStatic({ root: './public', }))
   app.use('*', serveStatic({ root: './public', path: 'index.html' }))
 }
 
