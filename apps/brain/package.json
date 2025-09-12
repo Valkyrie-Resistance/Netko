@@ -37,7 +37,7 @@
     "@types/ws": "^8.18.1",
     "@valkyrie-resistance/trpc-ws-hono-bun-adapter": "^0.2.1",
     "add": "^2.0.6",
-    "hono": "4.7.11",
+    "hono": "4.9.7",
     "superjson": "^2.2.2",
     "trpc-bun-adapter": "^1.3.0",
     "ws": "^8.18.2",
