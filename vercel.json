@@ -3,12 +3,12 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/ws",
-      "destination": "http://api.netko.pw/ws"
+      "source": "/ws/:match*",
+      "destination": "http://api.netko.pw/ws/:match*"
     },
     {
-      "source": "/api/:match*",
-      "destination": "http://api.netko.pw/api/:match*"
+      "source": "/api/trpc/:match*",
+      "destination": "http://api.netko.pw/api/trpc/:match*"
     },
     {
       "source": "/auth/api/:match*",
