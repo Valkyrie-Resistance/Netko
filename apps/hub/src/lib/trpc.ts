@@ -9,12 +9,17 @@ export const queryClient = new QueryClient()
 
 //* TRPC HTTP Client
 const trpcHttpClient = createTRPCClient<AppRouter>({
-  links: [httpBatchLink({ url: '/api/trpc', transformer: superjson })],
+  links: [
+    httpBatchLink({
+      url: import.meta.env.VITE_API_URL ?? '' + '/api/trpc',
+      transformer: superjson,
+    }),
+  ],
 })
 
 //* WS Client
 export const wsClient = createWSClient({
-  url: '/ws',
+  url: import.meta.env.VITE_WS_API_URL ?? '' + '/ws',
   connectionParams: async () => {
     // Always attempt to refresh/get the current session via Better Auth
     // This ensures a fresh ws JWT is set into localStorage by onResponse()
