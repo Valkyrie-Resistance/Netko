@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/ws",
+      "destination": "http://api.netko.pw/ws"
+    },
+    {
+      "source": "/api/:match*",
+      "destination": "http://api.netko.pw/api/:match*"
+    },
+    {
+      "source": "/auth/api/:match*",
+      "destination": "http://api.netko.pw/auth/api/:match*"
+    }
+  ]
+}
