@@ -3,6 +3,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    },
+    {
       "source": "/ws/:match*",
       "destination": "http://api.netko.pw/ws/:match*"
     },
