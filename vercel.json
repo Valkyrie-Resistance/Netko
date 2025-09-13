@@ -3,20 +3,20 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    },
-    {
       "source": "/ws/:match*",
       "destination": "https://api.netko.pw/ws/:match*"
     },
     {
-      "source": "/api/trpc/:match*",
-      "destination": "https://api.netko.pw/api/trpc/:match*"
+      "source": "/api/:match*",
+      "destination": "https://api.netko.pw/api/:match*"
     },
     {
       "source": "/auth/api/:match*",
       "destination": "https://api.netko.pw/auth/api/:match*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
