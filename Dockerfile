@@ -1,7 +1,5 @@
 FROM oven/bun:slim
 
-ARG VITE_SENTRY_DSN
-
 WORKDIR /app
 
 # openssl and ca-certificates
