@@ -8,15 +8,15 @@
     },
     {
       "source": "/ws/:match*",
-      "destination": "http://api.netko.pw/ws/:match*"
+      "destination": "https://api.netko.pw/ws/:match*"
     },
     {
       "source": "/api/trpc/:match*",
-      "destination": "http://api.netko.pw/api/trpc/:match*"
+      "destination": "https://api.netko.pw/api/trpc/:match*"
     },
     {
       "source": "/auth/api/:match*",
-      "destination": "http://api.netko.pw/auth/api/:match*"
+      "destination": "https://api.netko.pw/auth/api/:match*"
     }
   ]
 }
