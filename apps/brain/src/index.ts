@@ -6,7 +6,6 @@ import { auth, seed } from '@netko/brain-service'
 import * as Sentry from '@sentry/bun'
 import { createBunHonoWSHandler } from '@valkyrie-resistance/trpc-ws-hono-bun-adapter'
 import { Hono } from 'hono'
-import { serveStatic } from 'hono/bun'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { createContext, createWsContext } from './lib/trpc'
@@ -69,12 +68,6 @@ app.use(
 // Sentry middleware
 if (brainEnvConfig.app.sentryDsn) {
   app.use('*', sentry({ dsn: brainEnvConfig.app.sentryDsn }))
-}
-
-// Serve static files
-if (!brainEnvConfig.app.dev) {
-  app.use('*', serveStatic({ root: './public' }))
-  app.use('*', serveStatic({ root: './public', path: 'index.html' }))
 }
 
 // Global error handler

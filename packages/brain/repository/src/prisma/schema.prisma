@@ -22,20 +22,21 @@ enum ModelProvider {
 }
 
 model User {
-  id            String       @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-  threads       Thread[]
-  assistant     Assistant[]
-  message       Message[]
-  sharedChat    SharedChat[]
-  apiKeys       UserApiKey[]
+  id             String       @id
+  name           String
+  email          String
+  emailVerified  Boolean
+  image          String?
+  createdAt      DateTime
+  updatedAt      DateTime
+  sessions       Session[]
+  accounts       Account[]
+  threads        Thread[]
+  assistant      Assistant[]
+  message        Message[]
+  sharedChat     SharedChat[]
+  apiKeys        UserApiKey[]
+  authoredModels LLMModel[]   @relation("LLMModelAuthor")
 
   @@unique([email])
   @@map("user")
@@ -112,7 +113,10 @@ model LLMModel {
   displayName String // User-friendly name
   description String? // Model capabilities/description
   isActive    Boolean       @default(true)
-  isDefault   Boolean       @default(false) // Default model for provider
+  isPublic    Boolean       @default(false)
+
+  authorId String?
+  author   User?   @relation("LLMModelAuthor", fields: [authorId], references: [id])
 
   messages Message[]
   threads  Thread[]

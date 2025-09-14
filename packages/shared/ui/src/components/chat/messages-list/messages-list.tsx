@@ -21,7 +21,6 @@ export const MessagesList = React.forwardRef<HTMLDivElement, MessagesListProps>(
   const internalRef = React.useRef<HTMLDivElement>(null)
   const scrollRef = containerRef || internalRef
   const [autoScroll, setAutoScroll] = React.useState(true) // true when anchored to latest
-  const [isUserScrolling, setIsUserScrolling] = React.useState(false)
 
   // Ensure initial render starts at latest (bottom in visual order)
   React.useEffect(() => {
@@ -45,11 +44,9 @@ export const MessagesList = React.forwardRef<HTMLDivElement, MessagesListProps>(
     let scrollTimeout: NodeJS.Timeout
 
     const handleScroll = () => {
-      setIsUserScrolling(true)
       clearTimeout(scrollTimeout)
       
       scrollTimeout = setTimeout(() => {
-        setIsUserScrolling(false)
         // In column-reverse, scrollTop near 0 means anchored to latest (bottom)
         const { scrollTop } = element
         const isAtLatest = scrollTop <= 10
@@ -117,27 +114,7 @@ export const MessagesList = React.forwardRef<HTMLDivElement, MessagesListProps>(
           ))}
         </AnimatePresence>
 
-        {/* Scroll to latest indicator */}
-        {!autoScroll && !isUserScrolling && (
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            onClick={() => {
-              if (scrollRef.current) {
-                scrollRef.current.scrollTop = 0
-                setAutoScroll(true)
-              }
-            }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 backdrop-blur-md bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/10 rounded-full p-2 shadow-lg hover:bg-white/30 dark:hover:bg-black/30 transition-all duration-200"
-            style={{ transform: 'scaleY(-1)' }}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-            <span className="sr-only">Scroll to latest</span>
-          </motion.button>
-        )}
+        {/* Scroll to latest indicator removed */}
 
         {/* Generating indicator near bottom */}
         {isGenerating && (

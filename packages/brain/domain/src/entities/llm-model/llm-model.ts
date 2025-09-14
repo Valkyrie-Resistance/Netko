@@ -10,6 +10,8 @@ export const LLMModelSchema = z.object({
   provider: z.string(),
   displayName: z.string(),
   isActive: z.boolean(),
+  isPublic: z.boolean(),
+  authorId: z.string().nullish(),
 })
 
 export type LLMModel = z.infer<typeof LLMModelSchema>

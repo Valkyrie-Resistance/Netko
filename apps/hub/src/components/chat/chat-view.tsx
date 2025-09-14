@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { BarsSpinner } from '@/components/core/spinner/bars-spinner'
 import { trpcHttp, trpcWs } from '@/lib/trpc'
 import { useAuth } from '@/providers/auth-provider'
+import { useChatStore, useCurrentLLMModel, useWebSearchEnabled } from '@/stores/chat'
 import type { ChatViewProps } from './definitions/types'
 
 export function ChatView({ threadId, thread }: ChatViewProps) {
@@ -23,10 +24,15 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
   // State management
   const [chatInputValue, setChatInputValue] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [selectedModelId, setSelectedModelId] = useState<string>('')
   const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
-  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false)
   const [lastEventId, setLastEventId] = useState<string | null>(null)
+
+  // Persisted store-backed selections
+  const currentLLMModel = useCurrentLLMModel()
+  const selectedModelId = currentLLMModel?.id || ''
+  const isWebSearchEnabled = useWebSearchEnabled()
+  const setCurrentLLMModel = useChatStore((s) => s.setCurrentLLMModel)
+  const setWebSearchEnabled = useChatStore((s) => s.setWebSearchEnabled)
 
   // Message state for real-time updates
   const [realtimeMessages, setRealtimeMessages] = useState<UIMessage[]>([])
@@ -122,6 +128,13 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
             break
           }
 
+          case 'message_error': {
+            setStreamingMessageId(null)
+            setIsGenerating(false)
+            toast.error('Generation failed. Please try again.')
+            break
+          }
+
           default:
         }
 
@@ -197,14 +210,17 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
     }),
   )
 
-  // Initialize selected model and assistant - optimize by using thread data
+  // Initialize selected model from store or default to first available
   useEffect(() => {
-    if (llmModels.length > 0 && !selectedModelId) {
-      // Use first available model as default
-      const defaultModelId = llmModels[0]?.id || ''
-      setSelectedModelId(defaultModelId)
+    if (llmModels.length === 0) return
+    const storeModelId = currentLLMModel?.id
+    const storeModelExists = storeModelId ? llmModels.some((m) => m.id === storeModelId) : false
+
+    if (!storeModelExists) {
+      const firstModel = llmModels[0]
+      if (firstModel) setCurrentLLMModel(firstModel)
     }
-  }, [llmModels, selectedModelId])
+  }, [llmModels, currentLLMModel, setCurrentLLMModel])
 
   useEffect(() => {
     if (assistants.length > 0 && !selectedAssistant) {
@@ -221,16 +237,47 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
     (message: string) => {
       if (!message.trim() || isGenerating) return
 
+      // Resolve assistant fallback
+      const resolvedAssistant: Assistant | null =
+        selectedAssistant ||
+        thread?.assistant ||
+        assistants.find((a) => a.isPublic) ||
+        assistants[0] ||
+        null
+
+      // Ensure assistant state reflects resolved value
+      if (!selectedAssistant && resolvedAssistant) {
+        setSelectedAssistant(resolvedAssistant)
+      }
+
+      // Resolve model fallback from store or first available
+      const resolvedModel =
+        (selectedModelId && llmModels.find((m) => m.id === selectedModelId)) || llmModels[0]
+
+      if (!resolvedAssistant || !resolvedModel) {
+        toast.error('Missing assistant or model selection. Please pick both and try again.')
+        return
+      }
+
+      // Sync store with resolved model if store was empty
+      if (!currentLLMModel || currentLLMModel.id !== resolvedModel.id) {
+        setCurrentLLMModel(resolvedModel)
+      }
+
+      const payload = {
+        assistantId: resolvedAssistant.id,
+        llmModel: resolvedModel.id,
+        isWebSearchEnabled,
+      }
+
       if (!threadId) {
         // Create new thread with this message
         setIsGenerating(true)
         createThreadMutation.mutate({
           title: message.slice(0, 50),
           description: message,
-          assistantId: selectedAssistant?.id || '',
           content: message,
-          llmModel: selectedModelId,
-          isWebSearchEnabled,
+          ...payload,
         })
       } else {
         // Send message to existing thread
@@ -238,9 +285,7 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
         sendMessageMutation.mutate({
           threadId,
           content: message,
-          assistantId: selectedAssistant?.id || '',
-          llmModel: selectedModelId,
-          isWebSearchEnabled,
+          ...payload,
         })
       }
 
@@ -251,16 +296,23 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
       isGenerating,
       selectedAssistant,
       selectedModelId,
+      currentLLMModel,
+      assistants,
+      llmModels,
       isWebSearchEnabled,
       createThreadMutation,
       sendMessageMutation,
+      setCurrentLLMModel,
     ],
   )
 
   // Handle LLM model change
-  const handleLLMModelChange = useCallback((model: LLMModel) => {
-    setSelectedModelId(model.id)
-  }, [])
+  const handleLLMModelChange = useCallback(
+    (model: LLMModel) => {
+      setCurrentLLMModel(model)
+    },
+    [setCurrentLLMModel],
+  )
 
   // Handle file attachments (placeholder for now)
   const handleFilesSelected = useCallback((files: FileList) => {
@@ -268,9 +320,12 @@ export function ChatView({ threadId, thread }: ChatViewProps) {
   }, [])
 
   // Handle web search toggle
-  const handleWebSearchToggle = useCallback((enabled: boolean) => {
-    setIsWebSearchEnabled(enabled)
-  }, [])
+  const handleWebSearchToggle = useCallback(
+    (enabled: boolean) => {
+      setWebSearchEnabled(enabled)
+    },
+    [setWebSearchEnabled],
+  )
 
   // Handle suggestion clicks for new chat
   const handleSuggestionClick = useCallback((message: { role: 'user'; content: string }) => {
