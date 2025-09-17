@@ -12,6 +12,6 @@ RUN bun install turbo --global
 RUN bun install --frozen-lockfile
 
 RUN turbo db:generate
-RUN turbo build
+RUN turbo build --filter=./apps/brain
 
 CMD ["bun", "run", "--filter", "./apps/brain", "prod:release"]
