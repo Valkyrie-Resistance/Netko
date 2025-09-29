@@ -10,7 +10,6 @@ const brainConfig: BrainConfig = {
     baseUrl: process.env.BASE_URL,
     port: Number(process.env.PORT),
     cors: process.env.CORS?.split(',') ?? undefined,
-    sentryDsn: process.env.SENTRY_DSN,
     encryptionKey: process.env.ENCRYPTION_KEY,
   },
   cache: {
