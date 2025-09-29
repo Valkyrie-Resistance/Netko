@@ -9,20 +9,20 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.0.0",
-    "turbo": "^2.5.4",
-    "typescript": "5.8.2",
+    "@biomejs/biome": "2.2.4",
+    "turbo": "^2.5.8",
+    "typescript": "5.9.2",
     "@types/bun": "latest"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "bun@1.2.14",
+  "packageManager": "bun@1.2.23",
   "workspaces": [
     "apps/*",
     "packages/shared/*",
     "packages/clients/*",
-    "packages/brain/*",
+    "packages/claw/*",
     "packages/configs/*"
   ]
 }

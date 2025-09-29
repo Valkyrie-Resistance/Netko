@@ -1,0 +1,16 @@
+{
+  "name": "@netko/claw-domain",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "zod": "^3.25.58"
+  }
+}

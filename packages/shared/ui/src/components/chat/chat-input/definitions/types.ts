@@ -1,4 +1,4 @@
-import type { LLMModel } from '@netko/brain-domain'
+import type { LLMModel } from '@netko/claw-domain'
 import type * as React from 'react'
 
 export interface ChatInputProps {

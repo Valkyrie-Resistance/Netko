@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@netko/ui/components/shadcn
 import { ReasoningBlock } from './reasoning-block'
 import { MessageActions } from './message-actions'
 import type { MessageBubbleProps } from './definitions/types'
-import { MessageRoleEnum } from '@netko/brain-domain'
+import { MessageRoleEnum } from '@netko/claw-domain'
 import { MarkdownContent } from './markdown-content'
 
 const MessageBubbleComponent = ({

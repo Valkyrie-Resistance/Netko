@@ -1,5 +1,5 @@
 import type * as React from 'react'
-import type { Message } from '@netko/brain-domain'
+import type { Message } from '@netko/claw-domain'
 
 // Use DomainMessage with minimal UI extensions
 export interface UIMessage extends Message {

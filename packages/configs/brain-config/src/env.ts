@@ -1,4 +1,4 @@
-import { type BrainConfig, BrainConfigSchema } from '@netko/brain-domain'
+import { type BrainConfig, BrainConfigSchema } from '@netko/claw-domain'
 
 const isEnabled = (args: (string | undefined)[]): boolean => {
   return args.every((arg) => arg !== undefined && arg !== '')
