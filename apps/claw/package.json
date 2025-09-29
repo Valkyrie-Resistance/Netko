@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "bun run dev:setup && vite dev --port 3000",
     "start": "bun .output/server/index.mjs",
-    "build": "vite build",
+    "build": "NODE_ENV=production vite build",
     "serve": "vite preview",
-    "prod:release": "bun run prod:setup && bun run start",
-    "prod:setup": "bun run db:generate && bun run db:deploy",
-    "dev:setup": "bun run db:generate && bun run db:migrate",
-    "db:generate": "bun run --filter @netko/claw-repository db:generate",
+    "prod:release": "NODE_ENV=production bun run prod:setup && bun run start",
+    "prod:setup": "bun run db:generate && bun run db:deploy && bun run prod:db:seed",
+    "dev:setup": "bun run db:generate && bun run db:migrate && bun run dev:db:seed",
+    "prod:db:seed": "bun run --filter @netko/claw-repository db:seed",
+    "dev:db:seed": "bun run --env-file=../../../apps/claw/.env --cwd ../../packages/claw/repository db:seed",
     "db:migrate": "bun run --env-file=../../../apps/claw/.env --cwd ../../packages/claw/repository db:migrate",
+    "db:generate": "bun run --filter @netko/claw-repository db:generate",
     "db:deploy": "bun run --filter @netko/claw-repository db:deploy"
   },
   "dependencies": {

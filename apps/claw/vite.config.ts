@@ -5,17 +5,17 @@ import { nitro } from 'nitro/vite'
 import { defineConfig } from 'vite'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 
-const config = defineConfig({
-  plugins: [
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
-    tailwindcss(),
-    tanstackStart(),
-    nitro(),
-    viteReact(),
-  ],
+export default defineConfig(() => {
+  const isProduction = process.env.NODE_ENV === 'production'
+  return {
+    plugins: [
+      viteTsConfigPaths({
+        projects: ['./tsconfig.json'],
+      }),
+      tailwindcss(),
+      tanstackStart(),
+      ...(isProduction ? [nitro({ config: { preset: 'bun' } })] : []),
+      viteReact(),
+    ],
+  }
 })
-
-export default config

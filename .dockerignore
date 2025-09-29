@@ -3,3 +3,9 @@ bun_modules
 dist
 public
 generated
+.output
+.turbo
+.tanstack
+.git
+.github
+.vscode

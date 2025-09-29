@@ -1,8 +1,5 @@
 {
   "extends": "@netko/typescript-config/bun.json",
-  "compilerOptions": {
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
-  }
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
