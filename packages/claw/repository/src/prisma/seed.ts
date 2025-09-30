@@ -1,13 +1,11 @@
-import { brainEnvConfig } from '@netko/claw-config'
 import { prisma } from './client'
 
 const seed = async () => {
   try {
-    console.log('Seeding database...')
-    // Use a more reliable path resolution for Docker containers
-    const marvinPromptPath = !brainEnvConfig.app.dev
-      ? '/app/packages/brain/repository/src/files/assistans/marvin.md'
-      : new URL('../../../repository/src/files/assistans/marvin.md', import.meta.url).pathname
+    const marvinPromptPath = new URL(
+      '../../../repository/src/files/assistants/marvin.md',
+      import.meta.url,
+    ).pathname
 
     const marvinPrompt = await Bun.file(marvinPromptPath).text()
 
